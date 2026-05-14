@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stone Rock Studios — Seed Database</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #f0f0f0; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 40px; max-width: 700px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .sub { font-size: 13px; color: #555; margin-bottom: 32px; line-height: 1.6; }
+  .warning { background: #1a0800; border: 1px solid #3a1500; padding: 14px 18px; margin-bottom: 24px; font-size: 12px; color: #f59e0b; line-height: 1.6; }
+  .btn { padding: 12px 28px; background: #f0f0f0; color: #000; border: none; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; font-family: inherit; border-radius: 2px; }
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-red { background: #ef4444; color: #fff; }
+  .log { background: #111; border: 1px solid #222; padding: 16px; margin-top: 24px; font-family: monospace; font-size: 12px; line-height: 1.8; max-height: 400px; overflow-y: auto; display: none; }
+  .log-line { display: block; }
+  .log-line.ok { color: #22c55e; }
+  .log-line.err { color: #ef4444; }
+  .log-line.info { color: #f59e0b; }
+  .log-line.muted { color: #555; }
+  .progress { margin-top: 16px; font-size: 12px; color: #555; display: none; }
+  .done-msg { background: #001a08; border: 1px solid #003010; padding: 14px 18px; margin-top: 20px; font-size: 13px; color: #22c55e; display: none; }
+</style>
+</head>
+<body>
+<h1>Database Seeder</h1>
+<p class="sub">This tool pulls all videos from both YouTube accounts, detects portrait vs landscape, and writes them to your Firebase database. Run this once to get started. After seeding, use the Admin dashboard to manage everything.</p>
+
+<div class="warning">⚠️ This will OVERWRITE all existing videos in Firebase. Only run this once, or if you want to completely reset your database from YouTube.</div>
+
+<div style="display:flex;gap:10px">
+  <button class="btn" id="seedBtn" onclick="startSeed()">Seed Database</button>
+  <button class="btn btn-red" id="clearBtn" onclick="clearDatabase()">Clear Database</button>
+</div>
+
+<div class="progress" id="progress">Fetching videos...</div>
+<div class="log" id="log"></div>
+<div class="done-msg" id="doneMsg">✓ Database seeded successfully! You can now go to <a href="/admin.html" style="color:#22c55e">admin.html</a> to manage your videos, or <a href="/index.html" style="color:#22c55e">index.html</a> to see the site.</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyA5K470Y9UJjN6Y-iMf2w26dMhMJkWnbjE",
+  authDomain: "stonerockstudios.firebaseapp.com",
+  databaseURL: "https://stonerockstudios-default-rtdb.firebaseio.com",
+  projectId: "stonerockstudios",
+  storageBucket: "stonerockstudios.firebasestorage.app",
+  messagingSenderId: "342963187170",
+  appId: "1:342963187170:web:90f566d8f3f9135168ddbb"
+});
+
+const auth = firebase.auth();
+const db = firebase.database();
+const YT_KEY = 'AIzaSyDygMoFQUoRfeJ2egkA9HjGBfPHSs58sgw';
+
+const PLAYLISTS = [
+  { cat: 'moto',        label: 'Moto',          ids: ['PLKKIx2uUhNZmucMQgeedqY3sGzByBTKt3', 'PLTiOUGPx2LkJak7RAUM9psXgFFtqWfuHx'] },
+  { cat: 'food',        label: 'Food & Drink',   ids: ['PLKKIx2uUhNZlbOlAB_T3bbKSJ-Kusd8uf', 'PLTiOUGPx2LkLJj6dxJmDeq-ShBbwdQEXs'] },
+  { cat: 'lifestyle',   label: 'Lifestyle',      ids: ['PLKKIx2uUhNZmMm0k2YIufDWG-QSV4SdFO', 'PLTiOUGPx2LkJzXgPKaYnDlVI0hcimsNyX'] },
+  { cat: 'documentary', label: 'Documentary',    ids: ['PLKKIx2uUhNZllU3zHXj-xBKev0YjpRLUS', 'PLTiOUGPx2LkL1RkOiYEwa2XV6BYmUESh7'] },
+  { cat: 'events',      label: 'Event Coverage', ids: ['PLKKIx2uUhNZmGVgPsUJF7TQTHZlWfIedX', 'PLTiOUGPx2LkLi2CyIrBJT9A5vEFbDBQSK'] },
+  { cat: 'realestate',  label: 'Real Estate',    ids: ['PLKKIx2uUhNZl5WNoNDjf15dTGHXwsWfyX', 'PLTiOUGPx2LkIn5fBnG8aKUxj3xDAz7iZu'] },
+  { cat: 'reels',       label: 'Social Reels',   ids: ['PLKKIx2uUhNZnBzeNDmCB_l6XMcuitfe87', 'PLTiOUGPx2LkL1-OcGblIKk91TAJllEGWe'] },
+  { cat: 'music',       label: 'Music Videos',   ids: ['PLKKIx2uUhNZlbrnRSzIysGr-9bk8Iqz3A', 'PLTiOUGPx2LkLbASQmGZ4VzgUFc4RBTCsF'] },
+];
+
+function log(msg, type='') {
+  const logEl = document.getElementById('log');
+  logEl.style.display = 'block';
+  const line = document.createElement('span');
+  line.className = `log-line ${type}`;
+  line.textContent = msg;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function parseDuration(iso) {
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!m) return 0;
+  return (parseInt(m[1]||0)*3600)+(parseInt(m[2]||0)*60)+parseInt(m[3]||0);
+}
+
+function isPortrait(detail) {
+  const t = detail.snippet?.thumbnails;
+  const dur = parseDuration(detail.contentDetails?.duration || 'PT0S');
+  const th = t?.maxres || t?.standard || t?.high || t?.medium;
+  return (th && th.width && th.height && th.height > th.width) || (dur > 0 && dur <= 180);
+}
+
+async function fetchPlaylist(id) {
+  try {
+    const r = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${id}&key=${YT_KEY}`);
+    const d = await r.json();
+    return (d.items||[]).filter(v => v.snippet.resourceId?.videoId);
+  } catch(e) { return []; }
+}
+
+async function fetchDetails(ids) {
+  const map = {};
+  for (let i = 0; i < ids.length; i += 50) {
+    try {
+      const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${ids.slice(i,i+50).join(',')}&key=${YT_KEY}`);
+      const d = await r.json();
+      (d.items||[]).forEach(v => map[v.id] = v);
+    } catch(e) {}
+  }
+  return map;
+}
+
+async function signInForSeed() {
+  // Sign in anonymously just enough to write
+  const email = prompt('Enter admin email to authenticate:');
+  const pass = prompt('Enter admin password:');
+  await auth.signInWithEmailAndPassword(email, pass);
+}
+
+async function startSeed() {
+  document.getElementById('seedBtn').disabled = true;
+  document.getElementById('clearBtn').disabled = true;
+  document.getElementById('log').innerHTML = '';
+  document.getElementById('doneMsg').style.display = 'none';
+  document.getElementById('progress').style.display = 'block';
+
+  try {
+    log('Signing in...', 'info');
+    const email = prompt('Admin email:');
+    const pass = prompt('Admin password:');
+    await auth.signInWithEmailAndPassword(email, pass);
+    log('✓ Authenticated\n', 'ok');
+
+    log('Fetching all playlists...\n', 'info');
+
+    // Fetch all playlists
+    const results = await Promise.all(PLAYLISTS.map(async p => {
+      const all = (await Promise.all(p.ids.map(async id => {
+        const items = await fetchPlaylist(id);
+        log(`  Fetched ${items.length} videos from playlist ${id.slice(0,20)}...\n`, 'muted');
+        return items;
+      }))).flat();
+      const seen = new Set();
+      const unique = all.filter(v => {
+        const id = v.snippet.resourceId.videoId;
+        if(seen.has(id)) return false; seen.add(id); return true;
+      });
+      log(`${p.label}: ${unique.length} unique videos\n`, 'ok');
+      return { ...p, items: unique };
+    }));
+
+    // Interleave round-robin
+    const maxLen = Math.max(...results.map(r => r.items.length), 0);
+    const interleaved = [];
+    for (let i = 0; i < maxLen; i++) {
+      for (const r of results) {
+        if (r.items[i]) interleaved.push({ cat: r.cat, label: r.label, item: r.items[i] });
+      }
+    }
+
+    log(`\nTotal videos: ${interleaved.length}\n`, 'info');
+    log('Fetching video details (portrait detection)...\n', 'info');
+
+    const allIds = interleaved.map(v => v.item.snippet.resourceId.videoId);
+    const detailMap = await fetchDetails(allIds);
+    log(`✓ Got details for ${Object.keys(detailMap).length} videos\n`, 'ok');
+
+    // Build final video objects
+    const toSave = {};
+    interleaved.forEach(({ cat, label, item }, i) => {
+      const videoId = item.snippet.resourceId.videoId;
+      const detail = detailMap[videoId];
+      const thumbs = detail?.snippet?.thumbnails || item.snippet.thumbnails;
+      const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      const title = detail?.snippet?.title || item.snippet.title;
+      const portrait = detail ? isPortrait(detail) : false;
+      const duration = detail ? parseDuration(detail.contentDetails?.duration || 'PT0S') : 0;
+
+      toSave[videoId] = {
+        videoId,
+        title,
+        thumbnail: thumb,
+        category: cat,
+        categoryLabel: label,
+        portrait,
+        featured: false,
+        visible: true,
+        order: i,
+        duration,
+        addedAt: Date.now()
+      };
+    });
+
+    log(`\nWriting ${Object.keys(toSave).length} videos to Firebase...\n`, 'info');
+    await db.ref('videos').set(toSave);
+    log('✓ Database seeded successfully!\n', 'ok');
+
+    document.getElementById('doneMsg').style.display = 'block';
+    document.getElementById('progress').style.display = 'none';
+
+  } catch(e) {
+    log(`\n✕ Error: ${e.message}\n`, 'err');
+    console.error(e);
+  }
+
+  document.getElementById('seedBtn').disabled = false;
+  document.getElementById('clearBtn').disabled = false;
+}
+
+async function clearDatabase() {
+  if (!confirm('This will DELETE ALL VIDEOS from Firebase. Are you sure?')) return;
+  try {
+    const email = prompt('Admin email:');
+    const pass = prompt('Admin password:');
+    await auth.signInWithEmailAndPassword(email, pass);
+    await db.ref('videos').remove();
+    log('✓ Database cleared.\n', 'ok');
+  } catch(e) {
+    log(`✕ Error: ${e.message}\n`, 'err');
+  }
+}
+</script>
+</body>
+</html>

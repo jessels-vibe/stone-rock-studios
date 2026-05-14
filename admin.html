@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stone Rock Studios — Admin</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --black: #0a0a0a; --surface: #111; --surface2: #181818;
+    --border: #222; --text: #f0f0f0; --muted: #555;
+    --green: #22c55e; --red: #ef4444; --yellow: #f59e0b;
+  }
+  html, body { background: var(--black); color: var(--text); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+  /* LOGIN */
+  .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .login-box { width: 360px; padding: 40px; background: var(--surface); border: 1px solid var(--border); }
+  .login-logo { font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .login-sub { font-size: 11px; color: var(--muted); margin-bottom: 32px; }
+  .login-label { font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; }
+  .login-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-size: 13px; padding: 10px 14px; font-family: inherit; outline: none; margin-bottom: 16px; border-radius: 2px; }
+  .login-input:focus { border-color: #444; }
+  .login-btn { width: 100%; background: var(--text); color: var(--black); border: none; padding: 11px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; font-family: inherit; border-radius: 2px; }
+  .login-btn:hover { opacity: 0.85; }
+  .login-error { font-size: 11px; color: var(--red); margin-top: 12px; display: none; }
+
+  /* APP */
+  .app { display: none; }
+  .app.visible { display: flex; flex-direction: column; height: 100vh; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 52px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .nav-left { display: flex; align-items: center; gap: 14px; }
+  .nav-logo { font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .nav-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; background: #1e1e1e; color: var(--muted); padding: 3px 8px; border-radius: 2px; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .btn { padding: 7px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border: none; font-family: inherit; border-radius: 2px; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.8; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-primary { background: var(--text); color: var(--black); }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-danger { background: var(--red); color: #fff; }
+
+  /* BODY */
+  .body { display: flex; flex: 1; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar { width: 210px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; overflow-y: auto; }
+  .sidebar-label { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); padding: 0 20px; margin-bottom: 6px; margin-top: 20px; }
+  .sidebar-label:first-child { margin-top: 0; }
+  .sidebar-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 20px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.12s; }
+  .sidebar-item:hover { color: var(--text); background: var(--surface2); }
+  .sidebar-item.active { color: var(--text); background: var(--surface2); border-left: 2px solid var(--text); padding-left: 18px; }
+  .sidebar-count { font-size: 10px; background: #1e1e1e; color: var(--muted); padding: 2px 7px; border-radius: 10px; }
+  .sidebar-item.active .sidebar-count { color: var(--text); }
+
+  /* MAIN */
+  .main { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+  /* SAVE BAR */
+  .save-bar { display: flex; align-items: center; justify-content: space-between; background: #1a1500; border: 1px solid #3a2a00; padding: 10px 16px; margin-bottom: 16px; border-radius: 2px; }
+  .save-bar-text { font-size: 11px; color: var(--yellow); font-weight: 500; display: flex; align-items: center; gap: 8px; }
+  .save-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); display: inline-block; }
+  .save-bar-actions { display: flex; gap: 8px; }
+
+  /* STATS */
+  .stats-bar { display: flex; gap: 2px; margin-bottom: 20px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); padding: 14px 18px; flex: 1; }
+  .stat-num { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3px; }
+  .stat-label { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .toolbar-title { font-size: 14px; font-weight: 700; }
+  .toolbar-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .search-input { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 12px; padding: 8px 14px; font-family: inherit; outline: none; border-radius: 2px; width: 260px; }
+  .search-input:focus { border-color: #444; }
+  .search-input::placeholder { color: var(--muted); }
+
+  /* VIDEO LIST */
+  .video-list { display: flex; flex-direction: column; gap: 2px; }
+  .video-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); padding: 9px 12px; cursor: default; transition: background 0.12s; user-select: none; }
+  .video-row:hover { background: var(--surface2); }
+  .video-row.dragging { opacity: 0.35; }
+  .video-row.drag-over { border-color: var(--text); }
+  .video-row.hidden-row { opacity: 0.4; }
+  .drag-handle { color: #2a2a2a; font-size: 14px; cursor: grab; flex-shrink: 0; padding: 0 2px; }
+  .drag-handle:hover { color: var(--muted); }
+  .video-order { font-size: 11px; font-weight: 700; color: #333; width: 20px; text-align: right; flex-shrink: 0; }
+  .video-thumb { width: 76px; height: 43px; flex-shrink: 0; background: #1a1a1a; overflow: hidden; border: 1px solid var(--border); }
+  .video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-thumb.portrait-thumb { width: 24px; height: 43px; }
+  .video-info { flex: 1; min-width: 0; }
+  .video-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+  .video-id { font-size: 10px; color: #333; font-family: monospace; }
+  .cat-select { background: #1a1a1a; border: 1px solid var(--border); color: var(--text); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 8px; font-family: inherit; cursor: pointer; border-radius: 2px; outline: none; }
+  .cat-select:hover { border-color: #444; }
+  .toggle-group { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  .toggle-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 9px; border-radius: 2px; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; white-space: nowrap; }
+  .t-feat { background: #1e1600; color: #554000; border-color: #2a1e00; }
+  .t-feat.on { background: var(--yellow); color: #000; border-color: var(--yellow); }
+  .t-vis { background: #001208; color: #004020; border-color: #001a0a; }
+  .t-vis.on { background: var(--green); color: #000; border-color: var(--green); }
+  .t-hide { background: #1a0000; color: var(--red); border-color: #2a0000; }
+  .delete-btn { color: #2a2a2a; font-size: 13px; cursor: pointer; padding: 4px; flex-shrink: 0; transition: color 0.12s; background: none; border: none; font-size: 14px; }
+  .delete-btn:hover { color: var(--red); }
+
+  /* ADD MODAL */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 300; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal-bg.open { opacity: 1; pointer-events: all; }
+  .modal-box { width: 480px; background: var(--surface); border: 1px solid var(--border); padding: 28px; }
+  .modal-title { font-size: 14px; font-weight: 700; margin-bottom: 20px; }
+  .field-label { font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 7px; }
+  .field-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-size: 13px; padding: 9px 12px; font-family: inherit; outline: none; margin-bottom: 16px; border-radius: 2px; }
+  .field-input:focus { border-color: #444; }
+  .preview-card { display: flex; gap: 12px; align-items: flex-start; padding: 12px; background: var(--surface2); border: 1px solid var(--border); margin-bottom: 16px; }
+  .preview-thumb { width: 90px; height: 51px; background: #1a1a1a; flex-shrink: 0; overflow: hidden; }
+  .preview-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .preview-info { flex: 1; }
+  .preview-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .preview-meta { font-size: 10px; color: var(--muted); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">Stone Rock Studios</div>
+    <div class="login-sub">Admin Dashboard</div>
+    <label class="login-label">Email</label>
+    <input class="login-input" type="email" id="loginEmail" value="admin@stonerockstudios.xyz" placeholder="admin@stonerockstudios.xyz">
+    <label class="login-label">Password</label>
+    <input class="login-input" type="password" id="loginPassword" placeholder="••••••••">
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="loginError">Incorrect email or password.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <nav>
+    <div class="nav-left">
+      <span class="nav-logo">Stone Rock Studios</span>
+      <span class="nav-badge">Admin</span>
+    </div>
+    <div class="nav-right">
+      <button class="btn btn-ghost" onclick="window.open('https://stonerockstudios.xyz','_blank')">↗ View Site</button>
+      <button class="btn btn-ghost" onclick="doSignOut()">Sign Out</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveToFirebase()">Save Changes</button>
+    </div>
+  </nav>
+
+  <div class="body">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-label">Categories</div>
+      <div class="sidebar-item active" data-filter="all" onclick="sidebarFilter('all',this)">All Videos <span class="sidebar-count" id="cnt-all">0</span></div>
+      <div class="sidebar-item" data-filter="moto" onclick="sidebarFilter('moto',this)">Moto <span class="sidebar-count" id="cnt-moto">0</span></div>
+      <div class="sidebar-item" data-filter="food" onclick="sidebarFilter('food',this)">Food &amp; Drink <span class="sidebar-count" id="cnt-food">0</span></div>
+      <div class="sidebar-item" data-filter="lifestyle" onclick="sidebarFilter('lifestyle',this)">Lifestyle <span class="sidebar-count" id="cnt-lifestyle">0</span></div>
+      <div class="sidebar-item" data-filter="documentary" onclick="sidebarFilter('documentary',this)">Documentary <span class="sidebar-count" id="cnt-documentary">0</span></div>
+      <div class="sidebar-item" data-filter="events" onclick="sidebarFilter('events',this)">Event Coverage <span class="sidebar-count" id="cnt-events">0</span></div>
+      <div class="sidebar-item" data-filter="realestate" onclick="sidebarFilter('realestate',this)">Real Estate <span class="sidebar-count" id="cnt-realestate">0</span></div>
+      <div class="sidebar-item" data-filter="reels" onclick="sidebarFilter('reels',this)">Social Reels <span class="sidebar-count" id="cnt-reels">0</span></div>
+      <div class="sidebar-item" data-filter="music" onclick="sidebarFilter('music',this)">Music Videos <span class="sidebar-count" id="cnt-music">0</span></div>
+      <div class="sidebar-label">Filters</div>
+      <div class="sidebar-item" data-filter="featured" onclick="sidebarFilter('featured',this)">★ Featured <span class="sidebar-count" id="cnt-featured">0</span></div>
+      <div class="sidebar-item" data-filter="hidden" onclick="sidebarFilter('hidden',this)">✕ Hidden <span class="sidebar-count" id="cnt-hidden">0</span></div>
+    </div>
+
+    <div class="main">
+      <!-- SAVE BAR -->
+      <div class="save-bar" id="saveBar" style="display:none">
+        <div class="save-bar-text"><span class="save-dot"></span> Unsaved changes</div>
+        <div class="save-bar-actions">
+          <button class="btn btn-ghost" onclick="discardChanges()">Discard</button>
+          <button class="btn btn-success" onclick="saveToFirebase()">Save &amp; Publish</button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-bar">
+        <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total</div></div>
+        <div class="stat"><div class="stat-num" id="stat-featured" style="color:var(--yellow)">0</div><div class="stat-label">Featured</div></div>
+        <div class="stat"><div class="stat-num" id="stat-visible" style="color:var(--green)">0</div><div class="stat-label">Visible</div></div>
+        <div class="stat"><div class="stat-num" id="stat-hidden" style="color:var(--red)">0</div><div class="stat-label">Hidden</div></div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <div>
+          <div class="toolbar-title" id="toolbarTitle">All Videos</div>
+          <div class="toolbar-sub">Drag rows to reorder · saves on publish</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="search-input" type="text" placeholder="Search title or video ID..." oninput="searchVideos(this.value)">
+          <button class="btn btn-ghost" onclick="openAddModal()">+ Add Video</button>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <div class="video-list" id="videoList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-bg" id="addModal">
+  <div class="modal-box">
+    <div class="modal-title">Add Video from YouTube</div>
+    <label class="field-label">YouTube URL or Video ID</label>
+    <input class="field-input" type="text" id="addVideoInput" placeholder="https://youtube.com/watch?v=... or video ID">
+    <button class="btn btn-ghost" style="margin-bottom:16px" onclick="fetchAddPreview()">Fetch Video</button>
+    <div id="addPreview" style="display:none">
+      <div class="preview-card">
+        <div class="preview-thumb"><img id="previewThumb" src=""></div>
+        <div class="preview-info">
+          <div class="preview-title" id="previewTitle"></div>
+          <div class="preview-meta" id="previewMeta"></div>
+        </div>
+      </div>
+      <label class="field-label">Category</label>
+      <select class="field-input" id="addCatSelect">
+        <option value="moto">Moto</option>
+        <option value="food">Food &amp; Drink</option>
+        <option value="lifestyle">Lifestyle</option>
+        <option value="documentary">Documentary</option>
+        <option value="events">Event Coverage</option>
+        <option value="realestate">Real Estate</option>
+        <option value="reels">Social Reels</option>
+        <option value="music">Music Videos</option>
+      </select>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px">
+        <span class="toggle-pill t-feat" id="addFeaturedToggle" onclick="this.classList.toggle('on')">★ Featured</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" id="addConfirmBtn" style="display:none" onclick="confirmAddVideo()">Add to List</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA5K470Y9UJjN6Y-iMf2w26dMhMJkWnbjE",
+  authDomain: "stonerockstudios.firebaseapp.com",
+  databaseURL: "https://stonerockstudios-default-rtdb.firebaseio.com",
+  projectId: "stonerockstudios",
+  storageBucket: "stonerockstudios.firebasestorage.app",
+  messagingSenderId: "342963187170",
+  appId: "1:342963187170:web:90f566d8f3f9135168ddbb"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const YT_KEY = 'AIzaSyDygMoFQUoRfeJ2egkA9HjGBfPHSs58sgw';
+
+const CAT_LABELS = {
+  moto: 'Moto', food: 'Food & Drink', lifestyle: 'Lifestyle',
+  documentary: 'Documentary', events: 'Event Coverage',
+  realestate: 'Real Estate', reels: 'Social Reels', music: 'Music Videos'
+};
+
+let videos = []; // in-memory array
+let dirty = false;
+let currentFilter = 'all';
+let dragSrc = null;
+let pendingAdd = null;
+
+// AUTH
+auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    loadVideos();
+  }
+});
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+  } catch(e) {
+    errEl.style.display = 'block';
+    errEl.textContent = 'Incorrect email or password.';
+  }
+}
+
+document.getElementById('loginPassword').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+async function doSignOut() {
+  await auth.signOut();
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+// LOAD
+async function loadVideos() {
+  const snap = await db.ref('videos').once('value');
+  const data = snap.val();
+  if (data) {
+    videos = Object.values(data).sort((a,b) => a.order - b.order);
+  } else {
+    videos = [];
+  }
+  dirty = false;
+  document.getElementById('saveBar').style.display = 'none';
+  renderAll();
+}
+
+// RENDER
+function renderAll() {
+  updateStats();
+  updateSidebarCounts();
+  renderList();
+}
+
+function updateStats() {
+  const total = videos.length;
+  const featured = videos.filter(v => v.featured).length;
+  const visible = videos.filter(v => v.visible).length;
+  const hidden = videos.filter(v => !v.visible).length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-featured').textContent = featured;
+  document.getElementById('stat-visible').textContent = visible;
+  document.getElementById('stat-hidden').textContent = hidden;
+}
+
+function updateSidebarCounts() {
+  document.getElementById('cnt-all').textContent = videos.length;
+  ['moto','food','lifestyle','documentary','events','realestate','reels','music'].forEach(cat => {
+    const el = document.getElementById(`cnt-${cat}`);
+    if (el) el.textContent = videos.filter(v => v.category === cat).length;
+  });
+  document.getElementById('cnt-featured').textContent = videos.filter(v => v.featured).length;
+  document.getElementById('cnt-hidden').textContent = videos.filter(v => !v.visible).length;
+}
+
+function getFilteredVideos(searchTerm='') {
+  let filtered = videos;
+  if (currentFilter === 'featured') filtered = videos.filter(v => v.featured);
+  else if (currentFilter === 'hidden') filtered = videos.filter(v => !v.visible);
+  else if (currentFilter !== 'all') filtered = videos.filter(v => v.category === currentFilter);
+  if (searchTerm) {
+    const q = searchTerm.toLowerCase();
+    filtered = filtered.filter(v => v.title.toLowerCase().includes(q) || v.videoId.toLowerCase().includes(q));
+  }
+  return filtered;
+}
+
+function renderList(searchTerm='') {
+  const list = document.getElementById('videoList');
+  const filtered = getFilteredVideos(searchTerm);
+  list.innerHTML = '';
+
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;font-size:11px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase">No videos</div>';
+    return;
+  }
+
+  filtered.forEach((v, displayIdx) => {
+    const globalIdx = videos.indexOf(v);
+    const row = document.createElement('div');
+    row.className = `video-row${!v.visible ? ' hidden-row' : ''}`;
+    row.draggable = true;
+    row.dataset.idx = globalIdx;
+
+    const thumbClass = v.portrait ? 'portrait-thumb' : '';
+    row.innerHTML = `
+      <span class="drag-handle">⠿</span>
+      <span class="video-order">${globalIdx + 1}</span>
+      <div class="video-thumb ${thumbClass}"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
+      <div class="video-info">
+        <div class="video-title">${v.title}</div>
+        <div class="video-id">${v.videoId}</div>
+      </div>
+      <select class="cat-select" onchange="updateField(${globalIdx},'category',this.value);updateField(${globalIdx},'categoryLabel',CAT_LABELS[this.value])">
+        ${Object.entries(CAT_LABELS).map(([k,l]) => `<option value="${k}"${v.category===k?' selected':''}>${l}</option>`).join('')}
+      </select>
+      <div class="toggle-group">
+        <span class="toggle-pill t-feat${v.featured?' on':''}" onclick="toggleField(${globalIdx},'featured',this)">★ Featured</span>
+        <span class="toggle-pill ${v.visible?'t-vis on':'t-hide on'}" onclick="toggleVisible(${globalIdx},this)">${v.visible?'● Visible':'✕ Hidden'}</span>
+      </div>
+      <button class="delete-btn" onclick="deleteVideo(${globalIdx})">✕</button>
+    `;
+
+    // Drag events
+    row.addEventListener('dragstart', e => {
+      dragSrc = row;
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    row.addEventListener('dragend', () => {
+      document.querySelectorAll('.video-row').forEach(r => r.classList.remove('dragging','drag-over'));
+      markDirty();
+    });
+    row.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (row === dragSrc) return;
+      document.querySelectorAll('.video-row').forEach(r => r.classList.remove('drag-over'));
+      row.classList.add('drag-over');
+      const rect = row.getBoundingClientRect();
+      const after = e.clientY > rect.top + rect.height / 2;
+      const srcIdx = parseInt(dragSrc.dataset.idx);
+      const tgtIdx = parseInt(row.dataset.idx);
+      // Reorder in-memory
+      const moved = videos.splice(srcIdx, 1)[0];
+      const newTgt = videos.indexOf(videos[tgtIdx] || videos[videos.length-1]);
+      videos.splice(after ? newTgt + 1 : newTgt, 0, moved);
+      renderList(document.querySelector('.search-input')?.value || '');
+    });
+
+    list.appendChild(row);
+  });
+}
+
+function updateField(idx, field, value) {
+  videos[idx][field] = value;
+  markDirty();
+  updateStats();
+  updateSidebarCounts();
+}
+
+function toggleField(idx, field, el) {
+  videos[idx][field] = !videos[idx][field];
+  el.classList.toggle('on');
+  markDirty();
+  updateStats();
+  updateSidebarCounts();
+}
+
+function toggleVisible(idx, el) {
+  videos[idx].visible = !videos[idx].visible;
+  el.classList.toggle('on');
+  if (videos[idx].visible) {
+    el.className = 'toggle-pill t-vis on';
+    el.textContent = '● Visible';
+    el.closest('.video-row').classList.remove('hidden-row');
+  } else {
+    el.className = 'toggle-pill t-hide on';
+    el.textContent = '✕ Hidden';
+    el.closest('.video-row').classList.add('hidden-row');
+  }
+  markDirty();
+  updateStats();
+  updateSidebarCounts();
+}
+
+function deleteVideo(idx) {
+  if (!confirm(`Delete "${videos[idx].title}"? This cannot be undone.`)) return;
+  videos.splice(idx, 1);
+  markDirty();
+  renderAll();
+}
+
+function markDirty() {
+  dirty = true;
+  document.getElementById('saveBar').style.display = 'flex';
+}
+
+function discardChanges() {
+  loadVideos();
+}
+
+// SAVE
+async function saveToFirebase() {
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+  try {
+    // Reassign order 0,1,2...
+    const toSave = {};
+    videos.forEach((v, i) => {
+      v.order = i;
+      toSave[v.videoId] = v;
+    });
+    await db.ref('videos').set(toSave);
+    dirty = false;
+    document.getElementById('saveBar').style.display = 'none';
+    btn.textContent = '✓ Saved';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => {
+      btn.textContent = 'Save Changes';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 2000);
+  } catch(e) {
+    btn.textContent = 'Error — try again';
+    btn.style.background = 'var(--red)';
+    btn.disabled = false;
+    setTimeout(() => { btn.textContent = 'Save Changes'; btn.style.background = ''; }, 3000);
+  }
+}
+
+// SIDEBAR FILTER
+function sidebarFilter(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  const titles = { all:'All Videos', moto:'Moto', food:'Food & Drink', lifestyle:'Lifestyle', documentary:'Documentary', events:'Event Coverage', realestate:'Real Estate', reels:'Social Reels', music:'Music Videos', featured:'Featured Videos', hidden:'Hidden Videos' };
+  document.getElementById('toolbarTitle').textContent = titles[filter] || 'All Videos';
+  renderList();
+}
+
+// SEARCH
+function searchVideos(term) {
+  renderList(term);
+}
+
+// ADD VIDEO MODAL
+function openAddModal() {
+  document.getElementById('addModal').classList.add('open');
+  document.getElementById('addVideoInput').value = '';
+  document.getElementById('addPreview').style.display = 'none';
+  document.getElementById('addConfirmBtn').style.display = 'none';
+  pendingAdd = null;
+}
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+}
+
+function parseDuration(iso) {
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!m) return 0;
+  return (parseInt(m[1]||0)*3600)+(parseInt(m[2]||0)*60)+parseInt(m[3]||0);
+}
+
+function isPortrait(detail) {
+  const t = detail.snippet?.thumbnails;
+  const dur = parseDuration(detail.contentDetails?.duration || 'PT0S');
+  const th = t?.maxres || t?.standard || t?.high || t?.medium;
+  return (th && th.width && th.height && th.height > th.width) || (dur > 0 && dur <= 180);
+}
+
+async function fetchAddPreview() {
+  let input = document.getElementById('addVideoInput').value.trim();
+  // Extract video ID from URL if needed
+  const match = input.match(/(?:v=|youtu\.be\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+  const videoId = match ? match[1] : (input.length === 11 ? input : null);
+  if (!videoId) { alert('Invalid YouTube URL or video ID.'); return; }
+
+  try {
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${YT_KEY}`);
+    const data = await res.json();
+    if (!data.items?.length) { alert('Video not found.'); return; }
+    const detail = data.items[0];
+    const thumbs = detail.snippet.thumbnails;
+    const thumb = thumbs?.maxres?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    const portrait = isPortrait(detail);
+    const dur = parseDuration(detail.contentDetails.duration);
+
+    pendingAdd = {
+      videoId,
+      title: detail.snippet.title,
+      thumbnail: thumb,
+      portrait,
+      duration: dur,
+      visible: true,
+      featured: false,
+      addedAt: Date.now()
+    };
+
+    document.getElementById('previewThumb').src = thumb;
+    document.getElementById('previewTitle').textContent = detail.snippet.title;
+    document.getElementById('previewMeta').textContent = `${portrait ? 'Short / Portrait' : 'Landscape'} · ${Math.floor(dur/60)}:${String(dur%60).padStart(2,'0')}`;
+    document.getElementById('addPreview').style.display = 'block';
+    document.getElementById('addConfirmBtn').style.display = 'inline-block';
+  } catch(e) {
+    alert('Failed to fetch video. Check the ID and try again.');
+  }
+}
+
+function confirmAddVideo() {
+  if (!pendingAdd) return;
+  const catKey = document.getElementById('addCatSelect').value;
+  pendingAdd.category = catKey;
+  pendingAdd.categoryLabel = CAT_LABELS[catKey];
+  pendingAdd.featured = document.getElementById('addFeaturedToggle').classList.contains('on');
+  pendingAdd.order = videos.length;
+  videos.push(pendingAdd);
+  markDirty();
+  renderAll();
+  closeAddModal();
+}
+
+document.getElementById('addModal').addEventListener('click', e => { if(e.target === document.getElementById('addModal')) closeAddModal(); });
+</script>
+</body>
+</html>
