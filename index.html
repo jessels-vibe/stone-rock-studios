@@ -6,9 +6,23 @@
 <title>Stone Rock Studios</title>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --black: #0a0a0a; --surface: #111111; --border: #1e1e1e; --text: #f0f0f0; --muted: #555; --gap: 3px; }
+  :root {
+    --black: #0a0a0a;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --text: #f0f0f0;
+    --muted: #555;
+    --gap: 3px;
+  }
   html { background: var(--black); color: var(--text); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
-  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 52px; background: rgba(10,10,10,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 52px;
+    background: rgba(10,10,10,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
   .nav-logo { font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); text-decoration: none; }
   .nav-links { display: flex; gap: 40px; align-items: center; }
   .nav-link { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
@@ -31,15 +45,15 @@
   #grid { padding: 0 var(--gap); }
   .tile { position: relative; overflow: hidden; cursor: pointer; background: var(--surface); margin-bottom: var(--gap); float: left; }
   .tile.hidden { display: none; }
-  .w7 { width: calc((100% - var(--gap) * 11) / 12 * 7 + var(--gap) * 6); }
-  .w5 { width: calc((100% - var(--gap) * 11) / 12 * 5 + var(--gap) * 4); }
-  .w6 { width: calc((100% - var(--gap) * 11) / 12 * 6 + var(--gap) * 5); }
-  .w4 { width: calc((100% - var(--gap) * 11) / 12 * 4 + var(--gap) * 3); }
-  .w8 { width: calc((100% - var(--gap) * 11) / 12 * 8 + var(--gap) * 7); }
-  .w3 { width: calc((100% - var(--gap) * 11) / 12 * 3 + var(--gap) * 2); }
+  .w7  { width: calc((100% - var(--gap) * 11) / 12 * 7 + var(--gap) * 6); }
+  .w5  { width: calc((100% - var(--gap) * 11) / 12 * 5 + var(--gap) * 4); }
+  .w6  { width: calc((100% - var(--gap) * 11) / 12 * 6 + var(--gap) * 5); }
+  .w4  { width: calc((100% - var(--gap) * 11) / 12 * 4 + var(--gap) * 3); }
+  .w8  { width: calc((100% - var(--gap) * 11) / 12 * 8 + var(--gap) * 7); }
+  .w3  { width: calc((100% - var(--gap) * 11) / 12 * 3 + var(--gap) * 2); }
   .tile.landscape img { width: 100%; height: auto; display: block; }
   .tile.portrait .thumb-wrap { position: relative; width: 100%; padding-bottom: 177.78%; background: #000; }
-  .tile.portrait .thumb-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+  .tile.portrait .thumb-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .tile img { transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94); }
   .tile:hover img { transform: scale(1.04); }
   .tile-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.05) 45%, transparent 70%); opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px 20px; }
@@ -85,7 +99,7 @@
       <div class="dropdown-menu" id="dropdownMenu">
         <div class="dropdown-item selected" data-cat="all">All Work</div>
         <div class="dropdown-item" data-cat="moto">Moto</div>
-        <div class="dropdown-item" data-cat="food">Food &amp; Drink</div>
+        <div class="dropdown-item" data-cat="food">Food & Drink</div>
         <div class="dropdown-item" data-cat="lifestyle">Lifestyle</div>
         <div class="dropdown-item" data-cat="documentary">Documentary</div>
         <div class="dropdown-item" data-cat="events">Event Coverage</div>
@@ -97,6 +111,7 @@
     <a class="nav-link" id="aboutBtn" href="#">ABOUT</a>
   </div>
 </nav>
+
 <div id="workView">
   <div class="hero">
     <div class="hero-label">Selected Work</div>
@@ -109,12 +124,14 @@
     <div class="status-msg" id="statusMsg">Loading</div>
   </div>
 </div>
+
 <div class="about-section" id="aboutView">
   <div class="hero-label">About</div>
   <h2>Stone Rock<br>Studios</h2>
   <p>We're a two-person creative studio built on the belief that every moment deserves to be captured with intention. From high-speed moto to intimate documentaries, we bring the same eye to every frame.</p>
   <p>Based in Los Angeles. Available worldwide.</p>
 </div>
+
 <div class="modal-backdrop" id="modal">
   <div class="modal-inner landscape" id="modalInner">
     <button class="modal-close" id="modalClose">✕</button>
@@ -127,26 +144,39 @@
     </div>
   </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/5.0.0/imagesloaded.pkgd.min.js"></script>
 <script>
-const FIREBASE_DB_URL = 'https://stonerockstudios-default-rtdb.firebaseio.com';
+const FIREBASE_URL = 'https://stonerockstudios-default-rtdb.firebaseio.com';
+
 const LAND_W = ['w7','w5','w4','w4','w4','w6','w6','w8','w4','w3','w3','w6','w5'];
 const PORT_W = ['w3','w3','w3','w4','w3'];
 let li = 0, pi = 0, msnry = null;
 
 function makeTile(v) {
   const portrait = v.portrait;
+  const featured = v.featured;
   const wClass = portrait
     ? PORT_W[pi++ % PORT_W.length]
-    : (v.featured ? 'w7' : LAND_W.filter(w => w !== 'w7')[li++ % LAND_W.filter(w => w !== 'w7').length]);
+    : (featured ? 'w7' : LAND_W.filter(w => w !== 'w7')[li++ % LAND_W.filter(w => w !== 'w7').length]);
+
   const tile = document.createElement('div');
   tile.className = `tile ${wClass} ${portrait ? 'portrait' : 'landscape'}`;
   tile.dataset.cat = v.category;
+
   if (portrait) {
-    tile.innerHTML = `<div class="thumb-wrap"><img src="${v.thumbnail}" alt="" loading="lazy"></div><div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div><div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${v.title}</div></div>`;
+    tile.innerHTML = `
+      <div class="thumb-wrap"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
+      <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
+      <div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${v.title}</div></div>
+    `;
   } else {
-    tile.innerHTML = `<img src="${v.thumbnail}" alt="" loading="lazy"><div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div><div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${v.title}</div></div>`;
+    tile.innerHTML = `
+      <img src="${v.thumbnail}" alt="" loading="lazy">
+      <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
+      <div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${v.title}</div></div>
+    `;
   }
   tile.addEventListener('click', () => openModal(v.videoId, v.categoryLabel, v.title, portrait));
   return tile;
@@ -155,36 +185,70 @@ function makeTile(v) {
 async function loadAll() {
   const grid = document.getElementById('grid');
   const statusMsg = document.getElementById('statusMsg');
+
   try {
-    const res = await fetch(`${FIREBASE_DB_URL}/videos.json`);
+    const res = await fetch(`${FIREBASE_URL}/videos.json`);
     const data = await res.json();
+
     if (statusMsg) statusMsg.remove();
-    if (!data) { grid.innerHTML += '<div class="status-msg">Coming soon.</div>'; return; }
-    const videos = Object.values(data).filter(v => v.visible).sort((a, b) => a.order - b.order);
-    if (!videos.length) { grid.innerHTML += '<div class="status-msg">Coming soon.</div>'; return; }
+
+    if (!data) {
+      const m = document.createElement('div');
+      m.className = 'status-msg';
+      m.textContent = 'Coming soon.';
+      grid.appendChild(m);
+      return;
+    }
+
+    // Convert to array, filter visible, sort by order
+    const videos = Object.values(data)
+      .filter(v => v.visible)
+      .sort((a, b) => a.order - b.order);
+
+    if (!videos.length) {
+      const m = document.createElement('div');
+      m.className = 'status-msg';
+      m.textContent = 'Coming soon.';
+      grid.appendChild(m);
+      return;
+    }
+
+    // Separate horizontals and verticals
     const horizontals = videos.filter(v => !v.portrait);
     const verticals = videos.filter(v => v.portrait);
+
+    // Merge 3 horizontals then 1 vertical
     const merged = [];
     let hi = 0, vi = 0;
     while (hi < horizontals.length || vi < verticals.length) {
       for (let i = 0; i < 3 && hi < horizontals.length; i++) merged.push(horizontals[hi++]);
       if (vi < verticals.length) merged.push(verticals[vi++]);
     }
+
     const fragment = document.createDocumentFragment();
     merged.forEach(v => fragment.appendChild(makeTile(v)));
     grid.appendChild(fragment);
+
     imagesLoaded(grid, function() {
-      msnry = new Masonry(grid, { itemSelector: '.tile', columnWidth: '.grid-sizer', gutter: '.gutter-sizer', percentPosition: true, transitionDuration: '0.3s' });
+      msnry = new Masonry(grid, {
+        itemSelector: '.tile',
+        columnWidth: '.grid-sizer',
+        gutter: '.gutter-sizer',
+        percentPosition: true,
+        transitionDuration: '0.3s'
+      });
     });
+
   } catch(e) {
-    console.error(e);
-    if (statusMsg) statusMsg.textContent = 'Failed to load.';
+    if (statusMsg) statusMsg.textContent = 'Failed to load videos.';
   }
 }
 
+// MODAL
 const modal = document.getElementById('modal');
 const modalInner = document.getElementById('modalInner');
 const modalFrame = document.getElementById('modalFrame');
+
 function openModal(ytId, cat, title, portrait) {
   modalInner.className = `modal-inner ${portrait ? 'portrait' : 'landscape'}`;
   modalFrame.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&modestbranding=1&rel=0`;
@@ -197,9 +261,11 @@ document.getElementById('modalClose').addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
+// DROPDOWN + FILTER
 const workDropdown = document.getElementById('workDropdown');
 document.getElementById('workBtn').addEventListener('click', e => { e.stopPropagation(); workDropdown.classList.toggle('open'); });
 document.addEventListener('click', () => workDropdown.classList.remove('open'));
+
 document.querySelectorAll('.dropdown-item').forEach(item => {
   item.addEventListener('click', e => {
     e.stopPropagation();
@@ -207,15 +273,19 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
     item.classList.add('selected');
     workDropdown.classList.remove('open');
-    document.querySelectorAll('.tile').forEach(tile => { tile.style.display = (cat === 'all' || tile.dataset.cat === cat) ? '' : 'none'; });
+    document.querySelectorAll('.tile').forEach(tile => {
+      tile.style.display = (cat === 'all' || tile.dataset.cat === cat) ? '' : 'none';
+    });
     if (msnry) setTimeout(() => msnry.layout(), 50);
   });
 });
 
+// ABOUT
 const aboutView = document.getElementById('aboutView');
 const workView = document.getElementById('workView');
 const aboutBtn = document.getElementById('aboutBtn');
 const workBtn = document.getElementById('workBtn');
+
 aboutBtn.addEventListener('click', e => {
   e.preventDefault();
   const showing = aboutView.classList.contains('visible');
