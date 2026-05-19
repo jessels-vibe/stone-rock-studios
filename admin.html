@@ -9,15 +9,12 @@
   :root {
     --black: #0a0a0a; --surface: #111; --surface2: #181818;
     --border: #222; --text: #f0f0f0; --muted: #555;
-    --green: #22c55e; --red: #ef4444; --yellow: #f59e0b;
+    --green: #22c55e; --red: #ef4444; --yellow: #f59e0b; --blue: #38bdf8;
   }
   html, body { background: var(--black); color: var(--text); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
 
   /* LOGIN */
-  #loginScreen {
-    position: fixed; inset: 0; background: var(--black);
-    display: flex; align-items: center; justify-content: center; z-index: 999;
-  }
+  #loginScreen { position: fixed; inset: 0; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 999; }
   .login-box { width: 360px; }
   .login-logo { font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 40px; color: var(--text); }
   .login-title { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
@@ -43,8 +40,8 @@
   .btn-primary { background: var(--text); color: var(--black); }
   .btn-success { background: var(--green); color: #fff; }
   .btn-danger { background: var(--red); color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: 10px; }
 
-  /* LAYOUT */
   #adminScreen { display: none; }
   .layout { display: flex; height: calc(100vh - 52px); }
 
@@ -65,10 +62,16 @@
   .main-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
   /* SAVE BAR */
-  .save-bar { display: flex; align-items: center; justify-content: space-between; background: #1a1a1a; border: 1px solid #333; padding: 10px 16px; margin-bottom: 20px; border-radius: 2px; display: none; }
+  .save-bar { display: none; align-items: center; justify-content: space-between; background: #1a1a1a; border: 1px solid #333; padding: 10px 16px; margin-bottom: 20px; border-radius: 2px; }
   .save-bar.visible { display: flex; }
   .save-bar-text { font-size: 11px; color: var(--yellow); font-weight: 500; display: flex; align-items: center; gap: 8px; }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); display: inline-block; }
+
+  /* DUPLICATE WARNING */
+  .dupe-bar { display: none; align-items: center; gap: 10px; background: #1a0a00; border: 1px solid #3a2000; padding: 10px 16px; margin-bottom: 12px; border-radius: 2px; }
+  .dupe-bar.visible { display: flex; }
+  .dupe-bar-text { font-size: 11px; color: var(--yellow); font-weight: 500; flex: 1; }
+  .dupe-badge { font-size: 9px; font-weight: 700; background: var(--yellow); color: #000; padding: 2px 7px; border-radius: 2px; }
 
   /* STATS */
   .stats-bar { display: flex; gap: 3px; margin-bottom: 24px; }
@@ -76,35 +79,76 @@
   .stat-num { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
   .stat-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
 
-  /* SEARCH */
-  .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  /* SEARCH + BULK ROW */
+  .toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
   .search-input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 12px; padding: 8px 14px; font-family: inherit; outline: none; border-radius: 2px; }
   .search-input:focus { border-color: #333; }
   .search-input::placeholder { color: var(--muted); }
 
-  /* VIDEO LIST */
+  /* BULK ACTION BAR */
+  .bulk-bar { display: none; align-items: center; gap: 8px; background: #151515; border: 1px solid var(--border); padding: 8px 14px; margin-bottom: 8px; border-radius: 2px; }
+  .bulk-bar.visible { display: flex; }
+  .bulk-count { font-size: 11px; font-weight: 600; color: var(--text); margin-right: 4px; }
+  .bulk-divider { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
+
+  /* CHECKBOX */
+  .row-check { width: 16px; height: 16px; accent-color: var(--text); cursor: pointer; flex-shrink: 0; }
+  .select-all-check { width: 16px; height: 16px; accent-color: var(--text); cursor: pointer; }
+
+  /* LIST HEADER */
+  .list-header { display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+  .list-header-label { font-size: 9px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+
+  /* VIDEO ROW */
   .video-list { display: flex; flex-direction: column; gap: 2px; }
-  .video-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); padding: 8px 12px; cursor: grab; transition: background 0.12s, border-color 0.12s; user-select: none; }
+  .video-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); padding: 8px 12px; cursor: grab; transition: background 0.12s, border-color 0.12s; user-select: none; position: relative; }
   .video-row:hover { background: var(--surface2); }
   .video-row.dragging { opacity: 0.35; }
   .video-row.drag-over { border-color: #555; background: #1a1a1a; }
   .video-row.is-hidden { opacity: 0.4; }
+  .video-row.selected { border-color: #444; background: #161616; }
+  .video-row.is-duplicate { border-left: 3px solid var(--yellow); }
+
   .drag-handle { color: #2a2a2a; font-size: 16px; cursor: grab; flex-shrink: 0; transition: color 0.12s; }
   .video-row:hover .drag-handle { color: var(--muted); }
   .video-order { font-size: 11px; font-weight: 700; color: #333; width: 22px; text-align: center; flex-shrink: 0; }
-  .video-thumb { flex-shrink: 0; background: #1a1a1a; border: 1px solid var(--border); overflow: hidden; }
+
+  /* THUMBNAIL + HOVER PREVIEW */
+  .video-thumb-wrap { position: relative; flex-shrink: 0; }
+  .video-thumb { background: #1a1a1a; border: 1px solid var(--border); overflow: hidden; }
   .video-thumb.landscape-thumb { width: 80px; height: 45px; }
   .video-thumb.portrait-thumb { width: 26px; height: 45px; }
   .video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* HOVER PREVIEW POPUP */
+  .thumb-preview {
+    position: fixed; z-index: 1000;
+    width: 240px; background: #000; border: 1px solid #333;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    transform: translateY(-50%);
+  }
+  .thumb-preview.visible { opacity: 1; }
+  .thumb-preview img { width: 100%; display: block; }
+  .thumb-preview-title { font-size: 11px; font-weight: 600; padding: 8px 10px 4px; line-height: 1.3; }
+  .thumb-preview-meta { font-size: 10px; color: var(--muted); padding: 0 10px 8px; }
+  .dupe-warning { font-size: 9px; font-weight: 700; color: var(--yellow); background: #2a1500; padding: 2px 8px; }
+
   .video-info { flex: 1; min-width: 0; }
   .video-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+  .video-meta-row { display: flex; align-items: center; gap: 6px; }
   .video-id { font-size: 10px; color: #333; font-family: monospace; }
+  .dupe-tag { font-size: 8px; font-weight: 700; letter-spacing: 0.08em; background: var(--yellow); color: #000; padding: 1px 5px; border-radius: 2px; }
+
   .cat-select { background: #1a1a1a; border: 1px solid var(--border); color: var(--text); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 8px; font-family: inherit; cursor: pointer; border-radius: 2px; outline: none; flex-shrink: 0; }
   .cat-select:hover { border-color: #444; }
+
+  /* ASPECT RATIO SELECT */
+  .ratio-select { background: #1a1a1a; border: 1px solid var(--border); color: var(--blue); font-size: 10px; font-weight: 700; padding: 5px 8px; font-family: inherit; cursor: pointer; border-radius: 2px; outline: none; flex-shrink: 0; border-color: #002030; }
+  .ratio-select:hover { border-color: #0a3040; }
+
   .toggle-group { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
   .toggle-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 9px; border-radius: 2px; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; white-space: nowrap; }
-  .toggle-portrait { background: #001520; color: #38bdf8; border-color: #002030; }
-  .toggle-portrait.on { background: #38bdf8; color: #000; border-color: #38bdf8; }
   .toggle-featured { background: #2a2000; color: var(--yellow); border-color: #3a2a00; }
   .toggle-featured.on { background: var(--yellow); color: #000; border-color: var(--yellow); }
   .toggle-visible { background: #001a0a; color: var(--green); border-color: #002a10; }
@@ -116,16 +160,15 @@
   /* ADD MODAL */
   .modal-backdrop { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .modal-backdrop.open { opacity: 1; pointer-events: all; }
-  .modal-box { background: var(--surface); border: 1px solid var(--border); width: min(480px, 90vw); padding: 28px; }
+  .modal-box { background: var(--surface); border: 1px solid var(--border); width: min(480px, 90vw); padding: 28px; position: relative; }
   .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
   .modal-close-btn { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
   .preview-card { display: flex; gap: 12px; background: var(--surface2); border: 1px solid var(--border); padding: 12px; margin: 16px 0; }
   .preview-thumb { width: 80px; height: 45px; background: #222; flex-shrink: 0; overflow: hidden; }
   .preview-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .preview-info { flex: 1; min-width: 0; }
-  .preview-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .preview-title-text { font-size: 12px; font-weight: 600; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .preview-meta { font-size: 10px; color: var(--muted); font-family: monospace; }
-  .preview-portrait-badge { font-size: 9px; font-weight: 700; background: #38bdf8; color: #000; padding: 2px 6px; border-radius: 2px; margin-left: 6px; }
   .fetch-error { font-size: 11px; color: var(--red); margin-top: 8px; }
 
   ::-webkit-scrollbar { width: 4px; }
@@ -134,6 +177,13 @@
 </style>
 </head>
 <body>
+
+<!-- HOVER PREVIEW POPUP (singleton) -->
+<div class="thumb-preview" id="thumbPreview">
+  <img id="previewPopupImg" src="">
+  <div class="thumb-preview-title" id="previewPopupTitle"></div>
+  <div class="thumb-preview-meta" id="previewPopupMeta"></div>
+</div>
 
 <!-- LOGIN -->
 <div id="loginScreen">
@@ -171,8 +221,7 @@
   </nav>
 
   <div class="layout">
-    <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar">
       <div class="sidebar-label">Categories</div>
       <div class="sidebar-item active" data-filter="all" onclick="filterSidebar(this)">All Videos <span class="sidebar-count" id="cnt-all">0</span></div>
       <div class="sidebar-item" data-filter="moto" onclick="filterSidebar(this)">Moto <span class="sidebar-count" id="cnt-moto">0</span></div>
@@ -187,9 +236,9 @@
       <div class="sidebar-item" data-filter="featured" onclick="filterSidebar(this)">★ Featured <span class="sidebar-count" id="cnt-featured">0</span></div>
       <div class="sidebar-item" data-filter="hidden" onclick="filterSidebar(this)">Hidden <span class="sidebar-count" id="cnt-hidden">0</span></div>
       <div class="sidebar-item" data-filter="portrait" onclick="filterSidebar(this)">↕ Vertical <span class="sidebar-count" id="cnt-portrait">0</span></div>
+      <div class="sidebar-item" data-filter="dupes" onclick="filterSidebar(this)">⚠ Duplicates <span class="sidebar-count" id="cnt-dupes">0</span></div>
     </div>
 
-    <!-- MAIN -->
     <div class="main">
       <!-- SAVE BAR -->
       <div class="save-bar" id="saveBar">
@@ -200,57 +249,50 @@
         </div>
       </div>
 
+      <!-- DUPLICATE WARNING -->
+      <div class="dupe-bar" id="dupeBar">
+        <span class="dupe-badge">⚠ Duplicates</span>
+        <span class="dupe-bar-text" id="dupeBarText"></span>
+        <button class="btn btn-ghost btn-sm" onclick="filterSidebar(document.querySelector('[data-filter=dupes]'))">View All</button>
+        <button class="btn btn-danger btn-sm" onclick="removeAllDuplicates()">Remove Dupes</button>
+      </div>
+
       <!-- STATS -->
       <div class="stats-bar">
         <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total</div></div>
         <div class="stat"><div class="stat-num" style="color:var(--yellow)" id="statFeatured">0</div><div class="stat-label">Featured</div></div>
         <div class="stat"><div class="stat-num" style="color:var(--green)" id="statVisible">0</div><div class="stat-label">Visible</div></div>
         <div class="stat"><div class="stat-num" style="color:var(--red)" id="statHidden">0</div><div class="stat-label">Hidden</div></div>
-        <div class="stat"><div class="stat-num" style="color:#38bdf8" id="statPortrait">0</div><div class="stat-label">Vertical</div></div>
+        <div class="stat"><div class="stat-num" style="color:var(--blue)" id="statPortrait">0</div><div class="stat-label">Vertical</div></div>
       </div>
 
       <!-- HEADER -->
       <div class="main-header">
         <div>
           <div class="main-title" id="mainTitle">All Videos</div>
-          <div class="main-sub">Drag to reorder · click toggles to edit · save when done</div>
+          <div class="main-sub">Drag to reorder · hover thumbnail to preview · save when done</div>
         </div>
         <button class="btn btn-ghost" onclick="openAddModal()">+ Add Video</button>
       </div>
 
-      <!-- SEARCH -->
-      <div class="search-row">
+      <!-- TOOLBAR: search + select all -->
+      <div class="toolbar">
         <input class="search-input" type="text" placeholder="Search by title or video ID..." oninput="searchVideos(this.value)">
       </div>
 
-      <!-- LIST -->
-      <div class="video-list" id="videoList"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ADD VIDEO MODAL -->
-<div class="modal-backdrop" id="addModal">
-  <div class="modal-box" style="position:relative">
-    <button class="modal-close-btn" onclick="closeAddModal()">✕</button>
-    <div class="modal-title">Add Video</div>
-    <div class="form-group">
-      <label class="form-label">YouTube URL or Video ID</label>
-      <input class="form-input" type="text" id="addVideoInput" placeholder="e.g. https://youtu.be/ABC123 or ABC123">
-    </div>
-    <button class="btn btn-ghost" onclick="fetchVideoPreview()" style="margin-bottom:4px">Fetch Video</button>
-    <div class="fetch-error" id="fetchError"></div>
-    <div id="previewCard" style="display:none">
-      <div class="preview-card">
-        <div class="preview-thumb"><img id="previewThumb" src=""></div>
-        <div class="preview-info">
-          <div class="preview-title" id="previewTitle"></div>
-          <div class="preview-meta" id="previewId"></div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Category</label>
-        <select class="cat-select" id="addCatSelect" style="width:100%;padding:8px 10px;font-size:12px">
+      <!-- BULK ACTION BAR -->
+      <div class="bulk-bar" id="bulkBar">
+        <input type="checkbox" class="select-all-check" id="selectAllCheck" onchange="toggleSelectAll(this.checked)">
+        <span class="bulk-count" id="bulkCount">0 selected</span>
+        <div class="bulk-divider"></div>
+        <button class="btn btn-ghost btn-sm" onclick="bulkSetFeatured(true)">★ Feature</button>
+        <button class="btn btn-ghost btn-sm" onclick="bulkSetFeatured(false)">Unfeature</button>
+        <div class="bulk-divider"></div>
+        <button class="btn btn-ghost btn-sm" onclick="bulkSetVisible(true)">● Show</button>
+        <button class="btn btn-ghost btn-sm" onclick="bulkSetVisible(false)">Hide</button>
+        <div class="bulk-divider"></div>
+        <select class="cat-select" id="bulkCatSelect" onchange="bulkSetCategory(this.value)" style="font-size:10px">
+          <option value="">Move to category...</option>
           <option value="moto">Moto</option>
           <option value="food">Food & Drink</option>
           <option value="lifestyle">Lifestyle</option>
@@ -260,9 +302,69 @@
           <option value="reels">Social Reels</option>
           <option value="music">Music Videos</option>
         </select>
+        <div class="bulk-divider"></div>
+        <button class="btn btn-danger btn-sm" onclick="bulkDelete()">Delete</button>
+        <div class="bulk-divider"></div>
+        <button class="btn btn-ghost btn-sm" onclick="clearSelection()">Clear</button>
+      </div>
+
+      <!-- LIST HEADER -->
+      <div class="list-header">
+        <input type="checkbox" class="select-all-check" id="selectAllCheck2" onchange="toggleSelectAll(this.checked)" style="margin-right:2px">
+        <span style="width:22px"></span>
+        <span style="width:80px" class="list-header-label">Thumbnail</span>
+        <span style="flex:1" class="list-header-label">Title</span>
+        <span style="width:110px" class="list-header-label">Category</span>
+        <span style="width:80px" class="list-header-label">Ratio</span>
+        <span style="width:160px" class="list-header-label">Toggles</span>
+        <span style="width:24px"></span>
+      </div>
+
+      <div class="video-list" id="videoList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD VIDEO MODAL -->
+<div class="modal-backdrop" id="addModal">
+  <div class="modal-box">
+    <button class="modal-close-btn" onclick="closeAddModal()">✕</button>
+    <div class="modal-title">Add Video</div>
+    <div class="form-group">
+      <label class="form-label">YouTube URL or Video ID</label>
+      <input class="form-input" type="text" id="addVideoInput" placeholder="https://youtu.be/ABC123 or ABC123">
+    </div>
+    <button class="btn btn-ghost" onclick="fetchVideoPreview()" style="margin-bottom:4px">Fetch Video</button>
+    <div class="fetch-error" id="fetchError"></div>
+    <div id="previewCard" style="display:none">
+      <div class="preview-card">
+        <div class="preview-thumb"><img id="previewThumb" src=""></div>
+        <div class="preview-info">
+          <div class="preview-title-text" id="previewTitleText"></div>
+          <div class="preview-meta" id="previewIdText"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="cat-select" id="addCatSelect" style="width:100%;padding:8px 10px;font-size:12px">
+          <option value="moto">Moto</option><option value="food">Food & Drink</option>
+          <option value="lifestyle">Lifestyle</option><option value="documentary">Documentary</option>
+          <option value="events">Event Coverage</option><option value="realestate">Real Estate</option>
+          <option value="reels">Social Reels</option><option value="music">Music Videos</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Aspect Ratio</label>
+        <select class="cat-select" id="addRatioSelect" style="width:100%;padding:8px 10px;font-size:12px">
+          <option value="16:9">16:9 — Standard Landscape</option>
+          <option value="9:16">9:16 — Vertical / Short</option>
+          <option value="1:1">1:1 — Square</option>
+          <option value="4:3">4:3 — Classic</option>
+          <option value="4:5">4:5 — Portrait</option>
+          <option value="21:9">21:9 — Cinematic Wide</option>
+        </select>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:20px">
-        <span class="toggle-pill toggle-portrait" id="addPortraitToggle" onclick="this.classList.toggle('on')">↕ Vertical</span>
         <span class="toggle-pill toggle-featured" id="addFeaturedToggle" onclick="this.classList.toggle('on')">★ Featured</span>
       </div>
       <button class="btn btn-primary" style="width:100%" onclick="confirmAddVideo()">Add to List</button>
@@ -270,13 +372,10 @@
   </div>
 </div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-
 <script>
-// ── FIREBASE CONFIG ──
 const firebaseConfig = {
   apiKey: "AIzaSyA5K470Y9UJjN6Y-iMf2w26dMhMJkWnbjE",
   authDomain: "stonerockstudios.firebaseapp.com",
@@ -305,12 +404,24 @@ const PLAYLISTS = [
 
 const CAT_LABELS = { moto:'Moto', food:'Food & Drink', lifestyle:'Lifestyle', documentary:'Documentary', events:'Event Coverage', realestate:'Real Estate', reels:'Social Reels', music:'Music Videos' };
 
-let videos = []; // master in-memory array
+// Aspect ratio → portrait bool + padding %
+const RATIO_MAP = {
+  '16:9': { portrait: false, padding: 56.25 },
+  '9:16': { portrait: true,  padding: 177.78 },
+  '1:1':  { portrait: false, padding: 100 },
+  '4:3':  { portrait: false, padding: 75 },
+  '4:5':  { portrait: true,  padding: 125 },
+  '21:9': { portrait: false, padding: 42.86 },
+};
+
+let videos = [];
 let dirty = false;
 let currentFilter = 'all';
 let currentSearch = '';
 let dragSrc = null;
 let pendingAdd = null;
+let selectedIds = new Set();
+let dupeIds = new Set();
 
 // ── AUTH ──
 auth.onAuthStateChanged(user => {
@@ -329,18 +440,14 @@ async function signIn() {
   const pass = document.getElementById('loginPassword').value;
   const btn = document.getElementById('loginBtn');
   const err = document.getElementById('loginError');
-  btn.textContent = 'Signing in...';
-  btn.disabled = true;
-  err.textContent = '';
+  btn.textContent = 'Signing in...'; btn.disabled = true; err.textContent = '';
   try {
     await auth.signInWithEmailAndPassword(email, pass);
   } catch(e) {
     err.textContent = 'Incorrect email or password.';
-    btn.textContent = 'Sign In';
-    btn.disabled = false;
+    btn.textContent = 'Sign In'; btn.disabled = false;
   }
 }
-
 document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') signIn(); });
 
 function signOut() {
@@ -354,54 +461,75 @@ async function loadVideos() {
   try {
     const snap = await db.ref('videos').get();
     const data = snap.val();
-    if (data) {
-      videos = Object.values(data).sort((a,b) => a.order - b.order);
-    } else {
-      videos = [];
-    }
+    videos = data ? Object.values(data).sort((a,b) => a.order - b.order) : [];
+    // Ensure all videos have an aspectRatio field
+    videos.forEach(v => {
+      if (!v.aspectRatio) v.aspectRatio = v.portrait ? '9:16' : '16:9';
+    });
     dirty = false;
+    selectedIds.clear();
+    detectDuplicates();
     renderAll();
     setStatus('');
-  } catch(e) {
-    setStatus('Error loading: ' + e.message);
+  } catch(e) { setStatus('Error: ' + e.message); }
+}
+
+// ── DUPLICATE DETECTION ──
+function detectDuplicates() {
+  const seen = new Map();
+  dupeIds.clear();
+  videos.forEach(v => {
+    if (seen.has(v.videoId)) {
+      dupeIds.add(v.videoId);
+      seen.get(v.videoId).forEach(id => dupeIds.add(id));
+    } else {
+      seen.set(v.videoId, [v.videoId]);
+    }
+  });
+  // Show/hide dupe bar
+  const bar = document.getElementById('dupeBar');
+  const cnt = document.getElementById('cnt-dupes');
+  const dupeCount = videos.filter(v => dupeIds.has(v.videoId)).length;
+  cnt.textContent = dupeCount;
+  if (dupeCount > 0) {
+    bar.classList.add('visible');
+    document.getElementById('dupeBarText').textContent = `${dupeCount} duplicate video${dupeCount>1?'s':''} detected — keeping duplicates may cause videos to appear twice on the site.`;
+  } else {
+    bar.classList.remove('visible');
   }
+}
+
+function removeAllDuplicates() {
+  if (!confirm(`Remove ${dupeIds.size} duplicate entries? This keeps the first occurrence of each.`)) return;
+  const seen = new Set();
+  videos = videos.filter(v => {
+    if (seen.has(v.videoId)) return false;
+    seen.add(v.videoId); return true;
+  });
+  markDirty();
+  detectDuplicates();
+  renderAll();
 }
 
 // ── SAVE ──
 async function saveChanges() {
   const btn = document.getElementById('saveBtn');
-  btn.textContent = 'Saving...';
-  btn.disabled = true;
-  setStatus('Saving...');
+  btn.textContent = 'Saving...'; btn.disabled = true; setStatus('Saving...');
   try {
-    // Reassign order
     videos.forEach((v, i) => v.order = i);
-    // Write to Firebase as object keyed by videoId
     const obj = {};
     videos.forEach(v => { obj[v.videoId] = v; });
     await db.ref('videos').set(obj);
     dirty = false;
     document.getElementById('saveBar').classList.remove('visible');
     btn.textContent = '✓ Saved';
-    btn.style.background = 'var(--green)';
-    btn.style.color = '#000';
+    btn.style.background = 'var(--green)'; btn.style.color = '#000';
     setStatus('Saved ✓');
-    setTimeout(() => {
-      btn.textContent = 'Save Changes';
-      btn.style.background = '';
-      btn.style.color = '';
-      btn.disabled = false;
-      setStatus('');
-    }, 2000);
+    setTimeout(() => { btn.textContent = 'Save Changes'; btn.style.background = ''; btn.style.color = ''; btn.disabled = false; setStatus(''); }, 2000);
   } catch(e) {
-    btn.textContent = 'Error — Retry';
-    btn.style.background = 'var(--red)';
-    btn.disabled = false;
+    btn.textContent = 'Error — Retry'; btn.style.background = 'var(--red)'; btn.disabled = false;
     setStatus('Save failed: ' + e.message);
-    setTimeout(() => {
-      btn.textContent = 'Save Changes';
-      btn.style.background = '';
-    }, 3000);
+    setTimeout(() => { btn.textContent = 'Save Changes'; btn.style.background = ''; }, 3000);
   }
 }
 
@@ -415,48 +543,29 @@ function markDirty() {
   document.getElementById('saveBar').classList.add('visible');
 }
 
-function setStatus(msg) {
-  document.getElementById('syncStatus').textContent = msg;
-}
+function setStatus(msg) { document.getElementById('syncStatus').textContent = msg; }
 
 // ── SYNC FROM YOUTUBE ──
 async function syncFromYouTube() {
-  if (dirty && !confirm('Syncing will merge new videos from YouTube. Unsaved changes will be lost. Continue?')) return;
+  if (dirty && !confirm('Unsaved changes will be lost. Continue?')) return;
   const btn = document.getElementById('syncBtn');
-  btn.textContent = 'Syncing...';
-  btn.disabled = true;
-  setStatus('Fetching from YouTube...');
-
+  btn.textContent = 'Syncing...'; btn.disabled = true; setStatus('Fetching...');
   try {
     const existing = new Set(videos.map(v => v.videoId));
     const newVideos = [];
-
     for (const p of PLAYLISTS) {
-      for (const playlistId of p.ids) {
+      for (const pid of p.ids) {
         try {
-          const r = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YT_API_KEY}`);
+          const r = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${pid}&key=${YT_API_KEY}`);
           const d = await r.json();
-          const items = (d.items||[]).filter(i => i.snippet.resourceId?.videoId);
-          for (const item of items) {
+          for (const item of (d.items||[]).filter(i => i.snippet.resourceId?.videoId)) {
             const vid = item.snippet.resourceId.videoId;
-            if (!existing.has(vid)) {
-              existing.add(vid);
-              newVideos.push({ videoId: vid, cat: p.cat, label: p.label });
-            }
+            if (!existing.has(vid)) { existing.add(vid); newVideos.push({ videoId: vid, cat: p.cat, label: p.label }); }
           }
         } catch(e) {}
       }
     }
-
-    if (!newVideos.length) {
-      setStatus('No new videos found.');
-      btn.textContent = '↓ Sync YouTube';
-      btn.disabled = false;
-      setTimeout(() => setStatus(''), 3000);
-      return;
-    }
-
-    // Fetch details for new videos
+    if (!newVideos.length) { setStatus('No new videos.'); btn.textContent = '↓ Sync YouTube'; btn.disabled = false; setTimeout(() => setStatus(''), 3000); return; }
     const ids = newVideos.map(v => v.videoId);
     const detailMap = {};
     for (let i = 0; i < ids.length; i += 50) {
@@ -464,43 +573,22 @@ async function syncFromYouTube() {
       const d = await r.json();
       (d.items||[]).forEach(v => detailMap[v.id] = v);
     }
-
-    const startOrder = videos.length;
+    const start = videos.length;
     newVideos.forEach((v, i) => {
       const detail = detailMap[v.videoId];
       const thumbs = detail?.snippet?.thumbnails;
       const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`;
-      const title = detail?.snippet?.title || v.videoId;
       const portrait = detail ? isPortrait(detail) : false;
-      videos.push({
-        videoId: v.videoId,
-        title,
-        thumbnail: thumb,
-        category: v.cat,
-        categoryLabel: v.label,
-        portrait,
-        featured: false,
-        visible: true,
-        order: startOrder + i,
-        duration: detail ? parseDuration(detail.contentDetails?.duration||'PT0S') : 0,
-        addedAt: Date.now()
-      });
+      const aspectRatio = portrait ? '9:16' : '16:9';
+      videos.push({ videoId: v.videoId, title: detail?.snippet?.title || v.videoId, thumbnail: thumb, category: v.cat, categoryLabel: v.label, portrait, aspectRatio, featured: false, visible: true, order: start + i, duration: detail ? parseDuration(detail.contentDetails?.duration||'PT0S') : 0, addedAt: Date.now() });
     });
-
-    markDirty();
-    renderAll();
-    setStatus(`Added ${newVideos.length} new video${newVideos.length>1?'s':''}`);
-    btn.textContent = '↓ Sync YouTube';
-    btn.disabled = false;
+    markDirty(); detectDuplicates(); renderAll();
+    setStatus(`Added ${newVideos.length} video${newVideos.length>1?'s':''}`);
+    btn.textContent = '↓ Sync YouTube'; btn.disabled = false;
     setTimeout(() => setStatus(''), 4000);
-  } catch(e) {
-    setStatus('Sync error: ' + e.message);
-    btn.textContent = '↓ Sync YouTube';
-    btn.disabled = false;
-  }
+  } catch(e) { setStatus('Sync error: ' + e.message); btn.textContent = '↓ Sync YouTube'; btn.disabled = false; }
 }
 
-// ── PORTRAIT DETECTION ──
 function parseDuration(iso) {
   const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   if (!m) return 0;
@@ -520,7 +608,8 @@ function getFilteredVideos() {
     if (currentFilter === 'featured' && !v.featured) return false;
     if (currentFilter === 'hidden' && v.visible) return false;
     if (currentFilter === 'portrait' && !v.portrait) return false;
-    if (currentFilter !== 'all' && currentFilter !== 'featured' && currentFilter !== 'hidden' && currentFilter !== 'portrait' && v.category !== currentFilter) return false;
+    if (currentFilter === 'dupes' && !dupeIds.has(v.videoId)) return false;
+    if (!['all','featured','hidden','portrait','dupes'].includes(currentFilter) && v.category !== currentFilter) return false;
     if (currentSearch) {
       const q = currentSearch.toLowerCase();
       if (!v.title.toLowerCase().includes(q) && !v.videoId.toLowerCase().includes(q)) return false;
@@ -529,11 +618,7 @@ function getFilteredVideos() {
   });
 }
 
-function renderAll() {
-  renderStats();
-  renderSidebarCounts();
-  renderList();
-}
+function renderAll() { renderStats(); renderSidebarCounts(); renderList(); updateBulkBar(); }
 
 function renderStats() {
   document.getElementById('statTotal').textContent = videos.length;
@@ -552,6 +637,7 @@ function renderSidebarCounts() {
   document.getElementById('cnt-featured').textContent = videos.filter(v=>v.featured).length;
   document.getElementById('cnt-hidden').textContent = videos.filter(v=>!v.visible).length;
   document.getElementById('cnt-portrait').textContent = videos.filter(v=>v.portrait).length;
+  document.getElementById('cnt-dupes').textContent = videos.filter(v=>dupeIds.has(v.videoId)).length;
 }
 
 function renderList() {
@@ -564,57 +650,92 @@ function renderList() {
     return;
   }
 
-  // Show order numbers based on position in master array
   filtered.forEach(v => {
     const masterIdx = videos.indexOf(v);
+    const isDupe = dupeIds.has(v.videoId);
+    const isSelected = selectedIds.has(v.videoId);
     const row = document.createElement('div');
-    row.className = `video-row${!v.visible?' is-hidden':''}`;
+    row.className = `video-row${!v.visible?' is-hidden':''}${isDupe?' is-duplicate':''}${isSelected?' selected':''}`;
     row.dataset.videoid = v.videoId;
     row.draggable = true;
 
+    const currentRatio = v.aspectRatio || (v.portrait ? '9:16' : '16:9');
     const thumbClass = v.portrait ? 'portrait-thumb' : 'landscape-thumb';
 
     row.innerHTML = `
+      <input type="checkbox" class="row-check" ${isSelected?'checked':''} onclick="toggleSelect(event,'${v.videoId}')">
       <span class="drag-handle">⠿</span>
       <span class="video-order">${masterIdx + 1}</span>
-      <div class="video-thumb ${thumbClass}">
-        <img src="${v.thumbnail}" alt="" loading="lazy">
+      <div class="video-thumb-wrap">
+        <div class="video-thumb ${thumbClass}">
+          <img src="${v.thumbnail}" alt="" loading="lazy">
+        </div>
       </div>
       <div class="video-info">
         <div class="video-title">${v.title}</div>
-        <div class="video-id">${v.videoId}</div>
+        <div class="video-meta-row">
+          <span class="video-id">${v.videoId}</span>
+          ${isDupe ? '<span class="dupe-tag">DUPLICATE</span>' : ''}
+        </div>
       </div>
       <select class="cat-select" onchange="updateField('${v.videoId}','category',this.value);updateField('${v.videoId}','categoryLabel',CAT_LABELS[this.value])">
         ${Object.entries(CAT_LABELS).map(([k,l]) => `<option value="${k}"${v.category===k?' selected':''}>${l}</option>`).join('')}
       </select>
+      <select class="ratio-select" onchange="updateRatio('${v.videoId}',this.value)">
+        ${Object.keys(RATIO_MAP).map(r => `<option value="${r}"${currentRatio===r?' selected':''}>${r}</option>`).join('')}
+      </select>
       <div class="toggle-group">
-        <span class="toggle-pill toggle-portrait${v.portrait?' on':''}" onclick="toggleField('${v.videoId}','portrait',this)">↕ Vertical</span>
         <span class="toggle-pill toggle-featured${v.featured?' on':''}" onclick="toggleField('${v.videoId}','featured',this)">★ Featured</span>
         <span class="toggle-pill ${v.visible?'toggle-visible on':'toggle-hidden-pill on'}" onclick="toggleVisible('${v.videoId}',this)">${v.visible?'● Visible':'✕ Hidden'}</span>
       </div>
       <button class="delete-btn" onclick="deleteVideo('${v.videoId}')">✕</button>
     `;
 
-    // Drag events
+    // Hover preview
+    const thumbWrap = row.querySelector('.video-thumb-wrap');
+    thumbWrap.addEventListener('mouseenter', e => showPreview(v, e));
+    thumbWrap.addEventListener('mousemove', e => movePreview(e));
+    thumbWrap.addEventListener('mouseleave', hidePreview);
+
+    // Drag — supports multi-select group drag
     row.addEventListener('dragstart', e => {
       dragSrc = v.videoId;
-      row.classList.add('dragging');
+      // If dragging a non-selected row, clear selection and just drag that one
+      if (!selectedIds.has(v.videoId)) {
+        selectedIds.clear();
+        selectedIds.add(v.videoId);
+      }
+      // Mark all selected rows as dragging
+      document.querySelectorAll('.video-row').forEach(r => {
+        if (selectedIds.has(r.dataset.videoid)) r.classList.add('dragging');
+      });
+      e.dataTransfer.effectAllowed = 'move';
     });
+
     row.addEventListener('dragend', () => {
       document.querySelectorAll('.video-row').forEach(r => r.classList.remove('dragging','drag-over'));
       renderAll();
     });
+
     row.addEventListener('dragover', e => {
       e.preventDefault();
-      if (dragSrc === v.videoId) return;
+      if (selectedIds.has(v.videoId)) return; // can't drop onto self or selected
       document.querySelectorAll('.video-row').forEach(r => r.classList.remove('drag-over'));
       row.classList.add('drag-over');
-      // Reorder in master array
-      const srcIdx = videos.findIndex(x => x.videoId === dragSrc);
-      const tgtIdx = videos.findIndex(x => x.videoId === v.videoId);
-      if (srcIdx !== -1 && tgtIdx !== -1 && srcIdx !== tgtIdx) {
-        const [moved] = videos.splice(srcIdx, 1);
-        videos.splice(tgtIdx, 0, moved);
+
+      // Get all selected videos in their current order
+      const selectedGroup = videos.filter(x => selectedIds.has(x.videoId));
+      const remaining = videos.filter(x => !selectedIds.has(x.videoId));
+      const tgtIdx = remaining.findIndex(x => x.videoId === v.videoId);
+
+      if (tgtIdx !== -1) {
+        // Insert group before or after target based on mouse Y position
+        const rect = row.getBoundingClientRect();
+        const insertAfter = e.clientY > rect.top + rect.height / 2;
+        const insertIdx = insertAfter ? tgtIdx + 1 : tgtIdx;
+        remaining.splice(insertIdx, 0, ...selectedGroup);
+        videos.length = 0;
+        videos.push(...remaining);
         markDirty();
       }
     });
@@ -623,10 +744,49 @@ function renderList() {
   });
 }
 
+// ── HOVER PREVIEW ──
+const previewEl = document.getElementById('thumbPreview');
+let previewTimeout;
+
+function showPreview(v, e) {
+  clearTimeout(previewTimeout);
+  previewTimeout = setTimeout(() => {
+    document.getElementById('previewPopupImg').src = v.thumbnail;
+    document.getElementById('previewPopupTitle').textContent = v.title;
+    document.getElementById('previewPopupMeta').textContent = `${v.videoId} · ${v.aspectRatio || (v.portrait?'9:16':'16:9')} · ${v.categoryLabel}`;
+    previewEl.classList.add('visible');
+    movePreview(e);
+  }, 300);
+}
+
+function movePreview(e) {
+  const offset = 20;
+  let left = e.clientX + offset;
+  let top = e.clientY;
+  if (left + 260 > window.innerWidth) left = e.clientX - 260;
+  previewEl.style.left = left + 'px';
+  previewEl.style.top = top + 'px';
+}
+
+function hidePreview() {
+  clearTimeout(previewTimeout);
+  previewEl.classList.remove('visible');
+}
+
 // ── FIELD UPDATES ──
 function updateField(videoId, field, value) {
   const v = videos.find(x => x.videoId === videoId);
   if (v) { v[field] = value; markDirty(); renderStats(); renderSidebarCounts(); }
+}
+
+function updateRatio(videoId, ratio) {
+  const v = videos.find(x => x.videoId === videoId);
+  if (!v) return;
+  v.aspectRatio = ratio;
+  v.portrait = RATIO_MAP[ratio]?.portrait || false;
+  markDirty();
+  renderStats();
+  renderSidebarCounts();
 }
 
 function toggleField(videoId, field, el) {
@@ -634,16 +794,7 @@ function toggleField(videoId, field, el) {
   if (!v) return;
   v[field] = !v[field];
   el.classList.toggle('on', v[field]);
-  // Update row class for hidden state
-  if (field === 'portrait') {
-    // Update thumbnail class
-    const row = el.closest('.video-row');
-    const thumb = row.querySelector('.video-thumb');
-    thumb.className = `video-thumb ${v.portrait ? 'portrait-thumb' : 'landscape-thumb'}`;
-  }
-  markDirty();
-  renderStats();
-  renderSidebarCounts();
+  markDirty(); renderStats(); renderSidebarCounts();
 }
 
 function toggleVisible(videoId, el) {
@@ -652,20 +803,76 @@ function toggleVisible(videoId, el) {
   v.visible = !v.visible;
   el.className = `toggle-pill ${v.visible ? 'toggle-visible on' : 'toggle-hidden-pill on'}`;
   el.textContent = v.visible ? '● Visible' : '✕ Hidden';
-  const row = el.closest('.video-row');
-  row.classList.toggle('is-hidden', !v.visible);
-  markDirty();
-  renderStats();
-  renderSidebarCounts();
+  el.closest('.video-row').classList.toggle('is-hidden', !v.visible);
+  markDirty(); renderStats(); renderSidebarCounts();
 }
 
 function deleteVideo(videoId) {
   const v = videos.find(x => x.videoId === videoId);
-  if (!v) return;
-  if (!confirm(`Delete "${v.title}"? This removes it from the site but not from YouTube.`)) return;
+  if (!v || !confirm(`Delete "${v.title}"?`)) return;
   videos = videos.filter(x => x.videoId !== videoId);
-  markDirty();
-  renderAll();
+  selectedIds.delete(videoId);
+  markDirty(); detectDuplicates(); renderAll();
+}
+
+// ── BULK ACTIONS ──
+function toggleSelect(e, videoId) {
+  e.stopPropagation();
+  if (selectedIds.has(videoId)) selectedIds.delete(videoId);
+  else selectedIds.add(videoId);
+  updateBulkBar();
+  // Update checkbox state without full re-render
+  const row = document.querySelector(`[data-videoid="${videoId}"]`);
+  if (row) row.classList.toggle('selected', selectedIds.has(videoId));
+}
+
+function toggleSelectAll(checked) {
+  const filtered = getFilteredVideos();
+  if (checked) filtered.forEach(v => selectedIds.add(v.videoId));
+  else filtered.forEach(v => selectedIds.delete(v.videoId));
+  document.getElementById('selectAllCheck').checked = checked;
+  document.getElementById('selectAllCheck2').checked = checked;
+  renderList();
+  updateBulkBar();
+}
+
+function clearSelection() {
+  selectedIds.clear();
+  document.getElementById('selectAllCheck').checked = false;
+  document.getElementById('selectAllCheck2').checked = false;
+  renderList();
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulkBar');
+  const count = document.getElementById('bulkCount');
+  count.textContent = `${selectedIds.size} selected`;
+  bar.classList.toggle('visible', selectedIds.size > 0);
+}
+
+function bulkSetFeatured(val) {
+  selectedIds.forEach(id => { const v = videos.find(x => x.videoId === id); if (v) v.featured = val; });
+  markDirty(); renderAll();
+}
+
+function bulkSetVisible(val) {
+  selectedIds.forEach(id => { const v = videos.find(x => x.videoId === id); if (v) v.visible = val; });
+  markDirty(); renderAll();
+}
+
+function bulkSetCategory(cat) {
+  if (!cat) return;
+  selectedIds.forEach(id => { const v = videos.find(x => x.videoId === id); if (v) { v.category = cat; v.categoryLabel = CAT_LABELS[cat]; } });
+  document.getElementById('bulkCatSelect').value = '';
+  markDirty(); renderAll();
+}
+
+function bulkDelete() {
+  if (!selectedIds.size || !confirm(`Delete ${selectedIds.size} selected video${selectedIds.size>1?'s':''}?`)) return;
+  videos = videos.filter(v => !selectedIds.has(v.videoId));
+  selectedIds.clear();
+  markDirty(); detectDuplicates(); renderAll();
 }
 
 // ── FILTER / SEARCH ──
@@ -677,40 +884,29 @@ function filterSidebar(el) {
   renderList();
 }
 
-function searchVideos(q) {
-  currentSearch = q;
-  renderList();
-}
+function searchVideos(q) { currentSearch = q; renderList(); }
 
-// ── ADD VIDEO MODAL ──
+// ── ADD MODAL ──
 function openAddModal() {
   document.getElementById('addModal').classList.add('open');
   document.getElementById('addVideoInput').value = '';
   document.getElementById('previewCard').style.display = 'none';
   document.getElementById('fetchError').textContent = '';
-  document.getElementById('addPortraitToggle').classList.remove('on');
   document.getElementById('addFeaturedToggle').classList.remove('on');
   pendingAdd = null;
 }
 
-function closeAddModal() {
-  document.getElementById('addModal').classList.remove('open');
-}
+function closeAddModal() { document.getElementById('addModal').classList.remove('open'); }
 
 async function fetchVideoPreview() {
   const input = document.getElementById('addVideoInput').value.trim();
   const err = document.getElementById('fetchError');
   err.textContent = '';
-
-  // Extract video ID
   let videoId = input;
   const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
   if (match) videoId = match[1];
   if (videoId.length !== 11) { err.textContent = 'Invalid YouTube URL or video ID.'; return; }
-
-  // Check not already in list
   if (videos.find(v => v.videoId === videoId)) { err.textContent = 'This video is already in the list.'; return; }
-
   try {
     const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${YT_API_KEY}`);
     const d = await r.json();
@@ -719,42 +915,33 @@ async function fetchVideoPreview() {
     const thumbs = detail.snippet.thumbnails;
     const thumb = thumbs?.maxres?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
     const portrait = isPortrait(detail);
-
     pendingAdd = { detail, videoId, thumb, portrait };
-
     document.getElementById('previewThumb').src = thumb;
-    document.getElementById('previewTitle').textContent = detail.snippet.title;
-    document.getElementById('previewId').textContent = videoId;
-    if (portrait) document.getElementById('addPortraitToggle').classList.add('on');
+    document.getElementById('previewTitleText').textContent = detail.snippet.title;
+    document.getElementById('previewIdText').textContent = videoId;
+    document.getElementById('addRatioSelect').value = portrait ? '9:16' : '16:9';
     document.getElementById('previewCard').style.display = 'block';
-  } catch(e) {
-    err.textContent = 'Error fetching video. Try again.';
-  }
+  } catch(e) { err.textContent = 'Error fetching video.'; }
 }
 
 function confirmAddVideo() {
   if (!pendingAdd) return;
   const catVal = document.getElementById('addCatSelect').value;
-  const portrait = document.getElementById('addPortraitToggle').classList.contains('on');
+  const ratio = document.getElementById('addRatioSelect').value;
+  const portrait = RATIO_MAP[ratio]?.portrait || false;
   const featured = document.getElementById('addFeaturedToggle').classList.contains('on');
-
   videos.push({
     videoId: pendingAdd.videoId,
     title: pendingAdd.detail.snippet.title,
     thumbnail: pendingAdd.thumb,
     category: catVal,
     categoryLabel: CAT_LABELS[catVal],
-    portrait,
-    featured,
-    visible: true,
+    portrait, aspectRatio: ratio, featured, visible: true,
     order: videos.length,
     duration: parseDuration(pendingAdd.detail.contentDetails?.duration || 'PT0S'),
     addedAt: Date.now()
   });
-
-  markDirty();
-  renderAll();
-  closeAddModal();
+  markDirty(); detectDuplicates(); renderAll(); closeAddModal();
 }
 
 document.getElementById('addVideoInput').addEventListener('keydown', e => { if (e.key === 'Enter') fetchVideoPreview(); });
