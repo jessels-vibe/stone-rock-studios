@@ -152,6 +152,19 @@
   .ratio-select { background: #1a1a1a; border: 1px solid var(--border); color: var(--blue); font-size: 10px; font-weight: 700; padding: 5px 8px; font-family: inherit; cursor: pointer; border-radius: 2px; outline: none; flex-shrink: 0; border-color: #002030; }
   .ratio-select:hover { border-color: #0a3040; }
 
+  /* TAG PICKER */
+  .tags-cell { position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 3px; min-width: 130px; max-width: 200px; flex-shrink: 0; }
+  .tags-chips { display: flex; flex-wrap: wrap; gap: 3px; }
+  .tag-chip { display: inline-flex; align-items: center; gap: 2px; font-size: 9px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: #1e1e1e; border: 1px solid #333; color: var(--text); padding: 2px 4px 2px 6px; border-radius: 2px; white-space: nowrap; }
+  .tag-chip-remove { background: none; border: none; color: #555; cursor: pointer; font-size: 12px; line-height: 1; padding: 0 1px; font-family: inherit; transition: color 0.12s; }
+  .tag-chip-remove:hover { color: var(--red); }
+  .tag-add-btn { background: #161616; border: 1px solid #2a2a2a; color: #444; font-size: 16px; line-height: 1; cursor: pointer; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 2px; flex-shrink: 0; transition: all 0.12s; padding: 0; font-family: inherit; }
+  .tag-add-btn:hover { border-color: #444; color: var(--text); }
+  .tag-dropdown { position: absolute; top: calc(100% + 4px); left: 0; z-index: 200; background: #151515; border: 1px solid #333; min-width: 160px; box-shadow: 0 4px 20px rgba(0,0,0,0.7); display: none; }
+  .tag-option { display: flex; align-items: center; gap: 8px; padding: 7px 12px; font-size: 11px; font-weight: 500; color: var(--muted); cursor: pointer; transition: background 0.1s; user-select: none; }
+  .tag-option:hover { background: #1e1e1e; color: var(--text); }
+  .tag-option input[type=checkbox] { accent-color: var(--text); width: 13px; height: 13px; cursor: pointer; flex-shrink: 0; }
+
   .toggle-group { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
   .toggle-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 9px; border-radius: 2px; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; white-space: nowrap; }
   .toggle-featured { background: #2a2000; color: var(--yellow); border-color: #3a2a00; }
@@ -297,7 +310,7 @@
         <button class="btn btn-ghost btn-sm" onclick="bulkSetVisible(false)">Hide</button>
         <div class="bulk-divider"></div>
         <select class="cat-select" id="bulkCatSelect" onchange="bulkSetCategory(this.value)" style="font-size:10px">
-          <option value="">Move to category...</option>
+          <option value="">Add tag...</option>
           <option value="moto">Moto</option>
           <option value="food">Food & Drink</option>
           <option value="lifestyle">Lifestyle</option>
@@ -319,7 +332,7 @@
         <span style="width:22px"></span>
         <span style="width:80px" class="list-header-label">Thumbnail</span>
         <span style="flex:1" class="list-header-label">Title</span>
-        <span style="width:110px" class="list-header-label">Category</span>
+        <span style="width:130px" class="list-header-label">Tags</span>
         <span style="width:80px" class="list-header-label">Ratio</span>
         <span style="width:160px" class="list-header-label">Toggles</span>
         <span style="width:24px"></span>
@@ -472,6 +485,7 @@ async function loadVideos() {
     // Ensure all videos have an aspectRatio field
     videos.forEach(v => {
       if (!v.aspectRatio) v.aspectRatio = v.portrait ? '9:16' : '16:9';
+      if (!v.tags) v.tags = v.category ? [v.category] : [];
     });
     dirty = false;
     selectedIds.clear();
@@ -587,7 +601,7 @@ async function syncFromYouTube() {
       const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`;
       const portrait = detail ? isPortrait(detail) : false;
       const aspectRatio = portrait ? '9:16' : '16:9';
-      videos.push({ videoId: v.videoId, title: detail?.snippet?.title || v.videoId, thumbnail: thumb, category: v.cat, categoryLabel: v.label, portrait, aspectRatio, featured: false, visible: true, order: start + i, duration: detail ? parseDuration(detail.contentDetails?.duration||'PT0S') : 0, addedAt: Date.now() });
+      videos.push({ videoId: v.videoId, title: detail?.snippet?.title || v.videoId, thumbnail: thumb, category: v.cat, categoryLabel: v.label, tags: [v.cat], portrait, aspectRatio, featured: false, visible: true, order: start + i, duration: detail ? parseDuration(detail.contentDetails?.duration||'PT0S') : 0, addedAt: Date.now() });
     });
     markDirty(); detectDuplicates(); renderAll();
     setStatus(`Added ${newVideos.length} video${newVideos.length>1?'s':''}`);
@@ -616,7 +630,7 @@ function getFilteredVideos() {
     if (currentFilter === 'hidden' && v.visible) return false;
     if (currentFilter === 'portrait' && !v.portrait) return false;
     if (currentFilter === 'dupes' && !dupeIds.has(v.videoId)) return false;
-    if (!['all','featured','hidden','portrait','dupes'].includes(currentFilter) && v.category !== currentFilter) return false;
+    if (!['all','featured','hidden','portrait','dupes'].includes(currentFilter) && !(v.tags||[v.category]).includes(currentFilter)) return false;
     if (currentSearch) {
       const q = currentSearch.toLowerCase();
       if (!v.title.toLowerCase().includes(q) && !v.videoId.toLowerCase().includes(q)) return false;
@@ -639,7 +653,7 @@ function renderSidebarCounts() {
   document.getElementById('cnt-all').textContent = videos.length;
   ['moto','food','lifestyle','documentary','events','realestate','reels','music'].forEach(cat => {
     const el = document.getElementById('cnt-'+cat);
-    if (el) el.textContent = videos.filter(v=>v.category===cat).length;
+    if (el) el.textContent = videos.filter(v=>(v.tags||[v.category]).includes(cat)).length;
   });
   document.getElementById('cnt-featured').textContent = videos.filter(v=>v.featured).length;
   document.getElementById('cnt-hidden').textContent = videos.filter(v=>!v.visible).length;
@@ -686,9 +700,13 @@ function renderList() {
           ${isDupe ? '<span class="dupe-tag">DUPLICATE</span>' : ''}
         </div>
       </div>
-      <select class="cat-select" onchange="updateField('${v.videoId}','category',this.value);updateField('${v.videoId}','categoryLabel',CAT_LABELS[this.value])">
-        ${Object.entries(CAT_LABELS).map(([k,l]) => `<option value="${k}"${v.category===k?' selected':''}>${l}</option>`).join('')}
-      </select>
+      <div class="tags-cell" ondragstart="event.stopPropagation()">
+        <div class="tags-chips" id="chips-${v.videoId}">${buildChips(v.videoId)}</div>
+        <button class="tag-add-btn" onclick="toggleTagDropdown('${v.videoId}',event)" title="Add tag">+</button>
+        <div class="tag-dropdown" id="td-${v.videoId}">
+          ${Object.entries(CAT_LABELS).map(([k,l]) => `<label class="tag-option"><input type="checkbox" data-tag="${k}" ${(v.tags||[]).includes(k)?'checked':''} onchange="toggleTag('${v.videoId}','${k}',this.checked)">${l}</label>`).join('')}
+        </div>
+      </div>
       <select class="ratio-select" onchange="updateRatio('${v.videoId}',this.value)">
         ${Object.keys(RATIO_MAP).map(r => `<option value="${r}"${currentRatio===r?' selected':''}>${r}</option>`).join('')}
       </select>
@@ -761,7 +779,7 @@ function showPreview(v, e) {
   previewTimeout = setTimeout(() => {
     document.getElementById('previewPopupImg').src = v.thumbnail;
     document.getElementById('previewPopupTitle').textContent = v.title;
-    document.getElementById('previewPopupMeta').textContent = `${v.videoId} · ${v.aspectRatio || (v.portrait?'9:16':'16:9')} · ${v.categoryLabel}`;
+    document.getElementById('previewPopupMeta').textContent = `${v.videoId} · ${v.aspectRatio || (v.portrait?'9:16':'16:9')} · ${(v.tags||[v.category]).map(t=>CAT_LABELS[t]||t).join(', ')}`;
     previewEl.classList.add('visible');
     movePreview(e);
   }, 300);
@@ -871,7 +889,13 @@ function bulkSetVisible(val) {
 
 function bulkSetCategory(cat) {
   if (!cat) return;
-  selectedIds.forEach(id => { const v = videos.find(x => x.videoId === id); if (v) { v.category = cat; v.categoryLabel = CAT_LABELS[cat]; } });
+  selectedIds.forEach(id => {
+    const v = videos.find(x => x.videoId === id);
+    if (!v) return;
+    if (!v.tags) v.tags = v.category ? [v.category] : [];
+    if (!v.tags.includes(cat)) v.tags.push(cat);
+    v.category = v.tags[0]; v.categoryLabel = CAT_LABELS[v.tags[0]] || '';
+  });
   document.getElementById('bulkCatSelect').value = '';
   markDirty(); renderAll();
 }
@@ -944,6 +968,7 @@ function confirmAddVideo() {
     thumbnail: pendingAdd.thumb,
     category: catVal,
     categoryLabel: CAT_LABELS[catVal],
+    tags: [catVal],
     portrait, aspectRatio: ratio, featured, visible: true,
     order: videos.length,
     duration: parseDuration(pendingAdd.detail.contentDetails?.duration || 'PT0S'),
@@ -951,6 +976,51 @@ function confirmAddVideo() {
   });
   markDirty(); detectDuplicates(); renderAll(); closeAddModal();
 }
+
+// ── TAG PICKER ──
+let openTagDropdown = null;
+
+function buildChips(videoId) {
+  const v = videos.find(x => x.videoId === videoId);
+  if (!v) return '';
+  return (v.tags || []).map(t =>
+    `<span class="tag-chip">${CAT_LABELS[t] || t}<button class="tag-chip-remove" onclick="removeTag('${videoId}','${t}',event)">×</button></span>`
+  ).join('');
+}
+
+function toggleTagDropdown(videoId, e) {
+  e.stopPropagation();
+  const dd = document.getElementById('td-' + videoId);
+  if (!dd) return;
+  if (openTagDropdown && openTagDropdown !== dd) openTagDropdown.style.display = 'none';
+  const willOpen = dd.style.display === 'none' || !dd.style.display;
+  dd.style.display = willOpen ? 'block' : 'none';
+  openTagDropdown = willOpen ? dd : null;
+}
+
+function toggleTag(videoId, tag, checked) {
+  const v = videos.find(x => x.videoId === videoId);
+  if (!v) return;
+  if (!v.tags) v.tags = v.category ? [v.category] : [];
+  if (checked) { if (!v.tags.includes(tag)) v.tags.push(tag); }
+  else { v.tags = v.tags.filter(t => t !== tag); }
+  v.category = v.tags[0] || '';
+  v.categoryLabel = CAT_LABELS[v.category] || '';
+  markDirty(); renderSidebarCounts(); renderStats();
+  const chips = document.getElementById('chips-' + videoId);
+  if (chips) chips.innerHTML = buildChips(videoId);
+}
+
+function removeTag(videoId, tag, e) {
+  e.stopPropagation();
+  toggleTag(videoId, tag, false);
+  const dd = document.getElementById('td-' + videoId);
+  if (dd) { const cb = dd.querySelector(`input[data-tag="${tag}"]`); if (cb) cb.checked = false; }
+}
+
+document.addEventListener('click', () => {
+  if (openTagDropdown) { openTagDropdown.style.display = 'none'; openTagDropdown = null; }
+});
 
 document.getElementById('addVideoInput').addEventListener('keydown', e => { if (e.key === 'Enter') fetchVideoPreview(); });
 document.getElementById('addModal').addEventListener('click', e => { if (e.target === document.getElementById('addModal')) closeAddModal(); });

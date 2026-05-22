@@ -186,7 +186,7 @@ function makeTile(v) {
 
   const tile = document.createElement('div');
   tile.className = `tile ${wClass} ${portrait ? 'portrait' : 'landscape'}`;
-  tile.dataset.cat = v.category;
+  tile.dataset.tags = (v.tags || [v.category]).join(',');
 
   const displayTitle = v.customTitle || v.title;
   const roleHtml = v.role ? `<div class="tile-role">${v.role}</div>` : '';
@@ -335,7 +335,7 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     item.classList.add('selected');
     workDropdown.classList.remove('open');
     document.querySelectorAll('.tile').forEach(tile => {
-      tile.style.display = (activeCat === 'all' || tile.dataset.cat === activeCat) ? '' : 'none';
+      tile.style.display = (activeCat === 'all' || tile.dataset.tags.split(',').includes(activeCat)) ? '' : 'none';
     });
     if (msnry) setTimeout(() => msnry.layout(), 50);
   });
