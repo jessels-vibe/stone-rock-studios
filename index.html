@@ -60,6 +60,7 @@
   .tile:hover .tile-overlay { opacity: 1; }
   .tile-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 5px; }
   .tile-title { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.25; }
+  .tile-role { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; letter-spacing: 0.06em; }
   .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.75); width: 46px; height: 46px; background: rgba(255,255,255,0.12); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; }
   .play-btn svg { margin-left: 3px; }
   .tile:hover .play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -172,20 +173,23 @@ function makeTile(v) {
   tile.className = `tile ${wClass} ${portrait ? 'portrait' : 'landscape'}`;
   tile.dataset.cat = v.category;
 
+  const displayTitle = v.customTitle || v.title;
+  const roleHtml = v.role ? `<div class="tile-role">${v.role}</div>` : '';
+
   if (portrait) {
     tile.innerHTML = `
       <div class="thumb-wrap" style="padding-bottom:${padding}%"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
       <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
-      <div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${v.title}</div></div>
+      <div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>
     `;
   } else {
     tile.innerHTML = `
       <img src="${v.thumbnail}" alt="" loading="lazy">
       <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
-      <div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${v.title}</div></div>
+      <div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>
     `;
   }
-  tile.addEventListener('click', () => openModal(v.videoId, v.categoryLabel, v.title, ratio));
+  tile.addEventListener('click', () => openModal(v.videoId, v.categoryLabel, displayTitle, ratio));
   return tile;
 }
 

@@ -135,10 +135,15 @@
   .dupe-warning { font-size: 9px; font-weight: 700; color: var(--yellow); background: #2a1500; padding: 2px 8px; }
 
   .video-info { flex: 1; min-width: 0; }
-  .video-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
   .video-meta-row { display: flex; align-items: center; gap: 6px; }
   .video-id { font-size: 10px; color: #333; font-family: monospace; }
   .dupe-tag { font-size: 8px; font-weight: 700; letter-spacing: 0.08em; background: var(--yellow); color: #000; padding: 1px 5px; border-radius: 2px; }
+  .video-title-input { background: transparent; border: none; border-bottom: 1px solid transparent; color: var(--text); font-size: 12px; font-weight: 600; font-family: inherit; width: 100%; outline: none; padding: 1px 0; margin-bottom: 2px; transition: border-color 0.15s; }
+  .video-title-input:hover, .video-title-input:focus { border-bottom-color: #333; }
+  .video-title-input::placeholder { color: var(--muted); }
+  .video-role-input { background: transparent; border: none; border-bottom: 1px solid transparent; color: var(--muted); font-size: 10px; font-family: inherit; width: 100%; outline: none; padding: 1px 0; margin-bottom: 3px; transition: border-color 0.15s; }
+  .video-role-input:hover, .video-role-input:focus { border-bottom-color: #333; }
+  .video-role-input::placeholder { color: #333; }
 
   .cat-select { background: #1a1a1a; border: 1px solid var(--border); color: var(--text); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 8px; font-family: inherit; cursor: pointer; border-radius: 2px; outline: none; flex-shrink: 0; }
   .cat-select:hover { border-color: #444; }
@@ -414,6 +419,8 @@ const RATIO_MAP = {
   '21:9': { portrait: false, padding: 42.86 },
 };
 
+function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') : ''; }
+
 let videos = [];
 let dirty = false;
 let currentFilter = 'all';
@@ -672,7 +679,8 @@ function renderList() {
         </div>
       </div>
       <div class="video-info">
-        <div class="video-title">${v.title}</div>
+        <input class="video-title-input" value="${esc(v.customTitle||'')}" placeholder="${esc(v.title)}" oninput="updateField('${v.videoId}','customTitle',this.value)" ondragstart="event.stopPropagation()">
+        <input class="video-role-input" value="${esc(v.role||'')}" placeholder="Role / credit..." oninput="updateField('${v.videoId}','role',this.value)" ondragstart="event.stopPropagation()">
         <div class="video-meta-row">
           <span class="video-id">${v.videoId}</span>
           ${isDupe ? '<span class="dupe-tag">DUPLICATE</span>' : ''}
