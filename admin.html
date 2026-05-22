@@ -954,6 +954,13 @@ function confirmAddVideo() {
 
 document.getElementById('addVideoInput').addEventListener('keydown', e => { if (e.key === 'Enter') fetchVideoPreview(); });
 document.getElementById('addModal').addEventListener('click', e => { if (e.target === document.getElementById('addModal')) closeAddModal(); });
+
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault();
+    if (dirty) saveChanges();
+  }
+});
 </script>
 </body>
 </html>

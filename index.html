@@ -27,6 +27,8 @@
   .nav-links { display: flex; gap: 40px; align-items: center; }
   .nav-link { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
   .nav-link:hover, .nav-link.active { color: var(--text); }
+  .nav-cta { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); background: var(--text); padding: 7px 16px; text-decoration: none; transition: opacity 0.2s; }
+  .nav-cta:hover { opacity: 0.8; }
   .dropdown-wrapper { position: relative; }
   .dropdown-arrow { margin-left: 4px; display: inline-block; transition: transform 0.2s; font-size: 10px; }
   .dropdown-wrapper.open .dropdown-arrow { transform: rotate(180deg); }
@@ -76,6 +78,12 @@
   .modal-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
   .modal-close { position: absolute; top: -38px; right: 0; background: none; border: none; cursor: pointer; color: var(--muted); font-size: 22px; transition: color 0.2s; font-family: inherit; }
   .modal-close:hover { color: var(--text); }
+  .modal-nav { position: fixed; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.3); font-size: 28px; padding: 16px; transition: color 0.2s; font-family: inherit; z-index: 201; }
+  .modal-nav:hover { color: rgba(255,255,255,0.9); }
+  .modal-nav.prev { left: 16px; }
+  .modal-nav.next { right: 16px; }
+  .modal-nav:disabled { opacity: 0; pointer-events: none; }
+  .modal-counter { position: absolute; top: -38px; left: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; color: var(--muted); line-height: 22px; }
   .modal-meta { padding: 14px 0 0; }
   .modal-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
   .modal-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
@@ -110,6 +118,7 @@
       </div>
     </div>
     <a class="nav-link" id="aboutBtn" href="#">ABOUT</a>
+    <a class="nav-cta" href="mailto:hello@stonerockstudios.xyz">Get in Touch</a>
   </div>
 </nav>
 
@@ -118,6 +127,7 @@
     <div class="hero-label">Selected Work</div>
     <div class="hero-title">Stone Rock<br>Studios</div>
     <div class="hero-sub">Capture every moment.</div>
+    <a href="mailto:hello@stonerockstudios.xyz" style="display:inline-block;margin-top:28px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);text-decoration:none;border-bottom:1px solid #333;padding-bottom:2px;transition:color 0.2s,border-color 0.2s" onmouseover="this.style.color='#f0f0f0';this.style.borderColor='#666'" onmouseout="this.style.color='';this.style.borderColor=''">hello@stonerockstudios.xyz →</a>
   </div>
   <div id="grid">
     <div class="grid-sizer"></div>
@@ -134,7 +144,9 @@
 </div>
 
 <div class="modal-backdrop" id="modal">
+  <button class="modal-nav prev" id="modalPrev">&#8592;</button>
   <div class="modal-inner landscape" id="modalInner">
+    <div class="modal-counter" id="modalCounter"></div>
     <button class="modal-close" id="modalClose">✕</button>
     <div class="modal-video">
       <iframe id="modalFrame" src="" allowfullscreen allow="autoplay"></iframe>
@@ -144,6 +156,7 @@
       <div class="modal-title" id="modalTitle"></div>
     </div>
   </div>
+  <button class="modal-nav next" id="modalNext">&#8594;</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
@@ -158,6 +171,9 @@ let li = 0, pi = 0, msnry = null;
 const RATIO_PADDING = {'16:9':56.25,'9:16':177.78,'1:1':100,'4:3':75,'4:5':125,'21:9':42.86};
 const MODAL_WIDTH   = {'16:9':'min(900px,92vw)','9:16':'min(360px,52vw)','1:1':'min(600px,80vw)','4:3':'min(700px,88vw)','4:5':'min(400px,55vw)','21:9':'min(960px,95vw)'};
 const MODAL_PADDING = {'16:9':56.25,'9:16':177.78,'1:1':100,'4:3':75,'4:5':125,'21:9':42.86};
+
+let allVideos = [];
+let activeCat = 'all';
 
 function makeTile(v) {
   const portrait = v.portrait;
@@ -189,7 +205,11 @@ function makeTile(v) {
       <div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>
     `;
   }
-  tile.addEventListener('click', () => openModal(v.videoId, v.categoryLabel, displayTitle, ratio));
+  tile.addEventListener('click', () => {
+    activeVideos = activeCat === 'all' ? allVideos : allVideos.filter(x => x.category === activeCat);
+    activeIdx = activeVideos.indexOf(v);
+    openModal(v.videoId, v.categoryLabel, displayTitle, ratio);
+  });
   return tile;
 }
 
@@ -211,10 +231,10 @@ async function loadAll() {
       return;
     }
 
-    // Convert to array, filter visible, sort by order
+    // Convert to array, filter visible — featured first, then by order
     const videos = Object.values(data)
       .filter(v => v.visible)
-      .sort((a, b) => a.order - b.order);
+      .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || a.order - b.order);
 
     if (!videos.length) {
       const m = document.createElement('div');
@@ -229,15 +249,15 @@ async function loadAll() {
     const verticals = videos.filter(v => v.portrait);
 
     // Merge 3 horizontals then 1 vertical
-    const merged = [];
+    allVideos = [];
     let hi = 0, vi = 0;
     while (hi < horizontals.length || vi < verticals.length) {
-      for (let i = 0; i < 3 && hi < horizontals.length; i++) merged.push(horizontals[hi++]);
-      if (vi < verticals.length) merged.push(verticals[vi++]);
+      for (let i = 0; i < 3 && hi < horizontals.length; i++) allVideos.push(horizontals[hi++]);
+      if (vi < verticals.length) allVideos.push(verticals[vi++]);
     }
 
     const fragment = document.createDocumentFragment();
-    merged.forEach(v => fragment.appendChild(makeTile(v)));
+    allVideos.forEach(v => fragment.appendChild(makeTile(v)));
     grid.appendChild(fragment);
 
     imagesLoaded(grid, function() {
@@ -259,6 +279,12 @@ async function loadAll() {
 const modal = document.getElementById('modal');
 const modalInner = document.getElementById('modalInner');
 const modalFrame = document.getElementById('modalFrame');
+const modalPrev = document.getElementById('modalPrev');
+const modalNext = document.getElementById('modalNext');
+const modalCounter = document.getElementById('modalCounter');
+
+let activeVideos = [];
+let activeIdx = 0;
 
 function openModal(ytId, cat, title, ratio) {
   const isPortrait = ['9:16','4:5'].includes(ratio);
@@ -270,12 +296,32 @@ function openModal(ytId, cat, title, ratio) {
   modalFrame.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&modestbranding=1&rel=0`;
   document.getElementById('modalCat').textContent = cat;
   document.getElementById('modalTitle').textContent = title;
+  modalPrev.disabled = activeIdx <= 0;
+  modalNext.disabled = activeIdx >= activeVideos.length - 1;
+  modalCounter.textContent = activeVideos.length > 1 ? `${activeIdx + 1} / ${activeVideos.length}` : '';
   modal.classList.add('open');
 }
+
+function navigateModal(dir) {
+  const next = activeIdx + dir;
+  if (next < 0 || next >= activeVideos.length) return;
+  activeIdx = next;
+  const v = activeVideos[activeIdx];
+  const ratio = v.aspectRatio || (v.portrait ? '9:16' : '16:9');
+  openModal(v.videoId, v.categoryLabel, v.customTitle || v.title, ratio);
+}
+
 function closeModal() { modal.classList.remove('open'); modalFrame.src = ''; }
 document.getElementById('modalClose').addEventListener('click', closeModal);
+modalPrev.addEventListener('click', e => { e.stopPropagation(); navigateModal(-1); });
+modalNext.addEventListener('click', e => { e.stopPropagation(); navigateModal(1); });
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => {
+  if (!modal.classList.contains('open')) return;
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'ArrowLeft') navigateModal(-1);
+  if (e.key === 'ArrowRight') navigateModal(1);
+});
 
 // DROPDOWN + FILTER
 const workDropdown = document.getElementById('workDropdown');
@@ -285,12 +331,12 @@ document.addEventListener('click', () => workDropdown.classList.remove('open'));
 document.querySelectorAll('.dropdown-item').forEach(item => {
   item.addEventListener('click', e => {
     e.stopPropagation();
-    const cat = item.dataset.cat;
+    activeCat = item.dataset.cat;
     document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
     item.classList.add('selected');
     workDropdown.classList.remove('open');
     document.querySelectorAll('.tile').forEach(tile => {
-      tile.style.display = (cat === 'all' || tile.dataset.cat === cat) ? '' : 'none';
+      tile.style.display = (activeCat === 'all' || tile.dataset.cat === activeCat) ? '' : 'none';
     });
     if (msnry) setTimeout(() => msnry.layout(), 50);
   });
@@ -311,7 +357,13 @@ aboutBtn.addEventListener('click', e => {
   workBtn.classList.toggle('active', showing);
 });
 
-loadAll();
+loadAll().then(() => {
+  const cat = new URLSearchParams(location.search).get('cat');
+  if (cat && cat !== 'all') {
+    const item = document.querySelector(`.dropdown-item[data-cat="${cat}"]`);
+    if (item) item.click();
+  }
+});
 </script>
 </body>
 </html>
