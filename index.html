@@ -58,11 +58,13 @@
   .tile.portrait .thumb-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .tile img { transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94); }
   .tile:hover img { transform: scale(1.04); }
-  .tile-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.05) 45%, transparent 70%); opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px 20px; }
+  .tile-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.05) 45%, transparent 70%); opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; padding: 18px 20px; }
   .tile:hover .tile-overlay { opacity: 1; }
+  .tile-info-left { flex: 1; min-width: 0; }
   .tile-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 5px; }
   .tile-title { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.25; }
   .tile-role { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; letter-spacing: 0.06em; }
+  .tile-client { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.25; text-align: right; flex-shrink: 0; padding-left: 12px; max-width: 45%; }
   .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.75); width: 46px; height: 46px; background: rgba(255,255,255,0.12); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; }
   .play-btn svg { margin-left: 3px; }
   .tile:hover .play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -190,18 +192,19 @@ function makeTile(v) {
 
   const displayTitle = v.customTitle || v.title;
   const roleHtml = v.role ? `<div class="tile-role">${v.role}</div>` : '';
+  const clientHtml = v.client ? `<div class="tile-client">${v.client}</div>` : '';
 
   if (portrait) {
     tile.innerHTML = `
       <div class="thumb-wrap" style="padding-bottom:${padding}%"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
       <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
-      <div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>
+      <div class="tile-overlay"><div class="tile-info-left"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>${clientHtml}</div>
     `;
   } else {
     tile.innerHTML = `
       <img src="${v.thumbnail}" alt="" loading="lazy">
       <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
-      <div class="tile-overlay"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>
+      <div class="tile-overlay"><div class="tile-info-left"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>${clientHtml}</div>
     `;
   }
   tile.addEventListener('click', () => {
