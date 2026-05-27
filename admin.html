@@ -122,7 +122,10 @@
   .thumb-refresh-btn { position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.75); border: none; color: #aaa; font-size: 13px; width: 18px; height: 18px; cursor: pointer; border-radius: 2px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s, color 0.15s; padding: 0; font-family: inherit; line-height: 1; }
   .video-thumb-wrap:hover .thumb-refresh-btn { opacity: 1; }
   .thumb-refresh-btn:hover { color: #fff; }
-  .thumb-refresh-btn.spinning { animation: spin 0.7s linear infinite; opacity: 1; }
+  .thumb-upload-btn { position: absolute; bottom: 2px; left: 2px; background: rgba(0,0,0,0.75); border: none; color: #aaa; font-size: 11px; width: 18px; height: 18px; cursor: pointer; border-radius: 2px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s, color 0.15s; padding: 0; font-family: inherit; line-height: 1; }
+  .video-thumb-wrap:hover .thumb-upload-btn { opacity: 1; }
+  .thumb-upload-btn:hover { color: #fff; }
+  .thumb-refresh-btn.spinning, .thumb-upload-btn.spinning { animation: spin 0.7s linear infinite; opacity: 1; }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
   /* HOVER PREVIEW POPUP */
@@ -403,6 +406,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyA5K470Y9UJjN6Y-iMf2w26dMhMJkWnbjE",
@@ -416,6 +420,45 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
+const storage = firebase.storage();
+
+// Hidden file input for thumbnail uploads (reused across all rows)
+const thumbUploadInput = document.createElement('input');
+thumbUploadInput.type = 'file';
+thumbUploadInput.accept = 'image/*';
+thumbUploadInput.style.display = 'none';
+document.body.appendChild(thumbUploadInput);
+let uploadTarget = null;
+
+thumbUploadInput.addEventListener('change', async () => {
+  const file = thumbUploadInput.files[0];
+  if (!file || !uploadTarget) return;
+  const { videoId, btn } = uploadTarget;
+  const v = videos.find(x => x.videoId === videoId);
+  if (!v) return;
+  btn.classList.add('spinning');
+  try {
+    const ref = storage.ref(`thumbnails/${videoId}`);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+    v.thumbnail = url;
+    markDirty();
+    const row = document.querySelector(`[data-videoid="${videoId}"]`);
+    if (row) { const img = row.querySelector('.video-thumb img'); img.src = ''; img.src = url; }
+    btn.textContent = '✓';
+    setTimeout(() => { btn.textContent = '↑'; }, 1500);
+  } catch(e) {
+    btn.textContent = '!';
+    setTimeout(() => { btn.textContent = '↑'; }, 1500);
+  }
+  btn.classList.remove('spinning');
+  thumbUploadInput.value = '';
+});
+
+function uploadThumbnail(videoId, btn) {
+  uploadTarget = { videoId, btn };
+  thumbUploadInput.click();
+}
 
 const YT_API_KEY = 'AIzaSyDygMoFQUoRfeJ2egkA9HjGBfPHSs58sgw';
 
@@ -701,7 +744,8 @@ function renderList() {
         <div class="video-thumb ${thumbClass}">
           <img src="${v.thumbnail}" alt="" loading="lazy">
         </div>
-        <button class="thumb-refresh-btn" title="Refresh thumbnail" onclick="refreshThumbnail('${v.videoId}',this);event.stopPropagation()">↺</button>
+        <button class="thumb-upload-btn" title="Upload custom thumbnail" onclick="uploadThumbnail('${v.videoId}',this);event.stopPropagation()">↑</button>
+        <button class="thumb-refresh-btn" title="Refresh thumbnail from YouTube" onclick="refreshThumbnail('${v.videoId}',this);event.stopPropagation()">↺</button>
       </div>
       <div class="video-info">
         <div class="video-info-left">
