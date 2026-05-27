@@ -119,6 +119,11 @@
   .video-thumb.landscape-thumb { width: 80px; height: 45px; }
   .video-thumb.portrait-thumb { width: 26px; height: 45px; }
   .video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb-refresh-btn { position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.75); border: none; color: #aaa; font-size: 13px; width: 18px; height: 18px; cursor: pointer; border-radius: 2px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s, color 0.15s; padding: 0; font-family: inherit; line-height: 1; }
+  .video-thumb-wrap:hover .thumb-refresh-btn { opacity: 1; }
+  .thumb-refresh-btn:hover { color: #fff; }
+  .thumb-refresh-btn.spinning { animation: spin 0.7s linear infinite; opacity: 1; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
   /* HOVER PREVIEW POPUP */
   .thumb-preview {
@@ -696,6 +701,7 @@ function renderList() {
         <div class="video-thumb ${thumbClass}">
           <img src="${v.thumbnail}" alt="" loading="lazy">
         </div>
+        <button class="thumb-refresh-btn" title="Refresh thumbnail" onclick="refreshThumbnail('${v.videoId}',this);event.stopPropagation()">↺</button>
       </div>
       <div class="video-info">
         <div class="video-info-left">
@@ -813,6 +819,24 @@ function hidePreview() {
 function updateField(videoId, field, value) {
   const v = videos.find(x => x.videoId === videoId);
   if (v) { v[field] = value; markDirty(); renderStats(); renderSidebarCounts(); }
+}
+
+async function refreshThumbnail(videoId, btn) {
+  const v = videos.find(x => x.videoId === videoId);
+  if (!v) return;
+  btn.classList.add('spinning');
+  try {
+    const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YT_API_KEY}`);
+    const d = await r.json();
+    const thumbs = d.items?.[0]?.snippet?.thumbnails;
+    if (!thumbs) return;
+    const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    v.thumbnail = thumb;
+    markDirty();
+    const row = document.querySelector(`[data-videoid="${videoId}"]`);
+    if (row) row.querySelector('.video-thumb img').src = thumb;
+  } catch(e) {}
+  btn.classList.remove('spinning');
 }
 
 function updateRatio(videoId, ratio) {
