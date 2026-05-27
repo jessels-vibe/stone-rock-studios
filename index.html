@@ -53,9 +53,8 @@
   .w4  { width: calc((100% - var(--gap) * 11) / 12 * 4 + var(--gap) * 3); }
   .w8  { width: calc((100% - var(--gap) * 11) / 12 * 8 + var(--gap) * 7); }
   .w3  { width: calc((100% - var(--gap) * 11) / 12 * 3 + var(--gap) * 2); }
-  .tile.landscape img { width: 100%; height: auto; display: block; }
-  .tile.portrait .thumb-wrap { position: relative; width: 100%; padding-bottom: 177.78%; background: #000; }
-  .tile.portrait .thumb-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tile .thumb-wrap { position: relative; width: 100%; background: #000; }
+  .tile .thumb-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .tile img { transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94); }
   .tile:hover img { transform: scale(1.04); }
   .tile-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.05) 45%, transparent 70%); opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; padding: 18px 20px; }
@@ -202,7 +201,7 @@ function makeTile(v) {
     `;
   } else {
     tile.innerHTML = `
-      <img src="${v.thumbnail}" alt="" loading="lazy">
+      <div class="thumb-wrap" style="padding-bottom:${padding}%"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
       <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
       <div class="tile-overlay"><div class="tile-info-left"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>${clientHtml}</div>
     `;
