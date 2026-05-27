@@ -829,12 +829,19 @@ async function refreshThumbnail(videoId, btn) {
     const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YT_API_KEY}`);
     const d = await r.json();
     const thumbs = d.items?.[0]?.snippet?.thumbnails;
-    if (!thumbs) return;
-    const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-    v.thumbnail = thumb;
-    markDirty();
-    const row = document.querySelector(`[data-videoid="${videoId}"]`);
-    if (row) row.querySelector('.video-thumb img').src = thumb;
+    if (thumbs) {
+      const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      v.thumbnail = thumb;
+      markDirty();
+      const row = document.querySelector(`[data-videoid="${videoId}"]`);
+      if (row) {
+        const img = row.querySelector('.video-thumb img');
+        img.src = '';
+        img.src = thumb + (thumb.includes('?') ? '&' : '?') + '_r=' + Date.now();
+      }
+      btn.textContent = '✓';
+      setTimeout(() => { btn.textContent = '↺'; }, 1500);
+    }
   } catch(e) {}
   btn.classList.remove('spinning');
 }
