@@ -42,17 +42,9 @@
   .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
   .hero-title { font-weight: 700; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.03em; color: var(--text); margin-bottom: 14px; }
   .hero-sub { font-size: 13px; font-weight: 300; color: var(--muted); letter-spacing: 0.06em; }
-  .grid-sizer { width: calc((100% - var(--gap) * 11) / 12); }
-  .gutter-sizer { width: var(--gap); }
-  #grid { padding: 0 var(--gap); }
-  .tile { position: relative; overflow: hidden; cursor: pointer; background: var(--surface); margin-bottom: var(--gap); float: left; }
-  .tile.hidden { display: none; }
-  .w7  { width: calc((100% - var(--gap) * 11) / 12 * 7 + var(--gap) * 6); }
-  .w5  { width: calc((100% - var(--gap) * 11) / 12 * 5 + var(--gap) * 4); }
-  .w6  { width: calc((100% - var(--gap) * 11) / 12 * 6 + var(--gap) * 5); }
-  .w4  { width: calc((100% - var(--gap) * 11) / 12 * 4 + var(--gap) * 3); }
-  .w8  { width: calc((100% - var(--gap) * 11) / 12 * 8 + var(--gap) * 7); }
-  .w3  { width: calc((100% - var(--gap) * 11) / 12 * 3 + var(--gap) * 2); }
+  #grid { padding: 0 var(--gap); display: flex; flex-direction: column; gap: var(--gap); }
+  .grid-row { display: flex; gap: var(--gap); }
+  .tile { position: relative; overflow: hidden; cursor: pointer; background: var(--surface); flex-shrink: 0; }
   .tile .thumb-wrap { position: relative; width: 100%; background: #000; }
   .tile .thumb-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .tile img { transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94); }
@@ -93,8 +85,9 @@
   .about-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 24px; line-height: 0.95; }
   .about-section p { font-size: 15px; font-weight: 300; line-height: 1.85; color: var(--muted); margin-bottom: 16px; }
   @media (max-width: 768px) {
-    .w7, .w8, .w6, .w5 { width: 100%; }
-    .w4, .w3 { width: calc(50% - var(--gap) / 2); }
+    .grid-row { flex-wrap: wrap; }
+    .tile { width: 100% !important; }
+    .tile.portrait { width: calc(50% - var(--gap) / 2) !important; }
     nav { padding: 0 20px; }
     .hero { padding: 90px 20px 48px; }
   }
@@ -130,8 +123,6 @@
     <div class="hero-sub">Capture every moment.</div>
   </div>
   <div id="grid">
-    <div class="grid-sizer"></div>
-    <div class="gutter-sizer"></div>
     <div class="status-msg" id="statusMsg">Loading</div>
   </div>
 </div>
@@ -159,143 +150,170 @@
   <button class="modal-nav next" id="modalNext">&#8594;</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/5.0.0/imagesloaded.pkgd.min.js"></script>
 <script>
 const FIREBASE_URL = 'https://stonerockstudios-default-rtdb.firebaseio.com';
-
-const LAND_W = ['w7','w5','w4','w4','w4','w6','w6','w8','w4','w3','w3','w6','w5'];
-const PORT_W = ['w3','w3','w3','w4','w3'];
-let li = 0, pi = 0, msnry = null;
 
 const RATIO_PADDING = {'16:9':56.25,'9:16':177.78,'1:1':100,'4:3':75,'4:5':125,'21:9':42.86};
 const MODAL_WIDTH   = {'16:9':'min(900px,92vw)','9:16':'min(360px,52vw)','1:1':'min(600px,80vw)','4:3':'min(700px,88vw)','4:5':'min(400px,55vw)','21:9':'min(960px,95vw)'};
 const MODAL_PADDING = {'16:9':56.25,'9:16':177.78,'1:1':100,'4:3':75,'4:5':125,'21:9':42.86};
 
+// Row width patterns — each array sums to 12 columns
+const LAND_PATTERNS = [
+  [7, 5], [8, 4], [6, 6], [5, 7], [4, 8],
+  [4, 4, 4], [6, 3, 3], [3, 3, 6], [3, 6, 3], [9, 3], [3, 9],
+];
+const PORT_COLS = { 1: [12], 2: [6, 6], 3: [4, 4, 4], 4: [3, 3, 3, 3] };
+
 let allVideos = [];
+let activeVideos = [];
+let activeIdx = 0;
 let activeCat = 'all';
 
-function makeTile(v) {
-  const portrait = v.portrait;
-  const featured = v.featured;
-  const ratio = v.aspectRatio || (portrait ? '9:16' : '16:9');
-  const padding = RATIO_PADDING[ratio] || (portrait ? 177.78 : 56.25);
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
-  const wClass = portrait
-    ? PORT_W[pi++ % PORT_W.length]
-    : (featured ? 'w7' : LAND_W.filter(w => w !== 'w7')[li++ % LAND_W.filter(w => w !== 'w7').length]);
+function buildRows(videos) {
+  const featured = videos.filter(v => v.featured);
+  const nonFeat  = shuffle(videos.filter(v => !v.featured));
+  const ordered  = [...featured, ...nonFeat];
 
-  const tile = document.createElement('div');
-  tile.className = `tile ${wClass} ${portrait ? 'portrait' : 'landscape'}`;
-  tile.dataset.tags = (v.tags || [v.category]).join(',');
+  const lands = ordered.filter(v => !v.portrait);
+  const ports  = ordered.filter(v => v.portrait);
 
+  const rows = [];
+  let patIdx = 0;
+  let landsSincePort = 0;
+
+  while (lands.length || ports.length) {
+    if ((landsSincePort < 3 || !ports.length) && lands.length) {
+      // Landscape row — pick next pattern, adapt if fewer tiles remain
+      const pat  = LAND_PATTERNS[patIdx % LAND_PATTERNS.length];
+      patIdx++;
+      const take = Math.min(pat.length, lands.length);
+      const tiles = [];
+      let used = 0;
+      for (let i = 0; i < take; i++) {
+        const cols = i === take - 1 ? 12 - used : pat[i];
+        used += cols;
+        tiles.push({ v: lands.shift(), cols });
+      }
+      rows.push(tiles);
+      landsSincePort++;
+    } else if (ports.length) {
+      // Portrait row — up to 4 portraits, equal column widths
+      const take  = Math.min(4, ports.length);
+      const colsArr = PORT_COLS[take];
+      const tiles = ports.splice(0, take).map((v, i) => ({ v, cols: colsArr[i] }));
+      rows.push(tiles);
+      landsSincePort = 0;
+    } else {
+      break;
+    }
+  }
+
+  return rows;
+}
+
+function makeTile(v, cols, rowSize) {
+  const ratio  = v.aspectRatio || (v.portrait ? '9:16' : '16:9');
+  const padding = RATIO_PADDING[ratio] || (v.portrait ? 177.78 : 56.25);
   const displayTitle = v.customTitle || v.title;
-  const roleHtml = v.role ? `<div class="tile-role">${v.role}</div>` : '';
+  const roleHtml   = v.role   ? `<div class="tile-role">${v.role}</div>`     : '';
   const clientHtml = v.client ? `<div class="tile-client">${v.client}</div>` : '';
 
-  if (portrait) {
-    tile.innerHTML = `
-      <div class="thumb-wrap" style="padding-bottom:${padding}%"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
-      <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
-      <div class="tile-overlay"><div class="tile-info-left"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>${clientHtml}</div>
-    `;
-  } else {
-    tile.innerHTML = `
-      <div class="thumb-wrap" style="padding-bottom:${padding}%"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
-      <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
-      <div class="tile-overlay"><div class="tile-info-left"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>${clientHtml}</div>
-    `;
-  }
+  const tile = document.createElement('div');
+  tile.className   = `tile ${v.portrait ? 'portrait' : 'landscape'}`;
+  tile.dataset.tags = (v.tags || [v.category]).join(',');
+  tile.style.width  = `calc((100% - ${rowSize - 1} * var(--gap)) * ${cols} / 12)`;
+
+  tile.innerHTML = `
+    <div class="thumb-wrap" style="padding-bottom:${padding}%"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
+    <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
+    <div class="tile-overlay"><div class="tile-info-left"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>${clientHtml}</div>
+  `;
+
   tile.addEventListener('click', () => {
-    activeVideos = activeCat === 'all' ? allVideos : allVideos.filter(x => x.category === activeCat);
     activeIdx = activeVideos.indexOf(v);
     openModal(v.videoId, v.categoryLabel, displayTitle, ratio);
   });
+
   return tile;
 }
 
-async function loadAll() {
+function renderGrid(videos) {
   const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  if (!videos.length) {
+    const m = document.createElement('div');
+    m.className = 'status-msg';
+    m.textContent = 'No videos found.';
+    grid.appendChild(m);
+    activeVideos = [];
+    return;
+  }
+
+  const rows = buildRows(videos);
+  activeVideos = rows.flat().map(t => t.v);
+
+  const frag = document.createDocumentFragment();
+  rows.forEach(tiles => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'grid-row';
+    tiles.forEach(({ v, cols }) => rowEl.appendChild(makeTile(v, cols, tiles.length)));
+    frag.appendChild(rowEl);
+  });
+  grid.appendChild(frag);
+}
+
+async function loadAll() {
   const statusMsg = document.getElementById('statusMsg');
-
   try {
-    const res = await fetch(`${FIREBASE_URL}/videos.json`);
+    const res  = await fetch(`${FIREBASE_URL}/videos.json`);
     const data = await res.json();
-
     if (statusMsg) statusMsg.remove();
 
-    if (!data) {
-      const m = document.createElement('div');
-      m.className = 'status-msg';
-      m.textContent = 'Coming soon.';
-      grid.appendChild(m);
-      return;
-    }
+    if (!data) { renderGrid([]); return; }
 
-    // Convert to array, filter visible — featured first, then by order
-    const videos = Object.values(data)
+    allVideos = Object.values(data)
       .filter(v => v.visible)
       .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || a.order - b.order);
 
-    if (!videos.length) {
-      const m = document.createElement('div');
-      m.className = 'status-msg';
-      m.textContent = 'Coming soon.';
-      grid.appendChild(m);
-      return;
+    renderGrid(allVideos);
+
+    const cat = new URLSearchParams(location.search).get('cat');
+    if (cat && cat !== 'all') {
+      const item = document.querySelector(`.dropdown-item[data-cat="${cat}"]`);
+      if (item) item.click();
     }
-
-    // Separate horizontals and verticals
-    const horizontals = videos.filter(v => !v.portrait);
-    const verticals = videos.filter(v => v.portrait);
-
-    // Merge 3 horizontals then 1 vertical
-    allVideos = [];
-    let hi = 0, vi = 0;
-    while (hi < horizontals.length || vi < verticals.length) {
-      for (let i = 0; i < 3 && hi < horizontals.length; i++) allVideos.push(horizontals[hi++]);
-      if (vi < verticals.length) allVideos.push(verticals[vi++]);
-    }
-
-    const fragment = document.createDocumentFragment();
-    allVideos.forEach(v => fragment.appendChild(makeTile(v)));
-    grid.appendChild(fragment);
-
-    imagesLoaded(grid, function() {
-      msnry = new Masonry(grid, {
-        itemSelector: '.tile',
-        columnWidth: '.grid-sizer',
-        gutter: '.gutter-sizer',
-        percentPosition: true,
-        transitionDuration: '0.3s'
-      });
-    });
-
   } catch(e) {
     if (statusMsg) statusMsg.textContent = 'Failed to load videos.';
   }
 }
 
-// MODAL
-const modal = document.getElementById('modal');
-const modalInner = document.getElementById('modalInner');
-const modalFrame = document.getElementById('modalFrame');
-const modalPrev = document.getElementById('modalPrev');
-const modalNext = document.getElementById('modalNext');
+// ── MODAL ──
+const modal       = document.getElementById('modal');
+const modalInner  = document.getElementById('modalInner');
+const modalFrame  = document.getElementById('modalFrame');
+const modalPrev   = document.getElementById('modalPrev');
+const modalNext   = document.getElementById('modalNext');
 const modalCounter = document.getElementById('modalCounter');
-
-let activeVideos = [];
-let activeIdx = 0;
 
 function openModal(ytId, cat, title, ratio) {
   const isPortrait = ['9:16','4:5'].includes(ratio);
-  const mw = MODAL_WIDTH[ratio] || (isPortrait ? 'min(360px,52vw)' : 'min(900px,92vw)');
+  const mw = MODAL_WIDTH[ratio]   || (isPortrait ? 'min(360px,52vw)' : 'min(900px,92vw)');
   const mp = MODAL_PADDING[ratio] || (isPortrait ? 177.78 : 56.25);
   modalInner.className = `modal-inner ${isPortrait ? 'portrait' : 'landscape'}`;
   modalInner.style.width = mw;
   modalInner.querySelector('.modal-video').style.paddingBottom = mp + '%';
   modalFrame.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&modestbranding=1&rel=0`;
-  document.getElementById('modalCat').textContent = cat;
+  document.getElementById('modalCat').textContent   = cat;
   document.getElementById('modalTitle').textContent = title;
   modalPrev.disabled = activeIdx <= 0;
   modalNext.disabled = activeIdx >= activeVideos.length - 1;
@@ -319,12 +337,12 @@ modalNext.addEventListener('click', e => { e.stopPropagation(); navigateModal(1)
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 document.addEventListener('keydown', e => {
   if (!modal.classList.contains('open')) return;
-  if (e.key === 'Escape') closeModal();
-  if (e.key === 'ArrowLeft') navigateModal(-1);
-  if (e.key === 'ArrowRight') navigateModal(1);
+  if (e.key === 'Escape')      closeModal();
+  if (e.key === 'ArrowLeft')   navigateModal(-1);
+  if (e.key === 'ArrowRight')  navigateModal(1);
 });
 
-// DROPDOWN + FILTER
+// ── FILTER ──
 const workDropdown = document.getElementById('workDropdown');
 document.getElementById('workBtn').addEventListener('click', e => { e.stopPropagation(); workDropdown.classList.toggle('open'); });
 document.addEventListener('click', () => workDropdown.classList.remove('open'));
@@ -336,18 +354,18 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
     item.classList.add('selected');
     workDropdown.classList.remove('open');
-    document.querySelectorAll('.tile').forEach(tile => {
-      tile.style.display = (activeCat === 'all' || tile.dataset.tags.split(',').includes(activeCat)) ? '' : 'none';
-    });
-    if (msnry) setTimeout(() => msnry.layout(), 50);
+    const filtered = activeCat === 'all'
+      ? allVideos
+      : allVideos.filter(v => (v.tags || [v.category]).includes(activeCat));
+    renderGrid(filtered);
   });
 });
 
-// ABOUT
+// ── ABOUT ──
 const aboutView = document.getElementById('aboutView');
-const workView = document.getElementById('workView');
-const aboutBtn = document.getElementById('aboutBtn');
-const workBtn = document.getElementById('workBtn');
+const workView  = document.getElementById('workView');
+const aboutBtn  = document.getElementById('aboutBtn');
+const workBtn   = document.getElementById('workBtn');
 
 aboutBtn.addEventListener('click', e => {
   e.preventDefault();
@@ -358,13 +376,7 @@ aboutBtn.addEventListener('click', e => {
   workBtn.classList.toggle('active', showing);
 });
 
-loadAll().then(() => {
-  const cat = new URLSearchParams(location.search).get('cat');
-  if (cat && cat !== 'all') {
-    const item = document.querySelector(`.dropdown-item[data-cat="${cat}"]`);
-    if (item) item.click();
-  }
-});
+loadAll();
 </script>
 </body>
 </html>
