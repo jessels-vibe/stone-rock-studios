@@ -43,11 +43,10 @@
   .hero-title { font-weight: 700; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.03em; color: var(--text); margin-bottom: 14px; }
   .hero-sub { font-size: 13px; font-weight: 300; color: var(--muted); letter-spacing: 0.06em; }
   #grid { padding: 0 var(--gap); display: flex; flex-direction: column; gap: var(--gap); }
-  .grid-row { display: flex; gap: var(--gap); }
+  .grid-row { display: flex; gap: var(--gap); align-items: flex-start; }
   .tile { position: relative; overflow: hidden; cursor: pointer; background: var(--surface); flex-shrink: 0; }
-  .tile-sizer { width: 100%; display: block; }
-  .tile .thumb-wrap { position: absolute; inset: 0; background: #000; }
-  .tile .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tile .thumb-wrap { position: relative; width: 100%; background: #000; }
+  .tile .thumb-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .tile img { transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94); }
   .tile:hover img { transform: scale(1.04); }
   .tile-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.05) 45%, transparent 70%); opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; padding: 18px 20px; }
@@ -158,17 +157,13 @@ const RATIO_PADDING = {'16:9':56.25,'9:16':177.78,'1:1':100,'4:3':75,'4:5':125,'
 const MODAL_WIDTH   = {'16:9':'min(900px,92vw)','9:16':'min(360px,52vw)','1:1':'min(600px,80vw)','4:3':'min(700px,88vw)','4:5':'min(400px,55vw)','21:9':'min(960px,95vw)'};
 const MODAL_PADDING = {'16:9':56.25,'9:16':177.78,'1:1':100,'4:3':75,'4:5':125,'21:9':42.86};
 
-// Row width patterns — each array sums to 12 columns
-const LAND_PATTERNS = [
-  [7, 5], [8, 4], [6, 6], [5, 7], [4, 8],
-  [4, 4, 4], [6, 3, 3], [3, 3, 6], [3, 6, 3], [9, 3], [3, 9],
-];
-const PORT_COLS = { 1: [12], 2: [6, 6], 3: [4, 4, 4], 4: [3, 3, 3, 3] };
+// Portrait col patterns
+const PORT_COLS_MAP = { 1: [12], 2: [6, 6], 3: [4, 4, 4], 4: [3, 3, 3, 3] };
 
-let allVideos = [];
+let allVideos   = [];
 let activeVideos = [];
-let activeIdx = 0;
-let activeCat = 'all';
+let activeIdx   = 0;
+let activeCat   = 'all';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -179,51 +174,105 @@ function shuffle(arr) {
   return a;
 }
 
+// Natural row height score — cols × padding% — used to find best cross-ratio partners
+function heightScore(ratio, cols) {
+  return (RATIO_PADDING[ratio] || 56.25) * cols;
+}
+
 function buildRows(videos) {
   const featured = videos.filter(v => v.featured);
   const nonFeat  = shuffle(videos.filter(v => !v.featured));
   const ordered  = [...featured, ...nonFeat];
 
-  const lands = ordered.filter(v => !v.portrait);
-  const ports  = ordered.filter(v => v.portrait);
+  const portraits  = ordered.filter(v => v.portrait);
+  const landscapes = ordered.filter(v => !v.portrait);
 
-  const rows = [];
-  let patIdx = 0;
-  let landsSincePort = 0;
+  // Bucket landscape videos by aspect ratio (featured land first within each bucket)
+  const buckets = {};
+  landscapes.forEach(v => {
+    const r = v.aspectRatio || '16:9';
+    (buckets[r] = buckets[r] || []).push(v);
+  });
 
-  while (lands.length || ports.length) {
-    if ((landsSincePort < 3 || !ports.length) && lands.length) {
-      // Landscape row — pick next pattern, adapt if fewer tiles remain
-      const pat  = LAND_PATTERNS[patIdx % LAND_PATTERNS.length];
-      patIdx++;
-      const take = Math.min(pat.length, lands.length);
-      const tiles = [];
-      let used = 0;
-      for (let i = 0; i < take; i++) {
-        const cols = i === take - 1 ? 12 - used : pat[i];
-        used += cols;
-        tiles.push({ v: lands.shift(), cols });
-      }
-      rows.push(tiles);
-      landsSincePort++;
-    } else if (ports.length) {
-      // Portrait row — up to 4 portraits, equal column widths
-      const take  = Math.min(4, ports.length);
-      const colsArr = PORT_COLS[take];
-      const tiles = ports.splice(0, take).map((v, i) => ({ v, cols: colsArr[i] }));
-      rows.push(tiles);
-      landsSincePort = 0;
-    } else {
-      break;
+  const landRows = [];
+  let crossFlip = false; // alternate which ratio goes left vs right
+  let samePhase = 0;     // cycle same-ratio patterns: [6,6] → [4,4,4] → [6,6] ...
+
+  function available() {
+    return Object.entries(buckets).filter(([, q]) => q.length > 0);
+  }
+
+  function grab(ratio, n) {
+    return (buckets[ratio] || []).splice(0, n);
+  }
+
+  function has(ratio, n = 1) {
+    return (buckets[ratio]?.length || 0) >= n;
+  }
+
+  while (available().length) {
+    let row = null;
+
+    // ── Cross-ratio pairings (naturally equal heights, no gaps, no distortion) ──
+    // 16:9 @ 7 cols ≈ 4:3 @ 5 cols  (height scores: 394 vs 375 — 1.5% diff)
+    if (has('16:9') && has('4:3')) {
+      const [a] = grab('16:9', 1);
+      const [b] = grab('4:3',  1);
+      row = crossFlip
+        ? [{ v: b, cols: 5 }, { v: a, cols: 7 }]
+        : [{ v: a, cols: 7 }, { v: b, cols: 5 }];
+      crossFlip = !crossFlip;
     }
+
+    // ── Same-ratio rows: grouped so all tiles share one height, zero gaps ──
+    if (!row) {
+      // Pick the ratio bucket with the most videos
+      const [ratio, queue] = available()
+        .sort((a, b) => b[1].length - a[1].length)[0];
+
+      samePhase++;
+      if (queue.length >= 3 && samePhase % 3 === 0) {
+        // Three-up [4,4,4]
+        const [a, b, c] = grab(ratio, 3);
+        row = [{ v: a, cols: 4 }, { v: b, cols: 4 }, { v: c, cols: 4 }];
+      } else if (queue.length >= 2) {
+        // Side-by-side [6,6]
+        const [a, b] = grab(ratio, 2);
+        row = [{ v: a, cols: 6 }, { v: b, cols: 6 }];
+      } else {
+        // Solo full-width [12]
+        const [a] = grab(ratio, 1);
+        row = [{ v: a, cols: 12 }];
+      }
+    }
+
+    if (row) landRows.push(row);
+  }
+
+  // Portrait rows
+  const portRows = [];
+  const portQ = [...portraits];
+  while (portQ.length) {
+    const take = Math.min(4, portQ.length);
+    portRows.push(portQ.splice(0, take).map((v, i) => ({
+      v, cols: PORT_COLS_MAP[take][i]
+    })));
+  }
+
+  // Interleave: 3 landscape rows then 1 portrait row
+  const rows = [];
+  let lr = 0, pr = 0;
+  while (lr < landRows.length || pr < portRows.length) {
+    for (let i = 0; i < 3 && lr < landRows.length; i++) rows.push(landRows[lr++]);
+    if (pr < portRows.length) rows.push(portRows[pr++]);
   }
 
   return rows;
 }
 
-function makeTile(v, cols, rowSize, isPrimary) {
-  const ratio   = v.aspectRatio || (v.portrait ? '9:16' : '16:9');
-  const padding = RATIO_PADDING[ratio] || (v.portrait ? 177.78 : 56.25);
+function makeTile(v, cols, rowSize) {
+  const ratio    = v.aspectRatio || (v.portrait ? '9:16' : '16:9');
+  const padding  = RATIO_PADDING[ratio] || (v.portrait ? 177.78 : 56.25);
   const displayTitle = v.customTitle || v.title;
   const roleHtml   = v.role   ? `<div class="tile-role">${v.role}</div>`     : '';
   const clientHtml = v.client ? `<div class="tile-client">${v.client}</div>` : '';
@@ -233,13 +282,8 @@ function makeTile(v, cols, rowSize, isPrimary) {
   tile.dataset.tags = (v.tags || [v.category]).join(',');
   tile.style.width  = `calc((100% - ${rowSize - 1} * var(--gap)) * ${cols} / 12)`;
 
-  // Primary tile sets the row height via padding-bottom.
-  // All other tiles stretch to match via flex and fill with object-fit: cover.
-  const sizerHtml = isPrimary ? `<div class="tile-sizer" style="padding-bottom:${padding}%"></div>` : '';
-
   tile.innerHTML = `
-    ${sizerHtml}
-    <div class="thumb-wrap"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
+    <div class="thumb-wrap" style="padding-bottom:${padding}%"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
     <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
     <div class="tile-overlay"><div class="tile-info-left"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>${clientHtml}</div>
   `;
@@ -272,9 +316,7 @@ function renderGrid(videos) {
   rows.forEach(tiles => {
     const rowEl = document.createElement('div');
     rowEl.className = 'grid-row';
-    // Widest tile sets row height; all others stretch to fill via flex
-    const primaryIdx = tiles.reduce((mi, t, i, a) => t.cols > a[mi].cols ? i : mi, 0);
-    tiles.forEach(({ v, cols }, i) => rowEl.appendChild(makeTile(v, cols, tiles.length, i === primaryIdx)));
+    tiles.forEach(({ v, cols }) => rowEl.appendChild(makeTile(v, cols, tiles.length)));
     frag.appendChild(rowEl);
   });
   grid.appendChild(frag);
@@ -306,11 +348,11 @@ async function loadAll() {
 }
 
 // ── MODAL ──
-const modal       = document.getElementById('modal');
-const modalInner  = document.getElementById('modalInner');
-const modalFrame  = document.getElementById('modalFrame');
-const modalPrev   = document.getElementById('modalPrev');
-const modalNext   = document.getElementById('modalNext');
+const modal        = document.getElementById('modal');
+const modalInner   = document.getElementById('modalInner');
+const modalFrame   = document.getElementById('modalFrame');
+const modalPrev    = document.getElementById('modalPrev');
+const modalNext    = document.getElementById('modalNext');
 const modalCounter = document.getElementById('modalCounter');
 
 function openModal(ytId, cat, title, ratio) {
@@ -345,9 +387,9 @@ modalNext.addEventListener('click', e => { e.stopPropagation(); navigateModal(1)
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 document.addEventListener('keydown', e => {
   if (!modal.classList.contains('open')) return;
-  if (e.key === 'Escape')      closeModal();
-  if (e.key === 'ArrowLeft')   navigateModal(-1);
-  if (e.key === 'ArrowRight')  navigateModal(1);
+  if (e.key === 'Escape')     closeModal();
+  if (e.key === 'ArrowLeft')  navigateModal(-1);
+  if (e.key === 'ArrowRight') navigateModal(1);
 });
 
 // ── FILTER ──
