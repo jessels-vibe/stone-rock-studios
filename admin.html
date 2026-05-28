@@ -157,6 +157,10 @@
   .video-client-input { background: transparent; border: none; border-bottom: 1px solid transparent; color: var(--text); font-size: 12px; font-weight: 600; font-family: inherit; width: 100%; outline: none; padding: 1px 0; margin-bottom: 2px; transition: border-color 0.15s; text-align: right; }
   .video-client-input:hover, .video-client-input:focus { border-bottom-color: #333; }
   .video-client-input::placeholder { color: #2a2a2a; font-weight: 400; }
+  .video-link-input { background: transparent; border: none; border-bottom: 1px solid transparent; color: var(--muted); font-size: 10px; font-family: inherit; width: 100%; outline: none; padding: 1px 0; transition: border-color 0.15s; text-align: right; }
+  .video-link-input:hover, .video-link-input:focus { border-bottom-color: #333; }
+  .video-link-input::placeholder { color: #2a2a2a; }
+  .link-platform-badge { font-size: 8px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 2px; text-align: right; min-height: 10px; }
 
   .cat-select { background: #1a1a1a; border: 1px solid var(--border); color: var(--text); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 8px; font-family: inherit; cursor: pointer; border-radius: 2px; outline: none; flex-shrink: 0; }
   .cat-select:hover { border-color: #444; }
@@ -758,6 +762,8 @@ function renderList() {
         </div>
         <div class="video-info-right">
           <input class="video-client-input" value="${esc(v.client||'')}" placeholder="Client..." oninput="updateField('${v.videoId}','client',this.value)" ondragstart="event.stopPropagation()">
+          <input class="video-link-input" value="${esc(v.externalLink||'')}" placeholder="YouTube / IG / TikTok link..." oninput="updateExternalLink('${v.videoId}',this)" ondragstart="event.stopPropagation()">
+          <div class="link-platform-badge" id="lpb-${v.videoId}">${detectPlatformLabel(v.externalLink||'')}</div>
         </div>
       </div>
       <div class="tags-cell" ondragstart="event.stopPropagation()">
@@ -857,6 +863,21 @@ function movePreview(e) {
 function hidePreview() {
   clearTimeout(previewTimeout);
   previewEl.classList.remove('visible');
+}
+
+// ── EXTERNAL LINK ──
+function detectPlatformLabel(url) {
+  if (!url) return '';
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'YouTube';
+  if (url.includes('instagram.com')) return 'Instagram';
+  if (url.includes('tiktok.com')) return 'TikTok';
+  return 'Link';
+}
+
+function updateExternalLink(videoId, input) {
+  updateField(videoId, 'externalLink', input.value);
+  const badge = document.getElementById('lpb-' + videoId);
+  if (badge) badge.textContent = detectPlatformLabel(input.value);
 }
 
 // ── FIELD UPDATES ──
