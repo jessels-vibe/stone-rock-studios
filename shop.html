@@ -42,11 +42,24 @@
   .tile-title { font-size: 13px; font-weight: 600; color: #fefefe; margin-bottom: 5px; line-height: 1.3; }
   .tile-price { display: none; }
   .status-msg { grid-column: 1/-1; padding: 80px 32px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-align: center; }
-  .sort-bar { display: flex; align-items: center; gap: 20px; padding: 0 calc(var(--gap) + 4px) 20px; }
-  .sort-label { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  .filter-bar { display: flex; align-items: center; gap: 36px; padding: 0 calc(var(--gap) + 4px) 20px; flex-wrap: wrap; }
+  .filter-group { display: flex; align-items: center; gap: 16px; }
+  .filter-label { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
   .sort-btn { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); background: none; border: none; cursor: pointer; font-family: inherit; transition: color 0.2s; padding: 0; }
   .sort-btn:hover { color: var(--text); }
   .sort-btn.on { color: #fefefe; border-bottom: 1px solid #fefefe; padding-bottom: 1px; }
+  .dept-wrap { position: relative; }
+  .dept-trigger { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; display: flex; align-items: center; gap: 5px; transition: color 0.2s; padding: 0; }
+  .dept-trigger:hover { color: #fefefe; }
+  .dept-trigger.on { color: #fefefe; }
+  .dept-arrow { font-size: 9px; display: inline-block; transition: transform 0.2s; }
+  .dept-wrap.open .dept-arrow { transform: rotate(180deg); }
+  .dept-menu { position: absolute; top: calc(100% + 10px); left: 0; background: #151515; border: 1px solid var(--border); min-width: 220px; max-height: 340px; overflow-y: auto; opacity: 0; pointer-events: none; transform: translateY(-4px); transition: opacity 0.15s, transform 0.15s; z-index: 50; }
+  .dept-wrap.open .dept-menu { opacity: 1; pointer-events: all; transform: none; }
+  .dept-item { display: block; width: 100%; text-align: left; padding: 9px 16px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); cursor: pointer; background: none; border: none; border-bottom: 1px solid var(--border); font-family: inherit; transition: color 0.12s, background 0.12s; }
+  .dept-item:last-child { border-bottom: none; }
+  .dept-item:hover { color: #fefefe; background: #1c1c1c; }
+  .dept-item.on { color: #fefefe; }
 
   /* PRODUCT MODAL */
   .modal-back { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
@@ -152,11 +165,22 @@
   <div class="hero-sub">Wear the brand.</div>
 </div>
 
-<div class="sort-bar">
-  <span class="sort-label">Sort</span>
-  <button class="sort-btn on" id="sortDefault" onclick="setSort('default')">Default</button>
-  <button class="sort-btn" id="sortAZ" onclick="setSort('az')">A → Z</button>
-  <button class="sort-btn" id="sortZA" onclick="setSort('za')">Z → A</button>
+<div class="filter-bar">
+  <div class="filter-group">
+    <span class="filter-label">Sort</span>
+    <button class="sort-btn on" id="sortDefault" onclick="setSort('default')">Default</button>
+    <button class="sort-btn" id="sortAZ" onclick="setSort('az')">A → Z</button>
+    <button class="sort-btn" id="sortZA" onclick="setSort('za')">Z → A</button>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Department</span>
+    <div class="dept-wrap" id="deptWrap">
+      <button class="dept-trigger" id="deptTrigger" onclick="toggleDept()">
+        <span id="deptLabel">All</span> <span class="dept-arrow">↓</span>
+      </button>
+      <div class="dept-menu" id="deptMenu"></div>
+    </div>
+  </div>
 </div>
 
 <div id="shopGrid" class="shop-grid">
@@ -247,7 +271,7 @@ async function fetchProducts() {
     collection(id: "${COL}") {
       products(first: 50) {
         edges { node {
-          id title
+          id title productType
           featuredImage { url altText }
           images(first: 8) { edges { node { url altText } } }
           priceRange { minVariantPrice { amount currencyCode } }
@@ -286,13 +310,62 @@ function sortedProducts() {
   return p;
 }
 
+// ── DEPARTMENT FILTER ─────────────────────────────
+const DEPT_ORDER = [
+  'Production','Direction','Writing','Camera','Lighting/Electric','Grip','Sound',
+  'Art Department','Construction','Costume','Hair & Makeup','Stunts',
+  'Special Effects (On-Set)','VFX (On-Set)','Locations','Casting','Talent',
+  'Craft Services & Catering','Transport','Medical & Safety',
+  'Post (On-Set Liaisons)','Publicity'
+];
+
+let activeDept = 'all';
+
+function buildDeptMenu() {
+  const present = [...new Set(products.map(p => p.productType).filter(Boolean))];
+  present.sort((a, b) => {
+    const ai = DEPT_ORDER.indexOf(a), bi = DEPT_ORDER.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+  });
+  const menu = document.getElementById('deptMenu');
+  menu.innerHTML =
+    `<button class="dept-item on" onclick="setDept('all')">All Departments</button>` +
+    present.map(d => `<button class="dept-item" onclick="setDept(${JSON.stringify(d)})">${d}</button>`).join('');
+}
+
+function setDept(dept) {
+  activeDept = dept;
+  document.getElementById('deptLabel').textContent = dept === 'all' ? 'All' : dept;
+  document.querySelectorAll('.dept-item').forEach(b =>
+    b.classList.toggle('on', b.textContent === (dept === 'all' ? 'All Departments' : dept))
+  );
+  document.getElementById('deptWrap').classList.remove('open');
+  document.getElementById('deptTrigger').classList.toggle('on', dept !== 'all');
+  renderGrid();
+}
+
+function toggleDept() {
+  document.getElementById('deptWrap').classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if (!document.getElementById('deptWrap').contains(e.target))
+    document.getElementById('deptWrap').classList.remove('open');
+});
+
+function filteredProducts() {
+  const p = sortedProducts();
+  return activeDept === 'all' ? p : p.filter(p => p.productType === activeDept);
+}
+
 function renderGrid() {
   const grid = document.getElementById('shopGrid');
   if (!products.length) {
     grid.innerHTML = '<div class="status-msg">No products found.</div>';
     return;
   }
-  grid.innerHTML = sortedProducts().map(p => {
+  grid.innerHTML = filteredProducts().map(p => {
     const i     = products.indexOf(p);
     const img   = p.featuredImage?.url;
     const price = money(p.priceRange.minVariantPrice.amount, p.priceRange.minVariantPrice.currencyCode);
@@ -520,6 +593,7 @@ document.getElementById('cartOverlay').onclick = closeCart;
 // ── INIT ──────────────────────────────────────────
 (async () => {
   try { await fetchProducts(); } catch(e) { console.error(e); }
+  buildDeptMenu();
   renderGrid();
   loadCartFromStorage();
 })();
