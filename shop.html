@@ -39,9 +39,11 @@
   /* Shopify Buy Button overrides — product cards render in DOM (not iframe) */
   .shopify-buy__product { background: var(--surface) !important; }
   .shopify-buy__product-img-wrapper { background: var(--surface) !important; }
-  .shopify-buy__product__title { color: var(--text) !important; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size: 13px !important; font-weight: 600 !important; letter-spacing: 0.01em !important; }
+  .shopify-buy__product__title { color: #fefefe !important; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size: 13px !important; font-weight: 600 !important; letter-spacing: 0.01em !important; }
   .shopify-buy__product__actual-price,
-  .shopify-buy__product__price { color: var(--muted) !important; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size: 12px !important; }
+  .shopify-buy__product__price { color: #fefefe !important; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size: 12px !important; }
+  .shopify-buy__option-select__label,
+  .shopify-buy__option-select { color: #fefefe !important; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; }
   .shopify-buy__btn { border-radius: 0 !important; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; font-size: 11px !important; }
 
   @media (max-width: 768px) {
@@ -176,7 +178,22 @@
               },
               "text": { "button": "Add to Cart" }
             },
-            "option": {},
+            "option": {
+              "styles": {
+                "label": {
+                  "color": "#fefefe",
+                  "font-family": "Helvetica Neue, Helvetica, Arial, sans-serif",
+                  "font-size": "11px",
+                  "font-weight": "600",
+                  "letter-spacing": "0.1em",
+                  "text-transform": "uppercase"
+                },
+                "select": {
+                  "color": "#fefefe",
+                  "font-family": "Helvetica Neue, Helvetica, Arial, sans-serif"
+                }
+              }
+            },
             "cart": {
               "styles": {
                 "button": {
