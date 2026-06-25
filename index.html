@@ -447,6 +447,13 @@ aboutBtn.addEventListener('click', e => {
 });
 
 loadAll();
+
+if (location.hash === '#about') {
+  aboutView.classList.add('visible');
+  workView.style.display = 'none';
+  aboutBtn.classList.add('active');
+  workBtn.classList.remove('active');
+}
 </script>
 </body>
 </html>
