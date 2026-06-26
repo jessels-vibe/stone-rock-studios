@@ -127,7 +127,7 @@
 </head>
 <body>
 <nav>
-  <a class="nav-logo" href="#" id="logoBtn">Stone Rock Studios</a>
+  <a class="nav-logo" href="javascript:void(0)" onclick="showView('work')">Stone Rock Studios</a>
   <div class="nav-links">
     <div class="dropdown-wrapper" id="workDropdown">
       <span class="nav-link active" id="workBtn">WORK <span class="dropdown-arrow">↓</span></span>
@@ -486,34 +486,23 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
 });
 
 // ── VIEWS ──
-const aboutView   = document.getElementById('aboutView');
-const contactView = document.getElementById('contactView');
-const workView    = document.getElementById('workView');
-const aboutBtn    = document.getElementById('aboutBtn');
-const contactBtn  = document.getElementById('contactBtn');
-
 function showView(view) {
-  workView.style.display = view === 'work' ? '' : 'none';
-  aboutView.classList.toggle('visible', view === 'about');
-  contactView.classList.toggle('visible', view === 'contact');
+  document.getElementById('workView').style.display    = view === 'work'    ? '' : 'none';
+  document.getElementById('aboutView').classList.toggle('visible', view === 'about');
+  document.getElementById('contactView').classList.toggle('visible', view === 'contact');
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  if (view === 'about') aboutBtn.classList.add('active');
+  if (view === 'about') document.getElementById('aboutBtn').classList.add('active');
   if (view === 'work')  document.getElementById('workBtn').classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-document.getElementById('logoBtn').addEventListener('click', e => {
+document.getElementById('aboutBtn').addEventListener('click', e => {
   e.preventDefault();
-  e.stopPropagation();
-  showView('work');
+  const showing = document.getElementById('aboutView').classList.contains('visible');
+  showView(showing ? 'work' : 'about');
 });
 
-aboutBtn.addEventListener('click', e => {
-  e.preventDefault();
-  showView(aboutView.classList.contains('visible') ? 'work' : 'about');
-});
-
-contactBtn.addEventListener('click', e => {
+document.getElementById('contactBtn').addEventListener('click', e => {
   e.preventDefault();
   showView('contact');
 });
