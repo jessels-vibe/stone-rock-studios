@@ -131,9 +131,17 @@
   .cart-item { display: flex; gap: 14px; padding: 16px 22px; border-bottom: 1px solid var(--border); }
   .cart-item-img { width: 68px; height: 68px; object-fit: cover; background: var(--black); flex-shrink: 0; }
   .cart-item-body { flex: 1; min-width: 0; }
-  .cart-item-name { font-size: 12px; font-weight: 600; color: #fefefe; margin-bottom: 3px; line-height: 1.3; }
-  .cart-item-variant { font-size: 11px; color: #fefefe; margin-bottom: 6px; }
-  .cart-item-price { font-size: 12px; color: #fefefe; }
+  .cart-item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .cart-item-name { font-size: 12px; font-weight: 600; color: #fefefe; line-height: 1.3; }
+  .cart-item-variant { font-size: 11px; color: #fefefe; margin-top: 3px; }
+  .cart-item-price { font-size: 12px; color: #fefefe; margin-left: auto; flex-shrink: 0; }
+  .cart-remove { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 0; line-height: 1; transition: color 0.2s; flex-shrink: 0; margin-top: 1px; }
+  .cart-remove:hover { color: #fefefe; }
+  .cart-variant-sel { background: var(--surface2); border: 1px solid var(--border); color: #fefefe; font-size: 10px; letter-spacing: 0.04em; font-family: inherit; padding: 4px 6px; cursor: pointer; width: 100%; margin-top: 6px; }
+  .cart-item-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .cart-qty-btn { width: 24px; height: 24px; background: var(--surface2); border: 1px solid var(--border); color: #fefefe; font-size: 14px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; padding: 0; }
+  .cart-qty-btn:hover { background: #222; }
+  .cart-qty-num { font-size: 12px; color: #fefefe; min-width: 18px; text-align: center; }
   .cart-foot { padding: 18px 22px; border-top: 1px solid var(--border); flex-shrink: 0; }
   .cart-sub-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
   .cart-sub-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #fefefe; }
@@ -574,6 +582,22 @@ async function cartAdd(cartId, variantId, quantity) {
   return data?.cartLinesAdd?.cart;
 }
 
+async function cartRemoveLine(cartId, lineId) {
+  const { data } = await gql(
+    `mutation CartRemove($cartId:ID!,$lineIds:[ID!]!){cartLinesRemove(cartId:$cartId,lineIds:$lineIds){cart{${CART_F}}}}`,
+    { cartId, lineIds: [lineId] }
+  );
+  return data?.cartLinesRemove?.cart;
+}
+
+async function cartUpdateLines(cartId, lines) {
+  const { data } = await gql(
+    `mutation CartUpdate($cartId:ID!,$lines:[CartLineUpdateInput!]!){cartLinesUpdate(cartId:$cartId,lines:$lines){cart{${CART_F}}}}`,
+    { cartId, lines }
+  );
+  return data?.cartLinesUpdate?.cart;
+}
+
 function saveCart() { try { localStorage.setItem('srs_cart', JSON.stringify(cart)); } catch(e) {} }
 function loadCartFromStorage() {
   try {
@@ -600,12 +624,27 @@ function refreshCartUI() {
   foot.style.display = 'block';
   list.innerHTML = lines.map(({ node: item }) => {
     const m = item.merchandise;
+    const prod = products.find(p => p.title === m.product.title);
+    const variants = prod?.variants || [];
+    const hasVariants = variants.length > 1 || (variants[0] && variants[0].title !== 'Default Title');
     return `<div class="cart-item">
       ${m.image?.url ? `<img class="cart-item-img" src="${m.image.url}" alt="">` : '<div class="cart-item-img"></div>'}
       <div class="cart-item-body">
-        <div class="cart-item-name">${m.product.title}</div>
-        ${m.title !== 'Default Title' ? `<div class="cart-item-variant">${m.title}</div>` : ''}
-        <div class="cart-item-price">${money(m.price.amount, m.price.currencyCode)} × ${item.quantity}</div>
+        <div class="cart-item-head">
+          <div class="cart-item-name">${m.product.title}</div>
+          <button class="cart-remove" data-line-id="${item.id}" title="Remove">✕</button>
+        </div>
+        ${hasVariants
+          ? `<select class="cart-variant-sel" data-line-id="${item.id}" data-qty="${item.quantity}">
+              ${variants.map(v => `<option value="${v.id}"${v.id === m.id ? ' selected' : ''}${!v.availableForSale ? ' disabled' : ''}>${v.title}${!v.availableForSale ? ' — OOS' : ''}</option>`).join('')}
+             </select>`
+          : (m.title !== 'Default Title' ? `<div class="cart-item-variant">${m.title}</div>` : '')}
+        <div class="cart-item-controls">
+          <button class="cart-qty-btn" data-line-id="${item.id}" data-delta="-1">−</button>
+          <span class="cart-qty-num">${item.quantity}</span>
+          <button class="cart-qty-btn" data-line-id="${item.id}" data-delta="1">+</button>
+          <div class="cart-item-price">${money(m.price.amount, m.price.currencyCode)}</div>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -641,6 +680,43 @@ document.getElementById('atcBtn').onclick = async () => {
     note.textContent = 'Something went wrong. Try again.';
   }
 };
+
+document.getElementById('cartList').addEventListener('click', async e => {
+  const removeBtn = e.target.closest('.cart-remove');
+  const qtyBtn    = e.target.closest('.cart-qty-btn');
+  if (!cart?.id) return;
+
+  if (removeBtn) {
+    const lineId = removeBtn.dataset.lineId;
+    removeBtn.disabled = true;
+    cart = await cartRemoveLine(cart.id, lineId);
+    saveCart(); refreshCartUI();
+  }
+
+  if (qtyBtn) {
+    const lineId = qtyBtn.dataset.lineId;
+    const delta  = parseInt(qtyBtn.dataset.delta);
+    const line   = cart.lines.edges.find(e => e.node.id === lineId)?.node;
+    if (!line) return;
+    qtyBtn.disabled = true;
+    const newQty = line.quantity + delta;
+    cart = newQty <= 0
+      ? await cartRemoveLine(cart.id, lineId)
+      : await cartUpdateLines(cart.id, [{ id: lineId, quantity: newQty }]);
+    saveCart(); refreshCartUI();
+  }
+});
+
+document.getElementById('cartList').addEventListener('change', async e => {
+  const sel = e.target.closest('.cart-variant-sel');
+  if (!sel || !cart?.id) return;
+  const lineId     = sel.dataset.lineId;
+  const qty        = parseInt(sel.dataset.qty);
+  const variantId  = sel.value;
+  sel.disabled = true;
+  cart = await cartUpdateLines(cart.id, [{ id: lineId, merchandiseId: variantId, quantity: qty }]);
+  saveCart(); refreshCartUI();
+});
 
 function openCart() {
   document.getElementById('cartDrawer').classList.add('open');
