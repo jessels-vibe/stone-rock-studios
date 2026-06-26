@@ -42,24 +42,19 @@
   .tile-title { font-size: 13px; font-weight: 600; color: #fefefe; margin-bottom: 5px; line-height: 1.3; }
   .tile-price { display: none; }
   .status-msg { grid-column: 1/-1; padding: 80px 32px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-align: center; }
-  .filter-bar { display: flex; align-items: center; gap: 36px; padding: 0 calc(var(--gap) + 4px) 20px; flex-wrap: wrap; }
-  .filter-group { display: flex; align-items: center; gap: 16px; }
-  .filter-label { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
-  .sort-btn { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); background: none; border: none; cursor: pointer; font-family: inherit; transition: color 0.2s; padding: 0; }
-  .sort-btn:hover { color: var(--text); }
-  .sort-btn.on { color: #fefefe; border-bottom: 1px solid #fefefe; padding-bottom: 1px; }
-  .dept-wrap { position: relative; }
-  .dept-trigger { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; display: flex; align-items: center; gap: 5px; transition: color 0.2s; padding: 0; }
-  .dept-trigger:hover { color: #fefefe; }
-  .dept-trigger.on { color: #fefefe; }
-  .dept-arrow { font-size: 9px; display: inline-block; transition: transform 0.2s; }
-  .dept-wrap.open .dept-arrow { transform: rotate(180deg); }
-  .dept-menu { position: absolute; top: calc(100% + 10px); left: 0; background: #151515; border: 1px solid var(--border); min-width: 220px; max-height: 340px; overflow-y: auto; opacity: 0; pointer-events: none; transform: translateY(-4px); transition: opacity 0.15s, transform 0.15s; z-index: 50; }
-  .dept-wrap.open .dept-menu { opacity: 1; pointer-events: all; transform: none; }
-  .dept-item { display: block; width: 100%; text-align: left; padding: 9px 16px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); cursor: pointer; background: none; border: none; border-bottom: 1px solid var(--border); font-family: inherit; transition: color 0.12s, background 0.12s; }
-  .dept-item:last-child { border-bottom: none; }
-  .dept-item:hover { color: #fefefe; background: #1c1c1c; }
-  .dept-item.on { color: #fefefe; }
+  .filter-bar { display: flex; align-items: center; gap: 24px; padding: 0 calc(var(--gap) + 4px) 20px; }
+  .dd-wrap { position: relative; }
+  .dd-trigger { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; display: flex; align-items: center; gap: 5px; transition: color 0.2s; padding: 0; }
+  .dd-trigger:hover, .dd-trigger.on { color: #fefefe; }
+  .dd-arrow { font-size: 9px; display: inline-block; transition: transform 0.2s; }
+  .dd-wrap.open .dd-arrow { transform: rotate(180deg); }
+  .dd-wrap.open .dd-trigger { color: #fefefe; }
+  .dd-menu { position: absolute; top: calc(100% + 10px); left: 0; background: #151515; border: 1px solid var(--border); min-width: 180px; max-height: 340px; overflow-y: auto; opacity: 0; pointer-events: none; transform: translateY(-4px); transition: opacity 0.15s, transform 0.15s; z-index: 50; }
+  .dd-wrap.open .dd-menu { opacity: 1; pointer-events: all; transform: none; }
+  .dd-item { display: block; width: 100%; text-align: left; padding: 9px 16px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); cursor: pointer; background: none; border: none; border-bottom: 1px solid var(--border); font-family: inherit; transition: color 0.12s, background 0.12s; }
+  .dd-item:last-child { border-bottom: none; }
+  .dd-item:hover { color: #fefefe; background: #1c1c1c; }
+  .dd-item.on { color: #fefefe; }
 
   /* PRODUCT MODAL */
   .modal-back { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
@@ -166,20 +161,17 @@
 </div>
 
 <div class="filter-bar">
-  <div class="filter-group">
-    <span class="filter-label">Sort</span>
-    <button class="sort-btn on" id="sortDefault" onclick="setSort('default')">Default</button>
-    <button class="sort-btn" id="sortAZ" onclick="setSort('az')">A → Z</button>
-    <button class="sort-btn" id="sortZA" onclick="setSort('za')">Z → A</button>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">Department</span>
-    <div class="dept-wrap" id="deptWrap">
-      <button class="dept-trigger" id="deptTrigger" onclick="toggleDept()">
-        <span id="deptLabel">All</span> <span class="dept-arrow">↓</span>
-      </button>
-      <div class="dept-menu" id="deptMenu"></div>
+  <div class="dd-wrap" id="sortWrap">
+    <button class="dd-trigger" id="sortTrigger" onclick="toggleSort()">Sort <span class="dd-arrow">↓</span></button>
+    <div class="dd-menu" id="sortMenu">
+      <button class="dd-item on" data-sort="default">Default</button>
+      <button class="dd-item" data-sort="az">A → Z</button>
+      <button class="dd-item" data-sort="za">Z → A</button>
     </div>
+  </div>
+  <div class="dd-wrap" id="deptWrap">
+    <button class="dd-trigger" id="deptTrigger" onclick="toggleDept()">Department <span class="dd-arrow">↓</span></button>
+    <div class="dd-menu" id="deptMenu"></div>
   </div>
 </div>
 
@@ -297,12 +289,21 @@ async function fetchProducts() {
 
 let activeSort = 'default';
 
+function toggleSort() { document.getElementById('sortWrap').classList.toggle('open'); }
+
 function setSort(sort) {
   activeSort = sort;
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('on'));
-  document.getElementById(sort === 'default' ? 'sortDefault' : sort === 'az' ? 'sortAZ' : 'sortZA').classList.add('on');
+  document.querySelectorAll('#sortMenu .dd-item').forEach(b => b.classList.toggle('on', b.dataset.sort === sort));
+  document.getElementById('sortTrigger').classList.toggle('on', sort !== 'default');
+  document.getElementById('sortWrap').classList.remove('open');
   renderGrid();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('#sortMenu .dd-item').forEach(b =>
+    b.addEventListener('click', () => setSort(b.dataset.sort))
+  );
+});
 
 function sortedProducts() {
   const p = [...products];
@@ -379,9 +380,9 @@ function buildDeptMenu() {
   });
   const menu = document.getElementById('deptMenu');
   menu.innerHTML =
-    `<button class="dept-item on" data-dept="all">All Departments</button>` +
-    present.map(d => `<button class="dept-item" data-dept="${d}">${d}</button>`).join('');
-  menu.querySelectorAll('.dept-item').forEach(b =>
+    `<button class="dd-item on" data-dept="all">All</button>` +
+    present.map(d => `<button class="dd-item" data-dept="${d}">${d}</button>`).join('');
+  menu.querySelectorAll('.dd-item').forEach(b =>
     b.addEventListener('click', () => setDept(b.dataset.dept))
   );
 }
@@ -389,7 +390,7 @@ function buildDeptMenu() {
 function setDept(dept) {
   activeDept = dept;
   document.getElementById('deptLabel').textContent = dept === 'all' ? 'All' : dept;
-  document.querySelectorAll('.dept-item').forEach(b =>
+  document.querySelectorAll('#deptMenu .dd-item').forEach(b =>
     b.classList.toggle('on', b.dataset.dept === dept)
   );
   document.getElementById('deptWrap').classList.remove('open');
@@ -397,13 +398,13 @@ function setDept(dept) {
   renderGrid();
 }
 
-function toggleDept() {
-  document.getElementById('deptWrap').classList.toggle('open');
-}
+function toggleDept() { document.getElementById('deptWrap').classList.toggle('open'); }
 
 document.addEventListener('click', e => {
   if (!document.getElementById('deptWrap').contains(e.target))
     document.getElementById('deptWrap').classList.remove('open');
+  if (!document.getElementById('sortWrap').contains(e.target))
+    document.getElementById('sortWrap').classList.remove('open');
 });
 
 function filteredProducts() {
