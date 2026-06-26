@@ -499,10 +499,12 @@ function showView(view) {
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
   if (view === 'about') aboutBtn.classList.add('active');
   if (view === 'work')  document.getElementById('workBtn').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 document.getElementById('logoBtn').addEventListener('click', e => {
   e.preventDefault();
+  e.stopPropagation();
   showView('work');
 });
 
