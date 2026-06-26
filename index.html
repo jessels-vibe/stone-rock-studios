@@ -6,6 +6,7 @@
 <title>Stone Rock Studios</title>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  button, input, select, textarea { font-family: inherit; }
   :root {
     --black: #0a0a0a;
     --surface: #111111;
@@ -39,9 +40,9 @@
   .dropdown-item:hover { color: var(--text); background: #1c1c1c; }
   .dropdown-item.selected { color: var(--text); }
   .hero { padding: 120px 36px 56px; }
-  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
+  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; margin-bottom: 18px; }
   .hero-title { font-weight: 700; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.03em; color: var(--text); margin-bottom: 14px; }
-  .hero-sub { font-size: 13px; font-weight: 300; color: var(--muted); letter-spacing: 0.06em; }
+  .hero-sub { font-size: 13px; font-weight: 300; color: #fefefe; letter-spacing: 0.06em; }
   #grid { padding: 0 var(--gap); display: flex; flex-direction: column; gap: var(--gap); }
   .grid-row { display: flex; gap: var(--gap); align-items: flex-start; }
   .tile { position: relative; overflow: hidden; cursor: pointer; background: var(--surface); flex-shrink: 0; }
@@ -62,7 +63,7 @@
   .tile-ext-link { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s; z-index: 2; text-decoration: none; }
   .tile:hover .tile-ext-link { opacity: 1; }
   .tile-ext-link svg { width: 14px; height: 14px; }
-  .status-msg { padding: 80px 32px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-align: center; }
+  .status-msg { padding: 80px 32px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fefefe; text-align: center; }
   .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.94); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
   .modal-backdrop.open { opacity: 1; pointer-events: all; }
   .modal-inner { position: relative; transform: scale(0.97); transition: transform 0.25s; }
@@ -72,21 +73,21 @@
   .modal-inner.portrait { width: min(360px, 52vw); }
   .modal-inner.portrait .modal-video { position: relative; padding-bottom: 177.78%; background: #000; }
   .modal-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-  .modal-close { position: absolute; top: -38px; right: 0; background: none; border: none; cursor: pointer; color: var(--muted); font-size: 22px; transition: color 0.2s; font-family: inherit; }
+  .modal-close { position: absolute; top: -38px; right: 0; background: none; border: none; cursor: pointer; color: #fefefe; font-size: 22px; transition: color 0.2s; font-family: inherit; }
   .modal-close:hover { color: var(--text); }
   .modal-nav { position: fixed; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.3); font-size: 28px; padding: 16px; transition: color 0.2s; font-family: inherit; z-index: 201; }
   .modal-nav:hover { color: rgba(255,255,255,0.9); }
   .modal-nav.prev { left: 16px; }
   .modal-nav.next { right: 16px; }
   .modal-nav:disabled { opacity: 0; pointer-events: none; }
-  .modal-counter { position: absolute; top: -38px; left: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; color: var(--muted); line-height: 22px; }
+  .modal-counter { position: absolute; top: -38px; left: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; color: #fefefe; line-height: 22px; }
   .modal-meta { padding: 14px 0 0; }
-  .modal-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .modal-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #fefefe; margin-bottom: 5px; }
   .modal-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
   .about-section { display: none; padding: 130px 36px 80px; max-width: 580px; }
   .about-section.visible { display: block; }
   .about-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 24px; line-height: 0.95; }
-  .about-section p { font-size: 15px; font-weight: 300; line-height: 1.85; color: var(--muted); margin-bottom: 16px; }
+  .about-section p { font-size: 15px; font-weight: 300; line-height: 1.85; color: #fefefe; margin-bottom: 16px; }
   @media (max-width: 768px) {
     .grid-row { flex-wrap: wrap; }
     .tile { width: 100% !important; }
