@@ -127,7 +127,7 @@
 </head>
 <body>
 <nav>
-  <a class="nav-logo" href="#">Stone Rock Studios</a>
+  <a class="nav-logo" href="#" id="logoBtn">Stone Rock Studios</a>
   <div class="nav-links">
     <div class="dropdown-wrapper" id="workDropdown">
       <span class="nav-link active" id="workBtn">WORK <span class="dropdown-arrow">↓</span></span>
@@ -500,6 +500,11 @@ function showView(view) {
   if (view === 'about') aboutBtn.classList.add('active');
   if (view === 'work')  document.getElementById('workBtn').classList.add('active');
 }
+
+document.getElementById('logoBtn').addEventListener('click', e => {
+  e.preventDefault();
+  showView('work');
+});
 
 aboutBtn.addEventListener('click', e => {
   e.preventDefault();
