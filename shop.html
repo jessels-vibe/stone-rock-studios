@@ -379,15 +379,18 @@ function buildDeptMenu() {
   });
   const menu = document.getElementById('deptMenu');
   menu.innerHTML =
-    `<button class="dept-item on" onclick="setDept('all')">All Departments</button>` +
-    present.map(d => `<button class="dept-item" onclick="setDept(${JSON.stringify(d)})">${d}</button>`).join('');
+    `<button class="dept-item on" data-dept="all">All Departments</button>` +
+    present.map(d => `<button class="dept-item" data-dept="${d}">${d}</button>`).join('');
+  menu.querySelectorAll('.dept-item').forEach(b =>
+    b.addEventListener('click', () => setDept(b.dataset.dept))
+  );
 }
 
 function setDept(dept) {
   activeDept = dept;
   document.getElementById('deptLabel').textContent = dept === 'all' ? 'All' : dept;
   document.querySelectorAll('.dept-item').forEach(b =>
-    b.classList.toggle('on', b.textContent === (dept === 'all' ? 'All Departments' : dept))
+    b.classList.toggle('on', b.dataset.dept === dept)
   );
   document.getElementById('deptWrap').classList.remove('open');
   document.getElementById('deptTrigger').classList.toggle('on', dept !== 'all');
