@@ -44,17 +44,16 @@
   .status-msg { grid-column: 1/-1; padding: 80px 32px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-align: center; }
   .filter-bar { display: flex; align-items: center; gap: 24px; padding: 0 calc(var(--gap) + 4px) 20px; }
   .dd-wrap { position: relative; }
-  .dd-trigger { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; display: flex; align-items: center; gap: 5px; transition: color 0.2s; padding: 0; }
-  .dd-trigger:hover, .dd-trigger.on { color: #fefefe; }
+  .dd-trigger { background: none; border: none; cursor: pointer; color: #fefefe; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; display: flex; align-items: center; gap: 5px; transition: opacity 0.2s; padding: 0; }
+  .dd-trigger:hover { opacity: 0.7; }
   .dd-arrow { font-size: 9px; display: inline-block; transition: transform 0.2s; }
   .dd-wrap.open .dd-arrow { transform: rotate(180deg); }
-  .dd-wrap.open .dd-trigger { color: #fefefe; }
   .dd-menu { position: absolute; top: calc(100% + 10px); left: 0; background: #151515; border: 1px solid var(--border); min-width: 180px; max-height: 340px; overflow-y: auto; opacity: 0; pointer-events: none; transform: translateY(-4px); transition: opacity 0.15s, transform 0.15s; z-index: 50; }
   .dd-wrap.open .dd-menu { opacity: 1; pointer-events: all; transform: none; }
-  .dd-item { display: block; width: 100%; text-align: left; padding: 9px 16px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); cursor: pointer; background: none; border: none; border-bottom: 1px solid var(--border); font-family: inherit; transition: color 0.12s, background 0.12s; }
+  .dd-item { display: block; width: 100%; text-align: left; padding: 9px 16px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #fefefe; cursor: pointer; background: none; border: none; border-bottom: 1px solid var(--border); font-family: inherit; transition: background 0.12s; opacity: 0.45; }
   .dd-item:last-child { border-bottom: none; }
-  .dd-item:hover { color: #fefefe; background: #1c1c1c; }
-  .dd-item.on { color: #fefefe; }
+  .dd-item:hover { background: #1c1c1c; opacity: 1; }
+  .dd-item.on { opacity: 1; }
 
   /* PRODUCT MODAL */
   .modal-back { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
