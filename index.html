@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stone Rock Studios</title>
+<meta name="description" content="Stone Rock Studios — creative video production in Los Angeles. Moto, food, lifestyle, documentary, events, and more.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://stonerockstudios.xyz">
+<meta property="og:title" content="Stone Rock Studios">
+<meta property="og:description" content="Creative video production by Jes and Jackson. Los Angeles. Available worldwide.">
+<meta property="og:image" content="https://stonerockstudios.xyz/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Stone Rock Studios">
+<meta name="twitter:description" content="Creative video production by Jes and Jackson. Los Angeles. Available worldwide.">
+<meta name="twitter:image" content="https://stonerockstudios.xyz/og-image.jpg">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   button, input, select, textarea { font-family: inherit; }
@@ -88,12 +98,29 @@
   .about-section.visible { display: block; }
   .about-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 24px; line-height: 0.95; }
   .about-section p { font-size: 15px; font-weight: 300; line-height: 1.85; color: #fefefe; margin-bottom: 16px; }
+  .contact-section { display: none; padding: 130px 36px 80px; max-width: 580px; }
+  .contact-section.visible { display: block; }
+  .contact-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 8px; line-height: 0.95; }
+  .contact-lead { font-size: 13px; font-weight: 300; color: #fefefe; letter-spacing: 0.06em; margin-bottom: 36px; }
+  .c-form { display: flex; flex-direction: column; gap: 12px; }
+  .c-input, .c-select, .c-textarea { background: var(--surface); border: 1px solid var(--border); color: #fefefe; font-family: inherit; font-size: 13px; letter-spacing: 0.02em; padding: 13px 16px; width: 100%; outline: none; transition: border-color 0.2s; -webkit-appearance: none; border-radius: 0; }
+  .c-input::placeholder, .c-textarea::placeholder { color: #333; }
+  .c-input:focus, .c-select:focus, .c-textarea:focus { border-color: #444; }
+  .c-select { color: #555; cursor: pointer; }
+  .c-textarea { resize: vertical; min-height: 120px; }
+  .c-submit { background: #fefefe; color: var(--black); border: none; padding: 14px 32px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: opacity 0.2s; margin-top: 8px; }
+  .c-submit:hover { opacity: 0.8; }
+  .c-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .c-success { display: none; font-size: 13px; color: #fefefe; padding-top: 24px; letter-spacing: 0.04em; }
+  .c-success.show { display: block; }
   @media (max-width: 768px) {
     .grid-row { flex-wrap: wrap; }
     .tile { width: 100% !important; }
     .tile.portrait { width: calc(50% - var(--gap) / 2) !important; }
     nav { padding: 0 20px; }
     .hero { padding: 90px 20px 48px; }
+    .contact-section { padding: 90px 20px 60px; }
+    .contact-section h2 { font-size: 42px; }
   }
 </style>
 </head>
@@ -117,7 +144,7 @@
     </div>
     <a class="nav-link" id="aboutBtn" href="#">ABOUT</a>
     <a class="nav-link" href="shop.html">SHOP</a>
-    <a class="nav-cta" href="mailto:stonerockstudiosllc@gmail.com">Get in Touch</a>
+    <a class="nav-cta" href="#contact" id="contactBtn">Get in Touch</a>
   </div>
 </nav>
 
@@ -137,6 +164,31 @@
   <h2>Stone Rock<br>Studios</h2>
   <p>We're a two-person creative studio built on the belief that every moment deserves to be captured with intention. From high-speed moto to intimate documentaries, we bring the same eye to every frame.</p>
   <p>Based in Los Angeles. Available worldwide.</p>
+</div>
+
+<div class="contact-section" id="contactView">
+  <div class="hero-label">Contact</div>
+  <h2>Get in<br>Touch</h2>
+  <p class="contact-lead">Tell us about your project.</p>
+  <!-- Sign up free at formspree.io, create a form, and replace YOUR_FORM_ID below -->
+  <form class="c-form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+    <input class="c-input" type="text" name="name" placeholder="Name" required>
+    <input class="c-input" type="email" name="email" placeholder="Email" required>
+    <select class="c-select" name="project_type">
+      <option value="" disabled selected>Project Type</option>
+      <option value="moto">Moto</option>
+      <option value="food">Food &amp; Drink</option>
+      <option value="lifestyle">Lifestyle</option>
+      <option value="documentary">Documentary</option>
+      <option value="events">Event Coverage</option>
+      <option value="reels">Social Reels</option>
+      <option value="music">Music Video</option>
+      <option value="other">Other</option>
+    </select>
+    <textarea class="c-textarea" name="message" placeholder="Tell us about your project" required></textarea>
+    <button class="c-submit" type="submit">Send Message</button>
+  </form>
+  <div class="c-success" id="contactSuccess">Thanks — we'll be in touch soon.</div>
 </div>
 
 <div class="modal-backdrop" id="modal">
@@ -432,19 +484,60 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
   });
 });
 
-// ── ABOUT ──
-const aboutView = document.getElementById('aboutView');
-const workView  = document.getElementById('workView');
-const aboutBtn  = document.getElementById('aboutBtn');
-const workBtn   = document.getElementById('workBtn');
+// ── VIEWS ──
+const aboutView   = document.getElementById('aboutView');
+const contactView = document.getElementById('contactView');
+const workView    = document.getElementById('workView');
+const aboutBtn    = document.getElementById('aboutBtn');
+const contactBtn  = document.getElementById('contactBtn');
+
+function showView(view) {
+  workView.style.display = view === 'work' ? '' : 'none';
+  aboutView.classList.toggle('visible', view === 'about');
+  contactView.classList.toggle('visible', view === 'contact');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  if (view === 'about') aboutBtn.classList.add('active');
+  if (view === 'work')  document.getElementById('workBtn').classList.add('active');
+}
 
 aboutBtn.addEventListener('click', e => {
   e.preventDefault();
-  const showing = aboutView.classList.contains('visible');
-  aboutView.classList.toggle('visible', !showing);
-  workView.style.display = showing ? '' : 'none';
-  aboutBtn.classList.toggle('active', !showing);
-  workBtn.classList.toggle('active', showing);
+  showView(aboutView.classList.contains('visible') ? 'work' : 'about');
+});
+
+contactBtn.addEventListener('click', e => {
+  e.preventDefault();
+  showView('contact');
+});
+
+// ── CONTACT FORM ──
+const contactForm    = document.getElementById('contactForm');
+const contactSuccess = document.getElementById('contactSuccess');
+document.querySelectorAll('.c-select').forEach(s =>
+  s.addEventListener('change', () => { s.style.color = '#fefefe'; })
+);
+contactForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = contactForm.querySelector('.c-submit');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+  try {
+    const res = await fetch(contactForm.action, {
+      method: 'POST',
+      body: new FormData(contactForm),
+      headers: { Accept: 'application/json' },
+    });
+    if (res.ok) {
+      contactForm.style.display = 'none';
+      contactSuccess.classList.add('show');
+    } else {
+      btn.textContent = 'Try again';
+      btn.disabled = false;
+    }
+  } catch {
+    btn.textContent = 'Try again';
+    btn.disabled = false;
+  }
 });
 
 loadAll();
