@@ -289,8 +289,9 @@ async function fetchProducts() {
   if (!data?.collection) return;
   products = data.collection.products.edges.map(({ node: p }) => ({
     ...p,
-    images:   p.images.edges.map(e => e.node),
-    variants: p.variants.edges.map(e => e.node),
+    images:     p.images.edges.map(e => e.node),
+    variants:   p.variants.edges.map(e => e.node),
+    department: TITLE_DEPT[p.title] || p.productType || '',
   }));
 }
 
@@ -311,6 +312,54 @@ function sortedProducts() {
 }
 
 // ── DEPARTMENT FILTER ─────────────────────────────
+const TITLE_DEPT = {
+  // Production
+  'PA Tee': 'Production',
+  // Direction
+  'Director Tee': 'Direction',
+  '1st AD Tee': 'Direction',
+  '2nd AD': 'Direction',
+  '2nd 2nd AD Tee': 'Direction',
+  // Camera
+  'DP Tee': 'Camera',
+  'Cinematographer Tee': 'Camera',
+  'Director of Photography Tee': 'Camera',
+  'Camera Tee': 'Camera',
+  'Camera Team Tee': 'Camera',
+  '1st AC Tee': 'Camera',
+  'Focus (1st AC) Tee': 'Camera',
+  '2nd AC Tee': 'Camera',
+  'Clapper (2nd AC) Tee': 'Camera',
+  'Steadicam Tee': 'Camera',
+  // G&E
+  'G&E Tee': 'G&E',
+  'Best Boy Electric': 'G&E',
+  'Best Boy Tee': 'G&E',
+  'Best Boy Grip Tee': 'G&E',
+  // Sound
+  'Boom Tee': 'Sound',
+  // Art Department
+  'Art Director Tee': 'Art Department',
+  // Stunts
+  'Stunt Coordinator Tee': 'Stunts',
+  'Stunts Tee': 'Stunts',
+  'Stunt Double Tee': 'Stunts',
+  // Talent
+  'Actor Tee': 'Talent',
+  'Talent Tee': 'Talent',
+  'Background Tee': 'Talent',
+  'Talent Wrangler Tee': 'Talent',
+  // Medical & Safety
+  'Animal Wrangler Tee': 'Medical & Safety',
+  // Post
+  'Editor Tee': 'Post (On-Set Liaisons)',
+  'Colorist Tee': 'Post (On-Set Liaisons)',
+  'Composer Tee': 'Post (On-Set Liaisons)',
+  // Publicity
+  'Publicist Tee': 'Publicity',
+  'BTS Tee': 'Publicity',
+};
+
 const DEPT_ORDER = [
   'Production','Direction','Writing','Camera','G&E','Sound',
   'Art Department','Construction','Costume','Hair & Makeup','Stunts',
@@ -322,7 +371,7 @@ const DEPT_ORDER = [
 let activeDept = 'all';
 
 function buildDeptMenu() {
-  const present = [...new Set(products.map(p => p.productType).filter(Boolean))];
+  const present = [...new Set(products.map(p => p.department).filter(Boolean))];
   present.sort((a, b) => {
     const ai = DEPT_ORDER.indexOf(a), bi = DEPT_ORDER.indexOf(b);
     if (ai === -1 && bi === -1) return a.localeCompare(b);
@@ -356,7 +405,7 @@ document.addEventListener('click', e => {
 
 function filteredProducts() {
   const p = sortedProducts();
-  return activeDept === 'all' ? p : p.filter(p => p.productType === activeDept);
+  return activeDept === 'all' ? p : p.filter(p => p.department === activeDept);
 }
 
 function renderGrid() {
