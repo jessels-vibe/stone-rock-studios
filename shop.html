@@ -162,7 +162,7 @@
 
 <div class="filter-bar">
   <div class="dd-wrap" id="sortWrap">
-    <button class="dd-trigger" id="sortTrigger" onclick="toggleSort()">Sort <span class="dd-arrow">↓</span></button>
+    <button class="dd-trigger" id="sortTrigger" onclick="toggleSort()"><span id="sortLabel">Sort</span> <span class="dd-arrow">↓</span></button>
     <div class="dd-menu" id="sortMenu">
       <button class="dd-item on" data-sort="default">Default</button>
       <button class="dd-item" data-sort="az">A → Z</button>
@@ -170,7 +170,7 @@
     </div>
   </div>
   <div class="dd-wrap" id="deptWrap">
-    <button class="dd-trigger" id="deptTrigger" onclick="toggleDept()">Department <span class="dd-arrow">↓</span></button>
+    <button class="dd-trigger" id="deptTrigger" onclick="toggleDept()"><span id="deptLabel">Department</span> <span class="dd-arrow">↓</span></button>
     <div class="dd-menu" id="deptMenu"></div>
   </div>
 </div>
@@ -293,17 +293,17 @@ function toggleSort() { document.getElementById('sortWrap').classList.toggle('op
 
 function setSort(sort) {
   activeSort = sort;
+  const labels = { default: 'Sort', az: 'A → Z', za: 'Z → A' };
+  document.getElementById('sortLabel').textContent = labels[sort];
   document.querySelectorAll('#sortMenu .dd-item').forEach(b => b.classList.toggle('on', b.dataset.sort === sort));
   document.getElementById('sortTrigger').classList.toggle('on', sort !== 'default');
   document.getElementById('sortWrap').classList.remove('open');
   renderGrid();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('#sortMenu .dd-item').forEach(b =>
-    b.addEventListener('click', () => setSort(b.dataset.sort))
-  );
-});
+document.querySelectorAll('#sortMenu .dd-item').forEach(b =>
+  b.addEventListener('click', () => setSort(b.dataset.sort))
+);
 
 function sortedProducts() {
   const p = [...products];
@@ -389,7 +389,7 @@ function buildDeptMenu() {
 
 function setDept(dept) {
   activeDept = dept;
-  document.getElementById('deptLabel').textContent = dept === 'all' ? 'All' : dept;
+  document.getElementById('deptLabel').textContent = dept === 'all' ? 'Department' : dept;
   document.querySelectorAll('#deptMenu .dd-item').forEach(b =>
     b.classList.toggle('on', b.dataset.dept === dept)
   );
