@@ -179,6 +179,7 @@
   /* TILE SOLD-OUT */
   .tile-sold-out .tile-img { opacity: 0.35; }
   .tile-oos-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .tile-most-popular { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: #fefefe; margin-top: 4px; }
 
   /* BADGE POP */
   @keyframes badge-pop { 0%{transform:scale(1)} 45%{transform:scale(1.55)} 100%{transform:scale(1)} }
@@ -222,7 +223,7 @@
   <aside class="dept-sidebar" id="deptSidebar"></aside>
   <div class="shop-main">
     <div class="featured-wrap" id="featuredWrap">
-      <div class="section-label">Featured</div>
+      <div class="section-label">Best Selling</div>
       <div class="shop-grid" id="featuredGrid"></div>
     </div>
     <div id="shopSections"><div class="status-msg">Loading</div></div>
@@ -480,7 +481,7 @@ function getDailyFeatured() {
   return sorted.slice(0, 4);
 }
 
-function tileHTML(p) {
+function tileHTML(p, mostPopular = false) {
   const i = products.indexOf(p);
   const img = p.featuredImage?.url;
   const allSoldOut = p.variants.every(v => !v.availableForSale);
@@ -490,6 +491,7 @@ function tileHTML(p) {
     </div>
     <div class="tile-info">
       <div class="tile-title">${p.title}</div>
+      ${mostPopular ? '<div class="tile-most-popular">Most Popular</div>' : ''}
       ${allSoldOut ? '<div class="tile-oos-label">Sold out</div>' : ''}
     </div>
   </div>`;
@@ -502,7 +504,7 @@ function renderShop() {
   }
 
   // Featured strip
-  document.getElementById('featuredGrid').innerHTML = getDailyFeatured().map(tileHTML).join('');
+  document.getElementById('featuredGrid').innerHTML = getDailyFeatured().map((p, i) => tileHTML(p, i === 0)).join('');
 
   // Group products by department, in DEPT_ORDER order
   const byDept = {};
@@ -532,7 +534,7 @@ function renderShop() {
   // Sidebar links
   const sidebar = document.getElementById('deptSidebar');
   sidebar.innerHTML =
-    `<a class="sidebar-link active" data-section="featuredWrap" href="#featuredWrap">Featured</a>` +
+    `<a class="sidebar-link active" data-section="featuredWrap" href="#featuredWrap">Best Selling</a>` +
     depts.map(dept => {
       const id = 'sect-' + dept.toLowerCase().replace(/[\s&()\-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
       return `<a class="sidebar-link" data-section="${id}" href="#${id}">${dept}</a>`;
