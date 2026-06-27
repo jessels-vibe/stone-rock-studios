@@ -137,6 +137,16 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-26 — Fix "Most Popular" label appearing on all non-first dept tiles (shop.html)
+
+**What changed:** One-line fix in `renderShop()` — changed `byDept[dept].map(tileHTML)` to `byDept[dept].map(p => tileHTML(p))`.
+
+**Why:** `Array.prototype.map` passes `(element, index, array)` to its callback. When `tileHTML` was passed directly as the callback, the array index became the `mostPopular` argument — index 0 is falsy (no label), but index 1, 2, 3… are truthy, so every non-first shirt in every department incorrectly showed "Most Popular". Wrapping with an arrow function ensures only the explicit `i === 0` check in the featured strip produces the label.
+
+**Watch out for:** Any future call to `.map(tileHTML)` will reproduce this bug. Always use `.map(p => tileHTML(p))` or `.map((p, i) => tileHTML(p, i === 0))` depending on intent.
+
+---
+
 ### 2026-06-26 — Grouped layout with sidebar nav + daily featured rotation (shop.html)
 
 **What changed:** Full layout redesign of the shop page. Replaced flat grid + dropdown filters with department-sectioned layout and sticky sidebar jump nav.
