@@ -118,3 +118,19 @@ After every edit, append an entry here so future Claude instances understand wha
 - `CART_F` is now multi-line; any future mutation that adds/modifies `CART_F` fields must account for `note`, `discountCodes`, and the expanded `cost` block.
 - The cart footer elements (`#cartNote`, `#discountApply`, etc.) exist in static HTML and are always present — their event listeners are wired once at script load time, not rebuilt on re-render.
 - `quantityAvailable` returns `null` when Shopify inventory tracking is disabled for a product; `updateAtcState` checks `qty != null` before showing the low-stock label.
+
+---
+
+### 2026-06-26 — Department filter expanded to all 71 products (shop.html)
+
+**What changed:** `TITLE_DEPT` updated to map all 71 Shopify products to departments. `DEPT_ORDER` cleaned up. Products query bumped from `first: 50` to `first: 100`.
+
+**New departments added:** Writing, Construction, Hair & Makeup, Special Effects (On-Set), VFX (On-Set), Locations, Casting, Craft Services & Catering — plus expanded Production, Direction, G&E, Art Department, Talent, Medical & Safety, Publicity entries.
+
+**Key decisions:**
+- Costume Tee → Art Department (user preference)
+- Dialogue Coach Tee → Direction (user preference)
+- Executive Tee + Executive Producer Tee → both Production
+- Girp Tee → G&E (intentional typo product)
+- `first: 50` was silently dropping the 21 newest products from the grid — fixed to `first: 100`
+- Removed 'Costume' and 'Transport' from DEPT_ORDER (no standalone Costume dept; no Transport products)

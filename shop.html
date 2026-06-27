@@ -333,7 +333,7 @@ let products = [];
 async function fetchProducts() {
   const { data } = await gql(`{
     collection(id: "${COL}") {
-      products(first: 50) {
+      products(first: 100) {
         edges { node {
           id title productType
           featuredImage { url altText }
@@ -387,57 +387,102 @@ function sortedProducts() {
 // ── DEPARTMENT FILTER ─────────────────────────────
 const TITLE_DEPT = {
   // Production
-  'PA Tee': 'Production',
+  'PA Tee':                    'Production',
+  'Production Assistant Tee':  'Production',
+  'Producer Tee':              'Production',
+  'Executive Tee':             'Production',
+  'Executive Producer Tee':    'Production',
+  'Studio Head (Exec) Tee':    'Production',
   // Direction
-  'Director Tee': 'Direction',
-  '1st AD Tee': 'Direction',
-  '2nd AD': 'Direction',
-  '2nd 2nd AD Tee': 'Direction',
+  'Director Tee':              'Direction',
+  '1st AD Tee':                'Direction',
+  '2nd AD':                    'Direction',
+  '2nd 2nd AD Tee':            'Direction',
+  'Script Supervisor Tee':     'Direction',
+  'Dialogue Coach Tee':        'Direction',
+  // Writing
+  'Screen Writer Tee':         'Writing',
+  'Story Writer Tee':          'Writing',
   // Camera
-  'DP Tee': 'Camera',
-  'Cinematographer Tee': 'Camera',
+  'DP Tee':                    'Camera',
+  'Cinematographer Tee':       'Camera',
   'Director of Photography Tee': 'Camera',
-  'Camera Tee': 'Camera',
-  'Camera Team Tee': 'Camera',
-  '1st AC Tee': 'Camera',
-  'Focus (1st AC) Tee': 'Camera',
-  '2nd AC Tee': 'Camera',
-  'Clapper (2nd AC) Tee': 'Camera',
-  'Steadicam Tee': 'Camera',
+  'Camera Tee':                'Camera',
+  'Camera Team Tee':           'Camera',
+  '1st AC Tee':                'Camera',
+  'Focus (1st AC) Tee':        'Camera',
+  '2nd AC Tee':                'Camera',
+  'Clapper (2nd AC) Tee':      'Camera',
+  'Steadicam Tee':             'Camera',
   // G&E
-  'G&E Tee': 'G&E',
-  'Best Boy Electric': 'G&E',
-  'Best Boy Tee': 'G&E',
-  'Best Boy Grip Tee': 'G&E',
+  'G&E Tee':                   'G&E',
+  'Best Boy Electric':         'G&E',
+  'Best Boy Tee':              'G&E',
+  'Best Boy Grip Tee':         'G&E',
+  'Grip Tee':                  'G&E',
+  'Grip (Upside Down) Tee':    'G&E',
+  'Girp Tee':                  'G&E',
   // Sound
-  'Boom Tee': 'Sound',
+  'Boom Tee':                  'Sound',
   // Art Department
-  'Art Director Tee': 'Art Department',
+  'Art Director Tee':          'Art Department',
+  'Designer Tee':              'Art Department',
+  'Graphic Design Tee':        'Art Department',
+  'Prop Master Tee':           'Art Department',
+  'Prop Assistant Tee':        'Art Department',
+  'Set Decorator Tee':         'Art Department',
+  'Costume Tee':               'Art Department',
+  // Construction
+  'Carpenter Tee':             'Construction',
+  'Painter Tee':               'Construction',
+  'Plasterer Tee':             'Construction',
+  // Hair & Makeup
+  'Hair Tee':                  'Hair & Makeup',
+  'MakeUp Tee':                'Hair & Makeup',
+  'Prosthetics Tee':           'Hair & Makeup',
   // Stunts
-  'Stunt Coordinator Tee': 'Stunts',
-  'Stunts Tee': 'Stunts',
-  'Stunt Double Tee': 'Stunts',
+  'Stunt Coordinator Tee':     'Stunts',
+  'Stunts Tee':                'Stunts',
+  'Stunt Double Tee':          'Stunts',
+  // Special Effects
+  'Special Effects Tee':       'Special Effects (On-Set)',
+  'Pyrotechnician Tee':        'Special Effects (On-Set)',
+  // VFX
+  'Visual Effects Tee':        'VFX (On-Set)',
+  // Locations
+  'Location Scout Tee':        'Locations',
+  // Casting
+  'Casting Director Tee':      'Casting',
   // Talent
-  'Actor Tee': 'Talent',
-  'Talent Tee': 'Talent',
-  'Background Tee': 'Talent',
-  'Talent Wrangler Tee': 'Talent',
+  'Actor Tee':                 'Talent',
+  'Talent Tee':                'Talent',
+  'Background Tee':            'Talent',
+  'Talent Wrangler Tee':       'Talent',
+  'Extra Tee':                 'Talent',
+  'Stand In Tee':              'Talent',
+  'Photo Double Tee':          'Talent',
+  // Craft Services & Catering
+  'Catering Tee':              'Craft Services & Catering',
+  'Crafty Tee':                'Craft Services & Catering',
   // Medical & Safety
-  'Animal Wrangler Tee': 'Medical & Safety',
+  'Animal Wrangler Tee':       'Medical & Safety',
+  'Medic Tee':                 'Medical & Safety',
+  'Intimacy Coordinator Tee':  'Medical & Safety',
   // Post
-  'Editor Tee': 'Post (On-Set Liaisons)',
-  'Colorist Tee': 'Post (On-Set Liaisons)',
-  'Composer Tee': 'Post (On-Set Liaisons)',
+  'Editor Tee':                'Post (On-Set Liaisons)',
+  'Colorist Tee':              'Post (On-Set Liaisons)',
+  'Composer Tee':              'Post (On-Set Liaisons)',
   // Publicity
-  'Publicist Tee': 'Publicity',
-  'BTS Tee': 'Publicity',
+  'Publicist Tee':             'Publicity',
+  'BTS Tee':                   'Publicity',
+  'Photographer Tee':          'Publicity',
 };
 
 const DEPT_ORDER = [
   'Production','Direction','Writing','Camera','G&E','Sound',
-  'Art Department','Construction','Costume','Hair & Makeup','Stunts',
+  'Art Department','Construction','Hair & Makeup','Stunts',
   'Special Effects (On-Set)','VFX (On-Set)','Locations','Casting','Talent',
-  'Craft Services & Catering','Transport','Medical & Safety',
+  'Craft Services & Catering','Medical & Safety',
   'Post (On-Set Liaisons)','Publicity'
 ];
 
