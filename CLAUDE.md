@@ -187,7 +187,7 @@ After every edit, append an entry here so future Claude instances understand wha
 - Hero `padding-top` updated from `120px` → `156px` (desktop) and `90px` → `126px` (mobile)
 - Promo bar is `36px` tall; nav is `52px` tall; total fixed header = `88px`
 
-**To update the deals:** Edit the two `<span>` texts inside `<div class="promo-bar">` in shop.html. To remove the bar entirely, delete the `<div class="promo-bar">` element and revert the sidebar/hero offsets back to 52px.
+**To update the deals:** Edit the two `.promo-deal` spans inside `<div class="promo-banner">` in shop.html. To remove entirely, delete the `.promo-banner` div — no offset adjustments needed since it's inline content, not in the fixed header.
 
 ---
 
