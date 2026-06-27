@@ -175,6 +175,22 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-27 — Promo announcement bar (shop.html)
+
+**What changed:** Added a white announcement bar above the nav advertising two active Shopify automatic discounts.
+
+**Deals shown:** "Buy 3, Get 1 Free" and "Free Shipping on Orders Over $100" — these are Shopify automatic discounts that apply at checkout and can't be surfaced dynamically from the Storefront API, so they're hardcoded in the bar.
+
+**Layout changes to accommodate the bar:**
+- Wrapped `<nav>` in `<div class="site-header">` — the wrapper is `position: fixed; top: 0` instead of the nav itself
+- `.dept-sidebar` sticky top updated from `52px` → `88px`; height from `calc(100vh - 52px)` → `calc(100vh - 88px)`
+- Hero `padding-top` updated from `120px` → `156px` (desktop) and `90px` → `126px` (mobile)
+- Promo bar is `36px` tall; nav is `52px` tall; total fixed header = `88px`
+
+**To update the deals:** Edit the two `<span>` texts inside `<div class="promo-bar">` in shop.html. To remove the bar entirely, delete the `<div class="promo-bar">` element and revert the sidebar/hero offsets back to 52px.
+
+---
+
 ### 2026-06-27 — Coming Soon page + nav cleanup (index.html, shop.html)
 
 **What changed:** Replaced the full portfolio page with a minimal "Coming Soon" page. Removed the "Work" nav link from shop.html.
