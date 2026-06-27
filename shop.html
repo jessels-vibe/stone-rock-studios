@@ -72,6 +72,14 @@
   .dept-header-name { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; }
   .dept-header-count { font-size: 10px; color: var(--muted); }
 
+  /* SEARCH */
+  .shop-search-wrap { padding: 0 var(--gap) 20px; }
+  .shop-search { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 13px; font-family: inherit; font-weight: 400; padding: 12px 16px; outline: none; border-radius: 2px; transition: border-color 0.15s; }
+  .shop-search:focus { border-color: #444; }
+  .shop-search::placeholder { color: var(--muted); }
+  .search-results-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); padding: 0 var(--gap) 14px; }
+  #searchResults { display: none; padding: 0 0 100px; }
+
   /* PRODUCT MODAL */
   .modal-back { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
   .modal-back.open { opacity: 1; pointer-events: all; }
@@ -225,11 +233,20 @@
 <div class="shop-layout">
   <aside class="dept-sidebar" id="deptSidebar"></aside>
   <div class="shop-main">
-    <div class="featured-wrap" id="featuredWrap">
-      <div class="section-label">Best Selling</div>
-      <div class="shop-grid" id="featuredGrid"></div>
+    <div class="shop-search-wrap">
+      <input class="shop-search" type="search" id="shopSearch" placeholder="Search shirts…" oninput="searchShop(this.value)" autocomplete="off">
     </div>
-    <div id="shopSections"><div class="status-msg">Loading</div></div>
+    <div id="searchResults">
+      <div class="search-results-label" id="searchResultsLabel"></div>
+      <div class="shop-grid" style="padding: 0 var(--gap);" id="searchGrid"></div>
+    </div>
+    <div id="shopNormal">
+      <div class="featured-wrap" id="featuredWrap">
+        <div class="section-label">Best Selling</div>
+        <div class="shop-grid" id="featuredGrid"></div>
+      </div>
+      <div id="shopSections"><div class="status-msg">Loading</div></div>
+    </div>
   </div>
 </div>
 
@@ -567,6 +584,29 @@ function updateActiveSidebarLink() {
   );
 }
 window.addEventListener('scroll', updateActiveSidebarLink, { passive: true });
+
+// ── SEARCH ────────────────────────────────────────
+function searchShop(q) {
+  q = q.trim().toLowerCase();
+  const resultsEl = document.getElementById('searchResults');
+  const normalEl  = document.getElementById('shopNormal');
+  const grid      = document.getElementById('searchGrid');
+  const label     = document.getElementById('searchResultsLabel');
+  if (!q) {
+    resultsEl.style.display = 'none';
+    normalEl.style.display  = '';
+    return;
+  }
+  const matches = products.filter(p => p.title.toLowerCase().includes(q));
+  label.textContent = matches.length
+    ? `${matches.length} result${matches.length !== 1 ? 's' : ''} for "${q}"`
+    : `No results for "${q}"`;
+  grid.innerHTML = matches.length
+    ? matches.map(p => tileHTML(p)).join('')
+    : '';
+  normalEl.style.display  = 'none';
+  resultsEl.style.display = '';
+}
 
 // ── MODAL ─────────────────────────────────────────
 let activeProd = null, activeImgs = [], imgIdx = 0, qty = 1, selOpts = {};
