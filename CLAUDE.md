@@ -49,6 +49,44 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### (Pre-existing) — Admin Dashboard (admin.html)
+
+**What it is:** A full Firebase-backed admin panel at `/admin.html` for managing the Stone Rock Studios video portfolio. Not built in this Claude session — documented here retroactively for future context.
+
+**Features:**
+- **Firebase auth** — email/password login (`admin@stonerockstudios.xyz`). Auth state gates the entire admin UI.
+- **Firebase Realtime Database** — all video data lives at `db.ref('videos')`. Saved as a flat object keyed by `videoId`. Index.html reads this same ref to render the public site.
+- **Firebase Storage** — custom thumbnail uploads stored at `thumbnails/{videoId}`.
+- **YouTube sync** — pulls from 16 hardcoded playlist IDs (2 per category × 8 categories) via YouTube Data API v3. Only adds new videos not already in the DB. Fetches title, thumbnail, duration, and aspect ratio.
+- **Drag-and-drop reordering** — supports multi-select group drag. Drop target uses mouse Y midpoint to determine insert before/after. Order is written as `v.order = i` on save.
+- **Per-video fields:** `videoId`, `title`, `customTitle` (override display name), `role`, `client`, `externalLink`, `thumbnail`, `aspectRatio`, `portrait`, `category`, `tags[]`, `featured`, `visible`, `order`, `duration`, `addedAt`.
+- **Category sidebar** — Moto, Food & Drink, Lifestyle, Documentary, Event Coverage, Real Estate, Social Reels, Music Videos. Each maps to one or more YouTube playlist IDs in `PLAYLISTS`.
+- **Filter views** — Featured, Hidden, Portrait/Vertical, Duplicates (sidebar).
+- **Stats bar** — Total / Featured / Visible / Hidden / Vertical counts.
+- **Search** — filters by title or videoId in real time.
+- **Bulk actions** — select multiple rows; bulk feature/unfeature, show/hide, add tag, delete.
+- **Hover thumbnail preview** — 300ms delay popup follows cursor, shows title, videoId, ratio, tags.
+- **Thumbnail tools** — ↺ refresh from YouTube API, ↑ upload custom image to Firebase Storage.
+- **Aspect ratio selector** — 16:9, 9:16, 1:1, 4:3, 4:5, 21:9. Updates `portrait` bool used by index.html for Masonry layout.
+- **Tag chips** — multi-category per video via checkbox dropdown. `tags[0]` becomes `category`.
+- **Featured / Visible toggles** — per-row pill buttons. Hidden rows dim to 40% opacity in the list.
+- **Duplicate detection** — flags videos with the same `videoId` appearing more than once. Yellow left-border on row. One-click "Remove Dupes" keeps first occurrence.
+- **Add video modal** — paste any YouTube URL or bare video ID, fetches preview via API, set category/ratio/featured before adding.
+- **External link field** — auto-detects platform (YouTube, Instagram, TikTok) and shows badge.
+- **Save & Publish** — writes full `videos` object to Firebase. Unsaved changes tracked by `dirty` flag with yellow save bar. Discard reloads from DB.
+- **Cmd+S** keyboard shortcut to save.
+
+**Firebase services (v10.12.0 compat SDK):** `firebase-auth`, `firebase-database`, `firebase-storage`.
+
+**Watch out for:**
+- The `PLAYLISTS` array and `YT_API_KEY` are hardcoded in the script block. If playlists change or the API key rotates, update them there.
+- `isPortrait()` heuristic: uses thumbnail dimensions if available, falls back to duration ≤ 180s as a proxy for Shorts. Can misclassify long-form vertical videos.
+- The public site (`index.html`) reads `db.ref('videos')` and filters by `v.visible === true`, orders by `v.order`. Any field the public site uses must be saved to Firebase — it does not use `customTitle`, `role`, `client`, or `externalLink` unless index.html was updated to do so.
+- Firebase Realtime Database rules are not documented here — verify they restrict write access to authenticated users only.
+- `admin.html` is publicly accessible at the URL — it just requires login. There is no `.htaccess` or route guard hiding it.
+
+---
+
 ### 2026-06-26 — Cart item editing (shop.html)
 
 **What changed:** Added three in-cart editing capabilities to the cart drawer in `shop.html`.
