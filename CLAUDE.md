@@ -175,6 +175,22 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-27 — Search bar (shop.html)
+
+**What changed:** Added a real-time product search bar at the top of the shop main content area, above the Best Selling strip.
+
+**How it works:**
+- Input sits in `.shop-search-wrap` above the normal layout. The normal layout (`#shopNormal`) and search results (`#searchResults`) are toggled via `display` — one is always hidden.
+- `searchShop(q)` filters the in-memory `products` array by `title.toLowerCase().includes(q)`. Matched products render into `#searchGrid` using the existing `tileHTML()` function (no `mostPopular` flag).
+- Results label shows count: "N results for 'query'" or "No results for 'query'".
+- Clearing the input (or erasing to empty string) restores the normal Best Selling + department layout.
+
+**New elements:** `.shop-search-wrap`, `.shop-search`, `#shopSearch`, `#searchResults`, `#searchResultsLabel`, `#searchGrid`, `#shopNormal` (wrapper div around the normal layout).
+
+**Watch out for:** `#featuredWrap` and `#shopSections` are now children of `#shopNormal`. Any code that references them by ID still works, but the toggle hides/shows the parent `#shopNormal`, not each child individually.
+
+---
+
 ### 2026-06-26 — Fix "Most Popular" label appearing on all non-first dept tiles (shop.html)
 
 **What changed:** One-line fix in `renderShop()` — changed `byDept[dept].map(tileHTML)` to `byDept[dept].map(p => tileHTML(p))`.
