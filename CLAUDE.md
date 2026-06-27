@@ -175,6 +175,20 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-27 — Coming Soon page + nav cleanup (index.html, shop.html)
+
+**What changed:** Replaced the full portfolio page with a minimal "Coming Soon" page. Removed the "Work" nav link from shop.html.
+
+**index.html** is now a single-screen coming soon page: Stone Rock Studios wordmark, "Coming Soon" headline, "Something is in the works." sub, and a subtle "Visit the Shop" link to shop.html. All portfolio JS, Masonry, YouTube API, and Firebase code has been removed from index.html.
+
+**shop.html nav:** Removed `<a class="nav-link" href="index.html">Work</a>` since the portfolio is not public. The nav now only shows Shop, Bag, and Get in Touch.
+
+**Why:** Portfolio is private while in production. Shop is the public-facing presence.
+
+**Watch out for:** The full portfolio code (Masonry, YouTube playlists, Firebase integration) is gone from index.html — it lives in git history if needed. When the portfolio goes live, it will need to be rebuilt or restored from a prior commit.
+
+---
+
 ### 2026-06-27 — Search bar (shop.html)
 
 **What changed:** Added a real-time product search bar at the top of the shop main content area, above the Best Selling strip.
