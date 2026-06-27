@@ -44,7 +44,7 @@
   .hero-sub { font-size: 13px; font-weight: 300; color: #fefefe; letter-spacing: 0.06em; }
 
   /* GRID */
-  .shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); padding: 0 var(--gap) 100px; }
+  .shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
   .product-tile { cursor: pointer; background: var(--surface); overflow: hidden; }
   .tile-img-wrap { position: relative; padding-bottom: 100%; background: var(--surface2); overflow: hidden; }
   .tile-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94); }
@@ -54,18 +54,20 @@
   .tile-title { font-size: 13px; font-weight: 600; color: #fefefe; margin-bottom: 5px; line-height: 1.3; }
   .tile-price { display: none; }
   .status-msg { grid-column: 1/-1; padding: 80px 32px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fefefe; text-align: center; }
-  .filter-bar { display: flex; align-items: center; gap: 24px; padding: 0 32px 20px; }
-  .dd-wrap { position: relative; }
-  .dd-trigger { background: none; border: none; cursor: pointer; color: #fefefe; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; font-family: inherit; display: flex; align-items: center; gap: 5px; transition: opacity 0.2s; padding: 0; }
-  .dd-trigger:hover { opacity: 0.7; }
-  .dd-arrow { font-size: 9px; display: inline-block; transition: transform 0.2s; }
-  .dd-wrap.open .dd-arrow { transform: rotate(180deg); }
-  .dd-menu { position: absolute; top: calc(100% + 10px); left: 0; background: #151515; border: 1px solid var(--border); min-width: 180px; max-height: 340px; overflow-y: auto; opacity: 0; pointer-events: none; transform: translateY(-4px); transition: opacity 0.15s, transform 0.15s; z-index: 50; }
-  .dd-wrap.open .dd-menu { opacity: 1; pointer-events: all; transform: none; }
-  .dd-item { display: block; width: 100%; text-align: left; padding: 9px 16px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #fefefe; cursor: pointer; background: none; border: none; border-bottom: 1px solid var(--border); font-family: inherit; transition: background 0.12s; opacity: 0.45; }
-  .dd-item:last-child { border-bottom: none; }
-  .dd-item:hover { background: #1c1c1c; opacity: 1; }
-  .dd-item.on { opacity: 1; }
+  /* SHOP LAYOUT */
+  .shop-layout { display: flex; align-items: flex-start; }
+  .dept-sidebar { width: 158px; flex-shrink: 0; position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto; border-right: 1px solid var(--border); padding: 20px 0; }
+  .dept-sidebar::-webkit-scrollbar { display: none; }
+  .sidebar-link { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 8px 20px; margin-bottom: 1px; transition: color 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 2px solid transparent; }
+  .sidebar-link:hover { color: #fefefe; }
+  .sidebar-link.active { color: #fefefe; border-left-color: #fefefe; }
+  .shop-main { flex: 1; min-width: 0; padding-bottom: 100px; }
+  .featured-wrap { padding-bottom: 12px; }
+  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); padding: 32px var(--gap) 14px; }
+  .dept-section { padding-bottom: 12px; }
+  .dept-header { display: flex; align-items: baseline; gap: 10px; padding: 36px var(--gap) 14px; border-top: 1px solid var(--border); }
+  .dept-header-name { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; }
+  .dept-header-count { font-size: 10px; color: var(--muted); }
 
   /* PRODUCT MODAL */
   .modal-back { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
@@ -186,10 +188,14 @@
   @media (max-width: 768px) {
     nav { padding: 0 20px; }
     .hero { padding: 90px 20px 40px; }
-    .shop-grid { grid-template-columns: repeat(2, 1fr); padding: 0 var(--gap) 80px; }
+    .shop-grid { grid-template-columns: repeat(2, 1fr); }
     .modal-box { flex-direction: column; max-height: 92vh; }
     .modal-img-pane { width: 100%; height: 52vw; }
     .modal-detail { padding: 24px 20px 20px; }
+    .shop-layout { flex-direction: column; }
+    .dept-sidebar { width: 100%; height: auto; overflow-x: auto; overflow-y: hidden; border-right: none; border-bottom: 1px solid var(--border); padding: 0; display: flex; flex-direction: row; background: var(--black); z-index: 90; }
+    .sidebar-link { border-left: none; border-bottom: 2px solid transparent; padding: 10px 14px; margin-bottom: 0; flex-shrink: 0; }
+    .sidebar-link.active { border-left-color: transparent; border-bottom-color: #fefefe; }
   }
   @media (max-width: 480px) { .shop-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
@@ -212,23 +218,15 @@
   <div class="hero-sub">For your cast and crew.</div>
 </div>
 
-<div class="filter-bar">
-  <div class="dd-wrap" id="sortWrap">
-    <button class="dd-trigger" id="sortTrigger" onclick="toggleSort()"><span id="sortLabel">Sort</span> <span class="dd-arrow">↓</span></button>
-    <div class="dd-menu" id="sortMenu">
-      <button class="dd-item on" data-sort="default">Default</button>
-      <button class="dd-item" data-sort="az">A → Z</button>
-      <button class="dd-item" data-sort="za">Z → A</button>
+<div class="shop-layout">
+  <aside class="dept-sidebar" id="deptSidebar"></aside>
+  <div class="shop-main">
+    <div class="featured-wrap" id="featuredWrap">
+      <div class="section-label">Featured</div>
+      <div class="shop-grid" id="featuredGrid"></div>
     </div>
+    <div id="shopSections"><div class="status-msg">Loading</div></div>
   </div>
-  <div class="dd-wrap" id="deptWrap">
-    <button class="dd-trigger" id="deptTrigger" onclick="toggleDept()"><span id="deptLabel">Department</span> <span class="dd-arrow">↓</span></button>
-    <div class="dd-menu" id="deptMenu"></div>
-  </div>
-</div>
-
-<div id="shopGrid" class="shop-grid">
-  <div class="status-msg">Loading</div>
 </div>
 
 <!-- Product Modal -->
@@ -359,31 +357,6 @@ async function fetchProducts() {
   }));
 }
 
-let activeSort = 'default';
-
-function toggleSort() { document.getElementById('sortWrap').classList.toggle('open'); }
-
-function setSort(sort) {
-  activeSort = sort;
-  const labels = { default: 'Sort', az: 'A → Z', za: 'Z → A' };
-  document.getElementById('sortLabel').textContent = labels[sort];
-  document.querySelectorAll('#sortMenu .dd-item').forEach(b => b.classList.toggle('on', b.dataset.sort === sort));
-  document.getElementById('sortTrigger').classList.toggle('on', sort !== 'default');
-  document.getElementById('sortWrap').classList.remove('open');
-  renderGrid();
-}
-
-document.querySelectorAll('#sortMenu .dd-item').forEach(b =>
-  b.addEventListener('click', () => setSort(b.dataset.sort))
-);
-
-function sortedProducts() {
-  const p = [...products];
-  if (activeSort === 'az') p.sort((a, b) => a.title.localeCompare(b.title));
-  if (activeSort === 'za') p.sort((a, b) => b.title.localeCompare(a.title));
-  return p;
-}
-
 // ── DEPARTMENT FILTER ─────────────────────────────
 const TITLE_DEPT = {
   // Production
@@ -486,72 +459,108 @@ const DEPT_ORDER = [
   'Post (On-Set Liaisons)','Publicity'
 ];
 
-let activeDept = 'all';
+// Featured pool — 4 shown daily, rotating from this list
+const FEATURED_POOL = [
+  'Director Tee',
+  'Intimacy Coordinator Tee',
+  'Grip (Upside Down) Tee',
+  'PA Tee',
+  'Best Boy Tee',
+];
 
-function buildDeptMenu() {
-  const present = [...new Set(products.map(p => p.department).filter(Boolean))];
-  present.sort((a, b) => {
+function getDailyFeatured() {
+  const day  = Math.floor(Date.now() / 86400000);
+  const pool = FEATURED_POOL.map(t => products.find(p => p.title === t)).filter(Boolean);
+  const sorted = [...pool].sort((a, b) => {
+    const ha = Math.sin((day + pool.indexOf(a) + 1) * 127.1) * 43758.5453;
+    const hb = Math.sin((day + pool.indexOf(b) + 1) * 127.1) * 43758.5453;
+    return (ha - Math.floor(ha)) - (hb - Math.floor(hb));
+  });
+  return sorted.slice(0, 4);
+}
+
+function tileHTML(p) {
+  const i = products.indexOf(p);
+  const img = p.featuredImage?.url;
+  const allSoldOut = p.variants.every(v => !v.availableForSale);
+  return `<div class="product-tile${allSoldOut ? ' tile-sold-out' : ''}" onclick="openModal(${i})">
+    <div class="tile-img-wrap">
+      ${img ? `<img class="tile-img" src="${img}" alt="${p.title}" loading="lazy">` : '<div class="tile-no-img">No image</div>'}
+    </div>
+    <div class="tile-info">
+      <div class="tile-title">${p.title}</div>
+      ${allSoldOut ? '<div class="tile-oos-label">Sold out</div>' : ''}
+    </div>
+  </div>`;
+}
+
+function renderShop() {
+  if (!products.length) {
+    document.getElementById('shopSections').innerHTML = '<div class="status-msg">No products found.</div>';
+    return;
+  }
+
+  // Featured strip
+  document.getElementById('featuredGrid').innerHTML = getDailyFeatured().map(tileHTML).join('');
+
+  // Group products by department, in DEPT_ORDER order
+  const byDept = {};
+  for (const p of products) {
+    const d = p.department || 'Other';
+    if (!byDept[d]) byDept[d] = [];
+    byDept[d].push(p);
+  }
+  const depts = Object.keys(byDept).sort((a, b) => {
     const ai = DEPT_ORDER.indexOf(a), bi = DEPT_ORDER.indexOf(b);
     if (ai === -1 && bi === -1) return a.localeCompare(b);
     return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
   });
-  const menu = document.getElementById('deptMenu');
-  menu.innerHTML =
-    `<button class="dd-item on" data-dept="all">All</button>` +
-    present.map(d => `<button class="dd-item" data-dept="${d}">${d}</button>`).join('');
-  menu.querySelectorAll('.dd-item').forEach(b =>
-    b.addEventListener('click', () => setDept(b.dataset.dept))
-  );
-}
 
-function setDept(dept) {
-  activeDept = dept;
-  document.getElementById('deptLabel').textContent = dept === 'all' ? 'Department' : dept;
-  document.querySelectorAll('#deptMenu .dd-item').forEach(b =>
-    b.classList.toggle('on', b.dataset.dept === dept)
-  );
-  document.getElementById('deptWrap').classList.remove('open');
-  document.getElementById('deptTrigger').classList.toggle('on', dept !== 'all');
-  renderGrid();
-}
-
-function toggleDept() { document.getElementById('deptWrap').classList.toggle('open'); }
-
-document.addEventListener('click', e => {
-  if (!document.getElementById('deptWrap').contains(e.target))
-    document.getElementById('deptWrap').classList.remove('open');
-  if (!document.getElementById('sortWrap').contains(e.target))
-    document.getElementById('sortWrap').classList.remove('open');
-});
-
-function filteredProducts() {
-  const p = sortedProducts();
-  return activeDept === 'all' ? p : p.filter(p => p.department === activeDept);
-}
-
-function renderGrid() {
-  const grid = document.getElementById('shopGrid');
-  if (!products.length) {
-    grid.innerHTML = '<div class="status-msg">No products found.</div>';
-    return;
-  }
-  grid.innerHTML = filteredProducts().map(p => {
-    const i     = products.indexOf(p);
-    const img   = p.featuredImage?.url;
-    const price = money(p.priceRange.minVariantPrice.amount, p.priceRange.minVariantPrice.currencyCode);
-    const allSoldOut = p.variants.every(v => !v.availableForSale);
-    return `<div class="product-tile${allSoldOut ? ' tile-sold-out' : ''}" onclick="openModal(${i})">
-      <div class="tile-img-wrap">
-        ${img ? `<img class="tile-img" src="${img}" alt="${p.title}" loading="lazy">` : '<div class="tile-no-img">No image</div>'}
+  // Department sections
+  document.getElementById('shopSections').innerHTML = depts.map(dept => {
+    const id = 'sect-' + dept.toLowerCase().replace(/[\s&()\-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    return `<div class="dept-section" id="${id}">
+      <div class="dept-header">
+        <span class="dept-header-name">${dept}</span>
+        <span class="dept-header-count">${byDept[dept].length}</span>
       </div>
-      <div class="tile-info">
-        <div class="tile-title">${p.title}</div>
-        ${allSoldOut ? '<div class="tile-oos-label">Sold out</div>' : ''}
-        <div class="tile-price">${price}</div>
-      </div>
+      <div class="shop-grid">${byDept[dept].map(tileHTML).join('')}</div>
     </div>`;
   }).join('');
+
+  // Sidebar links
+  const sidebar = document.getElementById('deptSidebar');
+  sidebar.innerHTML =
+    `<a class="sidebar-link active" data-section="featuredWrap" href="#featuredWrap">Featured</a>` +
+    depts.map(dept => {
+      const id = 'sect-' + dept.toLowerCase().replace(/[\s&()\-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+      return `<a class="sidebar-link" data-section="${id}" href="#${id}">${dept}</a>`;
+    }).join('');
+
+  sidebar.addEventListener('click', e => {
+    const a = e.target.closest('.sidebar-link');
+    if (!a) return;
+    e.preventDefault();
+    const el = document.getElementById(a.dataset.section);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 }
+
+// Highlight sidebar link matching the section nearest the top of the viewport
+function updateActiveSidebarLink() {
+  const all = [
+    document.getElementById('featuredWrap'),
+    ...document.querySelectorAll('.dept-section'),
+  ].filter(Boolean);
+  let activeId = all[0]?.id;
+  for (const el of all) {
+    if (el.getBoundingClientRect().top <= 80) activeId = el.id;
+  }
+  document.querySelectorAll('.sidebar-link').forEach(l =>
+    l.classList.toggle('active', l.dataset.section === activeId)
+  );
+}
+window.addEventListener('scroll', updateActiveSidebarLink, { passive: true });
 
 // ── MODAL ─────────────────────────────────────────
 let activeProd = null, activeImgs = [], imgIdx = 0, qty = 1, selOpts = {};
@@ -942,8 +951,7 @@ document.getElementById('discountRemove').addEventListener('click', async () => 
 // ── INIT ──────────────────────────────────────────
 (async () => {
   try { await fetchProducts(); } catch(e) { console.error(e); }
-  buildDeptMenu();
-  renderGrid();
+  renderShop();
   loadCartFromStorage();
 })();
 </script>

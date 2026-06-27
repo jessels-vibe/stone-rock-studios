@@ -134,3 +134,24 @@ After every edit, append an entry here so future Claude instances understand wha
 - Girp Tee → G&E (intentional typo product)
 - `first: 50` was silently dropping the 21 newest products from the grid — fixed to `first: 100`
 - Removed 'Costume' and 'Transport' from DEPT_ORDER (no standalone Costume dept; no Transport products)
+
+---
+
+### 2026-06-26 — Grouped layout with sidebar nav + daily featured rotation (shop.html)
+
+**What changed:** Full layout redesign of the shop page. Replaced flat grid + dropdown filters with department-sectioned layout and sticky sidebar jump nav.
+
+**Features:**
+- **Featured strip** — 4 tiles at the top above all departments. Rotates daily from a hardcoded pool of 5 (`FEATURED_POOL`). Uses deterministic day-seeded shuffle (`Math.sin`) so all visitors see the same 4 on a given day. Note: user requested "group of 6" but only specified 5 — add a 6th to `FEATURED_POOL` when ready.
+- **Grouped by department** — each department gets a header (`dept-header-name` + count) and its own grid. Ordered by `DEPT_ORDER`.
+- **Sticky sidebar** — 158px wide on desktop, `position: sticky; top: 52px; height: calc(100vh - 52px)`. Links smooth-scroll to sections. Active link tracks scroll via `updateActiveSidebarLink()` on the scroll event (checks `getBoundingClientRect().top <= 80`).
+- **Mobile sidebar → horizontal strip** — at ≤768px, sidebar becomes a `display: flex; overflow-x: auto` sticky horizontal bar below the nav, with `border-bottom` active indicator instead of `border-left`.
+
+**Removed:** Sort dropdowns (A→Z, Z→A), department dropdown filter, `setSort`, `toggleSort`, `sortedProducts`, `setDept`, `toggleDept`, `buildDeptMenu`, `filteredProducts`, `renderGrid`. The `document.addEventListener('click')` dropdown-close listener was also removed.
+
+**New functions:** `getDailyFeatured()`, `tileHTML(p)`, `renderShop()`, `updateActiveSidebarLink()`
+
+**Watch out for:**
+- `tileHTML()` is now the single source of truth for product tile markup — used for both featured and department grids.
+- Sidebar links are rebuilt every time `renderShop()` runs. The click listener is re-added each time via `sidebar.innerHTML = ...` + `sidebar.addEventListener`. This is safe because `renderShop` only runs once on init.
+- `FEATURED_POOL` titles must match Shopify product titles exactly (case-sensitive). If a title isn't found in `products`, it's silently skipped by `.filter(Boolean)`.
