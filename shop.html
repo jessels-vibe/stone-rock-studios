@@ -530,7 +530,7 @@ function renderShop() {
         <span class="dept-header-name">${dept}</span>
         <span class="dept-header-count">${byDept[dept].length}</span>
       </div>
-      <div class="shop-grid">${byDept[dept].map(tileHTML).join('')}</div>
+      <div class="shop-grid">${byDept[dept].map(p => tileHTML(p)).join('')}</div>
     </div>`;
   }).join('');
 
