@@ -519,25 +519,27 @@ const DEPT_ORDER = [
   'Post (On-Set Liaisons)','Publicity'
 ];
 
-// Featured pool — 4 shown daily, rotating from this list
-const FEATURED_POOL = [
+// Featured pool — Production Assistant Tee is always pinned first (Most Popular).
+// The remaining 3 slots rotate daily from ROTATING_POOL.
+const PINNED_FEATURED = 'Production Assistant Tee';
+const ROTATING_POOL = [
   'Director Tee',
   'Intimacy Coordinator Tee',
   'Grip (Upside Down) Tee',
-  'Production Assistant Tee',
   'Best Boy Tee',
   'Publicist Tee',
 ];
 
 function getDailyFeatured() {
   const day  = Math.floor(Date.now() / 86400000);
-  const pool = FEATURED_POOL.map(t => products.find(p => p.title === t)).filter(Boolean);
+  const pinned = products.find(p => p.title === PINNED_FEATURED);
+  const pool = ROTATING_POOL.map(t => products.find(p => p.title === t)).filter(Boolean);
   const sorted = [...pool].sort((a, b) => {
     const ha = Math.sin((day + pool.indexOf(a) + 1) * 127.1) * 43758.5453;
     const hb = Math.sin((day + pool.indexOf(b) + 1) * 127.1) * 43758.5453;
     return (ha - Math.floor(ha)) - (hb - Math.floor(hb));
   });
-  return sorted.slice(0, 4);
+  return [pinned, ...sorted.slice(0, 3)].filter(Boolean);
 }
 
 function tileHTML(p, mostPopular = false) {
