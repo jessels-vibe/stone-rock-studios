@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Stone Rock Studios</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="About Stone Rock Studios — creative video production by Jes and Jackson. Los Angeles. Available worldwide.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://stonerockstudios.xyz/about.html">
+<meta property="og:title" content="About — Stone Rock Studios">
+<meta property="og:description" content="Creative video production by Jes and Jackson. Los Angeles. Available worldwide.">
+<meta property="og:image" content="https://stonerockstudios.xyz/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="About — Stone Rock Studios">
+<meta name="twitter:description" content="Creative video production by Jes and Jackson. Los Angeles. Available worldwide.">
+<meta name="twitter:image" content="https://stonerockstudios.xyz/og-image.png">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --black: #0a0a0a;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --text: #f0f0f0;
+    --muted: #555;
+  }
+  html { background: var(--black); color: var(--text); font-family: "Helvetica Neue", Helvetica, 'Inter', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 52px;
+    background: rgba(10,10,10,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); text-decoration: none; }
+  .nav-links { display: flex; gap: 40px; align-items: center; }
+  .nav-link { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .nav-link:hover, .nav-link.active { color: var(--text); }
+  .nav-cta { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); background: var(--text); padding: 7px 16px; text-decoration: none; transition: opacity 0.2s; }
+  .nav-cta:hover { opacity: 0.8; }
+  .about-section { padding: 130px 36px 80px; max-width: 580px; }
+  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; margin-bottom: 18px; }
+  .about-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 24px; line-height: 0.95; }
+  .about-section p { font-size: 15px; font-weight: 300; line-height: 1.85; color: #fefefe; margin-bottom: 16px; }
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .about-section { padding: 90px 20px 60px; }
+    .about-section h2 { font-size: 42px; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="index.html">Stone Rock Studios</a>
+  <div class="nav-links">
+    <a class="nav-link active" href="about.html">About</a>
+    <a class="nav-link" href="shop.html">Shop</a>
+    <a class="nav-cta" href="mailto:stonerockstudiosllc@gmail.com">Get in Touch</a>
+  </div>
+</nav>
+
+<div class="about-section">
+  <div class="hero-label">About</div>
+  <h2>Stone Rock<br>Studios</h2>
+  <p>We're a two-person creative studio built on the belief that every moment deserves to be captured with intention. From high-speed moto to intimate documentaries, we bring the same eye to every frame.</p>
+  <p>Based in Los Angeles. Available worldwide.</p>
+</div>
+
+</body>
+</html>
