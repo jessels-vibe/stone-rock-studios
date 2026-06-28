@@ -39,7 +39,8 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 - Main branch: `main`
 - Always write clear, descriptive commit messages
 - Create feature branches for major changes (e.g. `feature/admin-dashboard`)
-- Push to origin when work is stable
+- **After every commit, immediately push to `origin main` without waiting to be asked.** Changes that aren't pushed don't appear on the live GitHub Pages site (stonerockstudios.xyz).
+- After every code change, append an entry to the Change Log below covering what changed, why, and anything to watch out for.
 
 ---
 
