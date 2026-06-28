@@ -175,6 +175,22 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-28 — About page copy update (about.html)
+
+**What changed:** Replaced the two-paragraph studio bio with a single line: "The funniest production studio in the world."
+
+---
+
+### 2026-06-28 — Promo banner copy updates (shop.html)
+
+**What changed:** Two copy iterations on the promo banner deals text.
+- Added "Tees Starting at $19.99" as a middle deal between Buy 3 Get 1 Free and Free Shipping
+- Updated to "All Tees $19.99!" for a cleaner, more direct read
+
+Final banner reads: **Buy 3, Get 1 Free · All Tees $19.99! · Free Shipping on Orders Over $100**
+
+---
+
 ### 2026-06-28 — Restore portfolio (index.html, shop.html)
 
 **What changed:** Reverted index.html back to the full portfolio (Firebase + YouTube playlist integration). Restored Work nav link in shop.html alongside Dispatch's About link.
