@@ -175,6 +175,14 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-28 — Restore portfolio (index.html, shop.html)
+
+**What changed:** Reverted index.html back to the full portfolio (Firebase + YouTube playlist integration). Restored Work nav link in shop.html alongside Dispatch's About link.
+
+**Why:** Portfolio was temporarily hidden behind a coming soon page — now live again.
+
+---
+
 ### 2026-06-28 — Klaviyo email capture popup (shop.html)
 
 **What changed:** Added one `<script>` tag to shop.html that loads Klaviyo's onsite JS. This activates the existing "Email & SMS Popup" form (form ID `U9c6JM`) on the shop page.
