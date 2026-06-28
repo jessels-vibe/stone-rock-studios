@@ -175,6 +175,18 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-28 — Klaviyo email capture popup (shop.html)
+
+**What changed:** Added one `<script>` tag to shop.html that loads Klaviyo's onsite JS. This activates the existing "Email & SMS Popup" form (form ID `U9c6JM`) on the shop page.
+
+**Public API Key:** `YvXr4f` (Stone Rock Studios Klaviyo account)
+
+**How it works:** Klaviyo's script handles all popup logic — timing, display rules, form submission. The form is managed entirely in Klaviyo's dashboard (Sign-up forms → Email & SMS Popup → Edit form). No code changes needed to update the popup's design, offer, or targeting rules.
+
+**Watch out for:** The popup is currently set to "All Domains" permissions, so it will fire on stonerockstudios.xyz. If Klaviyo's domain targeting is ever restricted, the popup will stop showing — check Manage Permissions on the API Keys page.
+
+---
+
 ### 2026-06-27 — About page + nav links (about.html, index.html, shop.html) — Dispatch
 
 **What changed:** Added a standalone About page and wired it into navigation across the site.
