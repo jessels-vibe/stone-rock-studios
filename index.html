@@ -166,8 +166,7 @@
 <div class="about-section" id="aboutView">
   <div class="hero-label">About</div>
   <h2>Stone Rock<br>Studios</h2>
-  <p>We're a two-person creative studio built on the belief that every moment deserves to be captured with intention. From high-speed moto to intimate documentaries, we bring the same eye to every frame.</p>
-  <p>Based in Los Angeles. Available worldwide.</p>
+  <p>The funniest production studio in the world.</p>
 </div>
 
 <div class="contact-section" id="contactView">
@@ -471,7 +470,7 @@ document.addEventListener('keydown', e => {
 
 // ── FILTER ──
 const workDropdown = document.getElementById('workDropdown');
-document.getElementById('workBtn').addEventListener('click', e => { e.stopPropagation(); workDropdown.classList.toggle('open'); });
+document.getElementById('workBtn').addEventListener('click', e => { e.stopPropagation(); showView('work'); workDropdown.classList.toggle('open'); });
 document.addEventListener('click', () => workDropdown.classList.remove('open'));
 
 document.querySelectorAll('.dropdown-item').forEach(item => {
