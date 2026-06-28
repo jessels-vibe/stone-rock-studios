@@ -42,10 +42,10 @@
   .cart-badge.show { display: flex; }
 
   /* HERO */
-  .hero { padding: 120px 36px 48px; }
-  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; margin-bottom: 18px; }
-  .hero-title { font-weight: 700; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.03em; color: var(--text); margin-bottom: 14px; }
-  .hero-sub { font-size: 13px; font-weight: 300; color: #fefefe; letter-spacing: 0.06em; }
+  .hero { padding: 80px 36px 32px; }
+  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; margin-bottom: 12px; }
+  .hero-title { font-weight: 700; font-size: clamp(32px, 5vw, 56px); line-height: 0.92; letter-spacing: -0.03em; color: var(--text); margin-bottom: 10px; }
+  .hero-sub { font-size: 12px; font-weight: 300; color: #fefefe; letter-spacing: 0.06em; }
 
   /* GRID */
   .shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
@@ -217,7 +217,8 @@
   @media (max-width: 1024px) { .shop-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 768px) {
     nav { padding: 0 20px; }
-    .hero { padding: 90px 20px 40px; }
+    .hero { padding: 72px 20px 24px; }
+    .hero-title { font-size: clamp(28px, 8vw, 40px); }
     .shop-grid { grid-template-columns: repeat(2, 1fr); }
     .modal-box { flex-direction: column; max-height: 92vh; }
     .modal-img-pane { width: 100%; height: 52vw; }
@@ -226,6 +227,15 @@
     .dept-sidebar { width: 100%; height: auto; overflow-x: auto; overflow-y: hidden; border-right: none; border-bottom: 1px solid var(--border); padding: 0; display: flex; flex-direction: row; background: var(--black); z-index: 90; }
     .sidebar-link { border-left: none; border-bottom: 2px solid transparent; padding: 10px 14px; margin-bottom: 0; flex-shrink: 0; }
     .sidebar-link.active { border-left-color: transparent; border-bottom-color: #fefefe; }
+    .promo-banner { padding: 12px 16px; margin: 0 0 16px; }
+    .promo-deal { font-size: 11px; }
+    .promo-sub { font-size: 9px; }
+    .featured-title { font-size: 28px; }
+    .featured-sub { font-size: 11px; }
+    .crew-callout { padding: 14px 16px; }
+    .crew-callout-headline { font-size: 13px; }
+    .crew-callout-sub { font-size: 10px; }
+    .shop-search { font-size: 16px; } /* prevent iOS zoom on input focus */
   }
   @media (max-width: 480px) { .shop-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
@@ -272,7 +282,6 @@
     <div id="shopNormal">
       <div class="featured-wrap" id="featuredWrap">
         <div class="featured-header">
-          <div class="featured-label">Best Selling</div>
           <div class="featured-title">Fan Favorites</div>
           <div class="featured-sub">The ones your crew keeps reaching for.</div>
         </div>

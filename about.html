@@ -25,7 +25,7 @@
     --surface: #111111;
     --border: #1e1e1e;
     --text: #f0f0f0;
-    --muted: #555;
+    --muted: #aaa;
   }
   html { background: var(--black); color: var(--text); font-family: "Helvetica Neue", Helvetica, 'Inter', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
   nav {
@@ -42,14 +42,38 @@
   .nav-link:hover, .nav-link.active { color: var(--text); }
   .nav-cta { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); background: var(--text); padding: 7px 16px; text-decoration: none; transition: opacity 0.2s; }
   .nav-cta:hover { opacity: 0.8; }
-  .about-section { padding: 130px 36px 80px; max-width: 580px; }
-  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; margin-bottom: 18px; }
+
+  .about-section { padding: 130px 36px 60px; max-width: 580px; }
+  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
   .about-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 24px; line-height: 0.95; }
   .about-section p { font-size: 15px; font-weight: 300; line-height: 1.85; color: #fefefe; margin-bottom: 16px; }
+
+  .shop-cta-wrap { padding: 0 36px 60px; }
+  .shop-cta { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); background: var(--text); padding: 13px 28px; text-decoration: none; transition: opacity 0.2s; }
+  .shop-cta:hover { opacity: 0.8; }
+
+  .contact-wrap { padding: 0 36px 100px; max-width: 580px; }
+  .contact-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; border-top: 1px solid var(--border); padding-top: 48px; }
+  .contact-wrap h3 { font-weight: 700; font-size: 40px; letter-spacing: -0.02em; margin-bottom: 32px; line-height: 0.95; }
+  .c-form { display: flex; flex-direction: column; gap: 12px; }
+  .c-input, .c-textarea { background: var(--surface); border: 1px solid var(--border); color: #fefefe; font-family: inherit; font-size: 13px; letter-spacing: 0.02em; padding: 13px 16px; width: 100%; outline: none; transition: border-color 0.2s; border-radius: 0; }
+  .c-input::placeholder, .c-textarea::placeholder { color: #444; }
+  .c-input:focus, .c-textarea:focus { border-color: #444; }
+  .c-textarea { resize: vertical; min-height: 120px; }
+  .c-submit { background: #fefefe; color: var(--black); border: none; padding: 14px 32px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: opacity 0.2s; margin-top: 8px; }
+  .c-submit:hover { opacity: 0.8; }
+  .c-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .c-success { display: none; font-size: 13px; color: #fefefe; padding-top: 24px; letter-spacing: 0.04em; }
+  .c-success.show { display: block; }
+
   @media (max-width: 768px) {
     nav { padding: 0 20px; }
-    .about-section { padding: 90px 20px 60px; }
+    .about-section { padding: 90px 20px 40px; }
     .about-section h2 { font-size: 42px; }
+    .shop-cta-wrap { padding: 0 20px 48px; }
+    .contact-wrap { padding: 0 20px 80px; }
+    .contact-wrap h3 { font-size: 32px; }
+    .c-input, .c-textarea { font-size: 16px; } /* prevent iOS zoom */
   }
 </style>
 </head>
@@ -70,5 +94,35 @@
   <p>The funniest production studio in the world.</p>
 </div>
 
+<div class="shop-cta-wrap">
+  <a class="shop-cta" href="shop.html">Shop the Collection →</a>
+</div>
+
+<div class="contact-wrap">
+  <div class="contact-label">Contact</div>
+  <h3>Get in Touch</h3>
+  <form class="c-form" id="contactForm" action="https://formspree.io/f/mwvdoqdb" method="POST">
+    <input class="c-input" type="text" name="name" placeholder="Name" required>
+    <input class="c-input" type="email" name="email" placeholder="Email" required>
+    <textarea class="c-textarea" name="message" placeholder="Tell us about your project" required></textarea>
+    <button class="c-submit" type="submit">Send Message</button>
+  </form>
+  <div class="c-success" id="contactSuccess">Thanks — we'll be in touch soon.</div>
+</div>
+
+<script>
+const form = document.getElementById('contactForm');
+const success = document.getElementById('contactSuccess');
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = form.querySelector('.c-submit');
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  try {
+    const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+    if (res.ok) { form.style.display = 'none'; success.classList.add('show'); }
+    else { btn.textContent = 'Error — try again'; btn.disabled = false; }
+  } catch { btn.textContent = 'Error — try again'; btn.disabled = false; }
+});
+</script>
 </body>
 </html>
