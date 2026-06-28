@@ -175,6 +175,20 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-27 — About page + nav links (about.html, index.html, shop.html) — Dispatch
+
+**What changed:** Added a standalone About page and wired it into navigation across the site.
+
+**New file — `about.html`:** Matches the site's nav/typography exactly. Fixed nav with Stone Rock Studios logo, About (active) + Shop links + Get in Touch CTA. Content section: "About" label, "Stone Rock Studios" headline, two short paragraphs ("We're a two-person creative studio…" and "Based in Los Angeles. Available worldwide."). Responsive — collapses padding and headline size at ≤768px.
+
+**`index.html`:** Single "Visit the Shop" link replaced with a `.links-row` flex row containing two links side by side: "About" (→ about.html) and "Visit the Shop" (→ shop.html).
+
+**`shop.html` nav:** Added `<a class="nav-link" href="about.html">About</a>` before the Shop link so About appears in the shop nav.
+
+**Watch out for:** `about.html` has self-contained CSS (no shared stylesheet). If nav styles change elsewhere, about.html needs to be updated manually to stay consistent.
+
+---
+
 ### 2026-06-27 — Promo announcement bar (shop.html)
 
 **What changed:** Added a white announcement bar above the nav advertising two active Shopify automatic discounts.
