@@ -8,87 +8,539 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<meta name="description" content="Stone Rock Studios — creative video production in Los Angeles.">
+<meta name="description" content="Stone Rock Studios — creative video production in Los Angeles. Moto, food, lifestyle, documentary, events, and more.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://stonerockstudios.xyz">
 <meta property="og:title" content="Stone Rock Studios">
-<meta property="og:description" content="Coming soon.">
+<meta property="og:description" content="Creative video production by Jes and Jackson. Los Angeles. Available worldwide.">
 <meta property="og:image" content="https://stonerockstudios.xyz/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Stone Rock Studios">
-<meta name="twitter:description" content="Coming soon.">
+<meta name="twitter:description" content="Creative video production by Jes and Jackson. Los Angeles. Available worldwide.">
 <meta name="twitter:image" content="https://stonerockstudios.xyz/og-image.png">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    height: 100%;
-    background: #0a0a0a;
-    color: #fefefe;
-    font-family: "Helvetica Neue", Helvetica, 'Inter', Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
+  button, input, select, textarea { font-family: inherit; }
+  :root {
+    --black: #0a0a0a;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --text: #f0f0f0;
+    --muted: #555;
+    --gap: 3px;
   }
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 40px 24px;
-    text-align: center;
+  html { background: var(--black); color: var(--text); font-family: "Helvetica Neue", Helvetica, 'Inter', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 52px;
+    background: rgba(10,10,10,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
   }
-  .logo {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: #fefefe;
-    margin-bottom: 48px;
-  }
-  .headline {
-    font-size: clamp(36px, 8vw, 80px);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 0.92;
-    color: #fefefe;
-    margin-bottom: 28px;
-  }
-  .sub {
-    font-size: 13px;
-    font-weight: 300;
-    color: #555;
-    letter-spacing: 0.06em;
-    margin-bottom: 56px;
-  }
-  .shop-link {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: #444;
-    text-decoration: none;
-    border-bottom: 1px solid #222;
-    padding-bottom: 3px;
-    transition: color 0.2s, border-color 0.2s;
-  }
-  .shop-link:hover {
-    color: #fefefe;
-    border-color: #fefefe;
-  }
-  .links-row {
-    display: flex;
-    gap: 24px;
-    align-items: center;
+  .nav-logo { font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); text-decoration: none; }
+  .nav-links { display: flex; gap: 40px; align-items: center; }
+  .nav-link { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
+  .nav-link:hover, .nav-link.active { color: var(--text); }
+  .nav-cta { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); background: var(--text); padding: 7px 16px; text-decoration: none; transition: opacity 0.2s; }
+  .nav-cta:hover { opacity: 0.8; }
+  .dropdown-wrapper { position: relative; }
+  .dropdown-arrow { margin-left: 4px; display: inline-block; transition: transform 0.2s; font-size: 10px; }
+  .dropdown-wrapper.open .dropdown-arrow { transform: rotate(180deg); }
+  .dropdown-menu { position: absolute; top: calc(100% + 16px); right: 0; background: #151515; border: 1px solid var(--border); min-width: 170px; opacity: 0; pointer-events: none; transform: translateY(-6px); transition: opacity 0.15s, transform 0.15s; }
+  .dropdown-wrapper.open .dropdown-menu { opacity: 1; pointer-events: all; transform: translateY(0); }
+  .dropdown-item { display: block; padding: 10px 18px; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: color 0.12s, background 0.12s; border-bottom: 1px solid var(--border); }
+  .dropdown-item:last-child { border-bottom: none; }
+  .dropdown-item:hover { color: var(--text); background: #1c1c1c; }
+  .dropdown-item.selected { color: var(--text); }
+  .hero { padding: 120px 36px 56px; }
+  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; margin-bottom: 18px; }
+  .hero-title { font-weight: 700; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.03em; color: var(--text); margin-bottom: 14px; }
+  .hero-sub { font-size: 13px; font-weight: 300; color: #fefefe; letter-spacing: 0.06em; }
+  #grid { padding: 0 var(--gap); display: flex; flex-direction: column; gap: var(--gap); }
+  .grid-row { display: flex; gap: var(--gap); align-items: flex-start; }
+  .tile { position: relative; overflow: hidden; cursor: pointer; background: var(--surface); flex-shrink: 0; }
+  .tile .thumb-wrap { position: relative; width: 100%; background: #000; }
+  .tile .thumb-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tile img { transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94); }
+  .tile:hover img { transform: scale(1.04); }
+  .tile-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.05) 45%, transparent 70%); opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; padding: 18px 20px; }
+  .tile:hover .tile-overlay { opacity: 1; }
+  .tile-info-left { flex: 1; min-width: 0; }
+  .tile-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 5px; }
+  .tile-title { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.25; }
+  .tile-role { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; letter-spacing: 0.06em; }
+  .tile-client { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.25; text-align: right; flex-shrink: 0; padding-left: 12px; max-width: 45%; }
+  .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.75); width: 46px; height: 46px; background: rgba(255,255,255,0.12); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; }
+  .play-btn svg { margin-left: 3px; }
+  .tile:hover .play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .tile-ext-link { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s; z-index: 2; text-decoration: none; }
+  .tile:hover .tile-ext-link { opacity: 1; }
+  .tile-ext-link svg { width: 14px; height: 14px; }
+  .status-msg { padding: 80px 32px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fefefe; text-align: center; }
+  .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.94); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+  .modal-backdrop.open { opacity: 1; pointer-events: all; }
+  .modal-inner { position: relative; transform: scale(0.97); transition: transform 0.25s; }
+  .modal-backdrop.open .modal-inner { transform: scale(1); }
+  .modal-inner.landscape { width: min(900px, 92vw); }
+  .modal-inner.landscape .modal-video { position: relative; padding-bottom: 56.25%; background: #000; }
+  .modal-inner.portrait { width: min(360px, 52vw); }
+  .modal-inner.portrait .modal-video { position: relative; padding-bottom: 177.78%; background: #000; }
+  .modal-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+  .modal-close { position: absolute; top: -38px; right: 0; background: none; border: none; cursor: pointer; color: #fefefe; font-size: 22px; transition: color 0.2s; font-family: inherit; }
+  .modal-close:hover { color: var(--text); }
+  .modal-nav { position: fixed; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.3); font-size: 28px; padding: 16px; transition: color 0.2s; font-family: inherit; z-index: 201; }
+  .modal-nav:hover { color: rgba(255,255,255,0.9); }
+  .modal-nav.prev { left: 16px; }
+  .modal-nav.next { right: 16px; }
+  .modal-nav:disabled { opacity: 0; pointer-events: none; }
+  .modal-counter { position: absolute; top: -38px; left: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; color: #fefefe; line-height: 22px; }
+  .modal-meta { padding: 14px 0 0; }
+  .modal-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #fefefe; margin-bottom: 5px; }
+  .modal-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+  .about-section { display: none; padding: 130px 36px 80px; max-width: 580px; }
+  .about-section.visible { display: block; }
+  .about-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 24px; line-height: 0.95; }
+  .about-section p { font-size: 15px; font-weight: 300; line-height: 1.85; color: #fefefe; margin-bottom: 16px; }
+  .contact-section { display: none; padding: 130px 36px 80px; max-width: 580px; }
+  .contact-section.visible { display: block; }
+  .contact-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 8px; line-height: 0.95; }
+  .contact-lead { font-size: 13px; font-weight: 300; color: #fefefe; letter-spacing: 0.06em; margin-bottom: 36px; }
+  .c-form { display: flex; flex-direction: column; gap: 12px; }
+  .c-input, .c-select, .c-textarea { background: var(--surface); border: 1px solid var(--border); color: #fefefe; font-family: inherit; font-size: 13px; letter-spacing: 0.02em; padding: 13px 16px; width: 100%; outline: none; transition: border-color 0.2s; -webkit-appearance: none; border-radius: 0; }
+  .c-input::placeholder, .c-textarea::placeholder { color: #333; }
+  .c-input:focus, .c-select:focus, .c-textarea:focus { border-color: #444; }
+  .c-select { color: #555; cursor: pointer; }
+  .c-textarea { resize: vertical; min-height: 120px; }
+  .c-submit { background: #fefefe; color: var(--black); border: none; padding: 14px 32px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: opacity 0.2s; margin-top: 8px; }
+  .c-submit:hover { opacity: 0.8; }
+  .c-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .c-success { display: none; font-size: 13px; color: #fefefe; padding-top: 24px; letter-spacing: 0.04em; }
+  .c-success.show { display: block; }
+  @media (max-width: 768px) {
+    .grid-row { flex-wrap: wrap; }
+    .tile { width: 100% !important; }
+    .tile.portrait { width: calc(50% - var(--gap) / 2) !important; }
+    nav { padding: 0 20px; }
+    .hero { padding: 90px 20px 48px; }
+    .contact-section { padding: 90px 20px 60px; }
+    .contact-section h2 { font-size: 42px; }
   }
 </style>
 </head>
 <body>
-  <div class="logo">Stone Rock Studios</div>
-  <div class="headline">Coming<br>Soon</div>
-  <div class="sub">Something is in the works.</div>
-  <div class="links-row">
-    <a class="shop-link" href="about.html">About</a>
-    <a class="shop-link" href="shop.html">Visit the Shop</a>
+<nav>
+  <a class="nav-logo" href="javascript:void(0)" onclick="showView('work')">Stone Rock Studios</a>
+  <div class="nav-links">
+    <div class="dropdown-wrapper" id="workDropdown">
+      <span class="nav-link active" id="workBtn">WORK <span class="dropdown-arrow">↓</span></span>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-item selected" data-cat="all">All Work</div>
+        <div class="dropdown-item" data-cat="moto">Moto</div>
+        <div class="dropdown-item" data-cat="food">Food & Drink</div>
+        <div class="dropdown-item" data-cat="lifestyle">Lifestyle</div>
+        <div class="dropdown-item" data-cat="documentary">Documentary</div>
+        <div class="dropdown-item" data-cat="events">Event Coverage</div>
+        <div class="dropdown-item" data-cat="realestate">Real Estate</div>
+        <div class="dropdown-item" data-cat="reels">Social Reels</div>
+        <div class="dropdown-item" data-cat="music">Music Videos</div>
+      </div>
+    </div>
+    <a class="nav-link" id="aboutBtn" href="#">ABOUT</a>
+    <a class="nav-link" href="shop.html">SHOP</a>
+    <a class="nav-cta" href="#contact" id="contactBtn">Get in Touch</a>
   </div>
+</nav>
+
+<div id="workView">
+  <div class="hero">
+    <div class="hero-label">Selected Work</div>
+    <div class="hero-title">Stone Rock<br>Studios</div>
+    <div class="hero-sub">Capture every moment.</div>
+  </div>
+  <div id="grid">
+    <div class="status-msg" id="statusMsg">Loading</div>
+  </div>
+</div>
+
+<div class="about-section" id="aboutView">
+  <div class="hero-label">About</div>
+  <h2>Stone Rock<br>Studios</h2>
+  <p>We're a two-person creative studio built on the belief that every moment deserves to be captured with intention. From high-speed moto to intimate documentaries, we bring the same eye to every frame.</p>
+  <p>Based in Los Angeles. Available worldwide.</p>
+</div>
+
+<div class="contact-section" id="contactView">
+  <div class="hero-label">Contact</div>
+  <h2>Get in<br>Touch</h2>
+  <p class="contact-lead">Tell us about your project.</p>
+  <!-- Sign up free at formspree.io, create a form, and replace YOUR_FORM_ID below -->
+  <form class="c-form" id="contactForm" action="https://formspree.io/f/mwvdoqdb" method="POST">
+    <input class="c-input" type="text" name="name" placeholder="Name" required>
+    <input class="c-input" type="email" name="email" placeholder="Email" required>
+    <select class="c-select" name="project_type">
+      <option value="" disabled selected>Project Type</option>
+      <option value="moto">Moto</option>
+      <option value="food">Food &amp; Drink</option>
+      <option value="lifestyle">Lifestyle</option>
+      <option value="documentary">Documentary</option>
+      <option value="events">Event Coverage</option>
+      <option value="reels">Social Reels</option>
+      <option value="music">Music Video</option>
+      <option value="other">Other</option>
+    </select>
+    <textarea class="c-textarea" name="message" placeholder="Tell us about your project" required></textarea>
+    <button class="c-submit" type="submit">Send Message</button>
+  </form>
+  <div class="c-success" id="contactSuccess">Thanks — we'll be in touch soon.</div>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <button class="modal-nav prev" id="modalPrev">&#8592;</button>
+  <div class="modal-inner landscape" id="modalInner">
+    <div class="modal-counter" id="modalCounter"></div>
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-video">
+      <iframe id="modalFrame" src="" allowfullscreen allow="autoplay"></iframe>
+    </div>
+    <div class="modal-meta">
+      <div class="modal-cat" id="modalCat"></div>
+      <div class="modal-title" id="modalTitle"></div>
+    </div>
+  </div>
+  <button class="modal-nav next" id="modalNext">&#8594;</button>
+</div>
+
+<script>
+const FIREBASE_URL = 'https://stonerockstudios-default-rtdb.firebaseio.com';
+
+const RATIO_PADDING = {'16:9':56.25,'9:16':177.78,'1:1':100,'4:3':75,'4:5':125,'21:9':42.86};
+const MODAL_WIDTH   = {'16:9':'min(900px,92vw)','9:16':'min(360px,52vw)','1:1':'min(600px,80vw)','4:3':'min(700px,88vw)','4:5':'min(400px,55vw)','21:9':'min(960px,95vw)'};
+const MODAL_PADDING = {'16:9':56.25,'9:16':177.78,'1:1':100,'4:3':75,'4:5':125,'21:9':42.86};
+
+// Portrait col patterns
+const PORT_COLS_MAP = { 1: [12], 2: [6, 6], 3: [4, 4, 4], 4: [3, 3, 3, 3] };
+
+let allVideos   = [];
+let activeVideos = [];
+let activeIdx   = 0;
+let activeCat   = 'all';
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Natural row height score — cols × padding% — used to find best cross-ratio partners
+function heightScore(ratio, cols) {
+  return (RATIO_PADDING[ratio] || 56.25) * cols;
+}
+
+function buildRows(videos) {
+  const featured = videos.filter(v => v.featured);
+  const nonFeat  = shuffle(videos.filter(v => !v.featured));
+  const ordered  = [...featured, ...nonFeat];
+
+  const portraits  = ordered.filter(v => v.portrait);
+  const landscapes = ordered.filter(v => !v.portrait);
+
+  // Bucket landscape videos by aspect ratio (featured land first within each bucket)
+  const buckets = {};
+  landscapes.forEach(v => {
+    const r = v.aspectRatio || '16:9';
+    (buckets[r] = buckets[r] || []).push(v);
+  });
+
+  const landRows = [];
+  let crossFlip = false; // alternate which ratio goes left vs right
+  let samePhase = 0;     // cycle same-ratio patterns: [6,6] → [4,4,4] → [6,6] ...
+
+  function available() {
+    return Object.entries(buckets).filter(([, q]) => q.length > 0);
+  }
+
+  function grab(ratio, n) {
+    return (buckets[ratio] || []).splice(0, n);
+  }
+
+  function has(ratio, n = 1) {
+    return (buckets[ratio]?.length || 0) >= n;
+  }
+
+  while (available().length) {
+    let row = null;
+
+    // ── Cross-ratio pairings (naturally equal heights, no gaps, no distortion) ──
+    // 16:9 @ 7 cols ≈ 4:3 @ 5 cols  (height scores: 394 vs 375 — 1.5% diff)
+    if (has('16:9') && has('4:3')) {
+      const [a] = grab('16:9', 1);
+      const [b] = grab('4:3',  1);
+      row = crossFlip
+        ? [{ v: b, cols: 5 }, { v: a, cols: 7 }]
+        : [{ v: a, cols: 7 }, { v: b, cols: 5 }];
+      crossFlip = !crossFlip;
+    }
+
+    // ── Same-ratio rows: grouped so all tiles share one height, zero gaps ──
+    if (!row) {
+      // Pick the ratio bucket with the most videos
+      const [ratio, queue] = available()
+        .sort((a, b) => b[1].length - a[1].length)[0];
+
+      samePhase++;
+      if (queue.length >= 3 && samePhase % 3 === 0) {
+        // Three-up [4,4,4]
+        const [a, b, c] = grab(ratio, 3);
+        row = [{ v: a, cols: 4 }, { v: b, cols: 4 }, { v: c, cols: 4 }];
+      } else if (queue.length >= 2) {
+        // Side-by-side [6,6]
+        const [a, b] = grab(ratio, 2);
+        row = [{ v: a, cols: 6 }, { v: b, cols: 6 }];
+      } else {
+        // Solo full-width [12]
+        const [a] = grab(ratio, 1);
+        row = [{ v: a, cols: 12 }];
+      }
+    }
+
+    if (row) landRows.push(row);
+  }
+
+  // Portrait rows
+  const portRows = [];
+  const portQ = [...portraits];
+  while (portQ.length) {
+    const take = Math.min(4, portQ.length);
+    portRows.push(portQ.splice(0, take).map((v, i) => ({
+      v, cols: PORT_COLS_MAP[take][i]
+    })));
+  }
+
+  // Interleave: 3 landscape rows then 1 portrait row
+  const rows = [];
+  let lr = 0, pr = 0;
+  while (lr < landRows.length || pr < portRows.length) {
+    for (let i = 0; i < 3 && lr < landRows.length; i++) rows.push(landRows[lr++]);
+    if (pr < portRows.length) rows.push(portRows[pr++]);
+  }
+
+  return rows;
+}
+
+function platformIcon(url) {
+  if (!url) return '';
+  let svg = '';
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    svg = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2.1C.7 15.5 1 17.6 1 17.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.6 21.8 12 21.8 12 21.8s4.2 0 6.8-.2c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.2v-2.1C23.3 9.1 23 7 23 7zm-13.5 8.5v-7.3l8 3.7-8 3.6z"/></svg>';
+  } else if (url.includes('instagram.com')) {
+    svg = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8 0 3.2 0 3.6-.1 4.8-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.9.1-3.2 0-3.6 0-4.8-.1-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.6-.1-4.8 0-3.2 0-3.6.1-4.8C2.4 3.9 4 2.3 7.2 2.3c1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1.0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4A6.2 6.2 0 0012 5.8zm0 10.2a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg>';
+  } else if (url.includes('tiktok.com')) {
+    svg = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M19.6 3.3A4.5 4.5 0 0115.2 0h-3.3v16.4a2.7 2.7 0 01-2.7 2.3 2.7 2.7 0 01-2.7-2.7 2.7 2.7 0 012.7-2.7c.3 0 .5 0 .8.1V10c-.3 0-.5-.1-.8-.1A6 6 0 003.2 16a6 6 0 006 6 6 6 0 006-6V8.3a7.8 7.8 0 004.6 1.5V6.5a4.5 4.5 0 01-2.2-.7 4.5 4.5 0 01-2.3-2.5h3.3z"/></svg>';
+  } else {
+    svg = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>';
+  }
+  return `<a class="tile-ext-link" href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${svg}</a>`;
+}
+
+function makeTile(v, cols, rowSize) {
+  const ratio    = v.aspectRatio || (v.portrait ? '9:16' : '16:9');
+  const padding  = RATIO_PADDING[ratio] || (v.portrait ? 177.78 : 56.25);
+  const displayTitle = v.customTitle || v.title;
+  const roleHtml   = v.role   ? `<div class="tile-role">${v.role}</div>`     : '';
+  const clientHtml = v.client ? `<div class="tile-client">${v.client}</div>` : '';
+
+  const tile = document.createElement('div');
+  tile.className    = `tile ${v.portrait ? 'portrait' : 'landscape'}`;
+  tile.dataset.tags = (v.tags || [v.category]).join(',');
+  tile.style.width  = `calc((100% - ${rowSize - 1} * var(--gap)) * ${cols} / 12)`;
+
+  tile.innerHTML = `
+    <div class="thumb-wrap" style="padding-bottom:${padding}%"><img src="${v.thumbnail}" alt="" loading="lazy"></div>
+    <div class="play-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M4 2l10 6-10 6z"/></svg></div>
+    ${platformIcon(v.externalLink || '')}
+    <div class="tile-overlay"><div class="tile-info-left"><div class="tile-cat">${v.categoryLabel}</div><div class="tile-title">${displayTitle}</div>${roleHtml}</div>${clientHtml}</div>
+  `;
+
+  tile.addEventListener('click', () => {
+    activeIdx = activeVideos.indexOf(v);
+    openModal(v.videoId, v.categoryLabel, displayTitle, ratio);
+  });
+
+  return tile;
+}
+
+function renderGrid(videos) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  if (!videos.length) {
+    const m = document.createElement('div');
+    m.className = 'status-msg';
+    m.textContent = 'No videos found.';
+    grid.appendChild(m);
+    activeVideos = [];
+    return;
+  }
+
+  const rows = buildRows(videos);
+  activeVideos = rows.flat().map(t => t.v);
+
+  const frag = document.createDocumentFragment();
+  rows.forEach(tiles => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'grid-row';
+    tiles.forEach(({ v, cols }) => rowEl.appendChild(makeTile(v, cols, tiles.length)));
+    frag.appendChild(rowEl);
+  });
+  grid.appendChild(frag);
+}
+
+async function loadAll() {
+  const statusMsg = document.getElementById('statusMsg');
+  try {
+    const res  = await fetch(`${FIREBASE_URL}/videos.json`);
+    const data = await res.json();
+    if (statusMsg) statusMsg.remove();
+
+    if (!data) { renderGrid([]); return; }
+
+    allVideos = Object.values(data)
+      .filter(v => v.visible)
+      .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || a.order - b.order);
+
+    renderGrid(allVideos);
+
+    const cat = new URLSearchParams(location.search).get('cat');
+    if (cat && cat !== 'all') {
+      const item = document.querySelector(`.dropdown-item[data-cat="${cat}"]`);
+      if (item) item.click();
+    }
+  } catch(e) {
+    if (statusMsg) statusMsg.textContent = 'Failed to load videos.';
+  }
+}
+
+// ── MODAL ──
+const modal        = document.getElementById('modal');
+const modalInner   = document.getElementById('modalInner');
+const modalFrame   = document.getElementById('modalFrame');
+const modalPrev    = document.getElementById('modalPrev');
+const modalNext    = document.getElementById('modalNext');
+const modalCounter = document.getElementById('modalCounter');
+
+function openModal(ytId, cat, title, ratio) {
+  const isPortrait = ['9:16','4:5'].includes(ratio);
+  const mw = MODAL_WIDTH[ratio]   || (isPortrait ? 'min(360px,52vw)' : 'min(900px,92vw)');
+  const mp = MODAL_PADDING[ratio] || (isPortrait ? 177.78 : 56.25);
+  modalInner.className = `modal-inner ${isPortrait ? 'portrait' : 'landscape'}`;
+  modalInner.style.width = mw;
+  modalInner.querySelector('.modal-video').style.paddingBottom = mp + '%';
+  modalFrame.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&modestbranding=1&rel=0`;
+  document.getElementById('modalCat').textContent   = cat;
+  document.getElementById('modalTitle').textContent = title;
+  modalPrev.disabled = activeIdx <= 0;
+  modalNext.disabled = activeIdx >= activeVideos.length - 1;
+  modalCounter.textContent = activeVideos.length > 1 ? `${activeIdx + 1} / ${activeVideos.length}` : '';
+  modal.classList.add('open');
+}
+
+function navigateModal(dir) {
+  const next = activeIdx + dir;
+  if (next < 0 || next >= activeVideos.length) return;
+  activeIdx = next;
+  const v = activeVideos[activeIdx];
+  const ratio = v.aspectRatio || (v.portrait ? '9:16' : '16:9');
+  openModal(v.videoId, v.categoryLabel, v.customTitle || v.title, ratio);
+}
+
+function closeModal() { modal.classList.remove('open'); modalFrame.src = ''; }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+modalPrev.addEventListener('click', e => { e.stopPropagation(); navigateModal(-1); });
+modalNext.addEventListener('click', e => { e.stopPropagation(); navigateModal(1); });
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => {
+  if (!modal.classList.contains('open')) return;
+  if (e.key === 'Escape')     closeModal();
+  if (e.key === 'ArrowLeft')  navigateModal(-1);
+  if (e.key === 'ArrowRight') navigateModal(1);
+});
+
+// ── FILTER ──
+const workDropdown = document.getElementById('workDropdown');
+document.getElementById('workBtn').addEventListener('click', e => { e.stopPropagation(); workDropdown.classList.toggle('open'); });
+document.addEventListener('click', () => workDropdown.classList.remove('open'));
+
+document.querySelectorAll('.dropdown-item').forEach(item => {
+  item.addEventListener('click', e => {
+    e.stopPropagation();
+    activeCat = item.dataset.cat;
+    document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
+    item.classList.add('selected');
+    workDropdown.classList.remove('open');
+    const filtered = activeCat === 'all'
+      ? allVideos
+      : allVideos.filter(v => (v.tags || [v.category]).includes(activeCat));
+    renderGrid(filtered);
+  });
+});
+
+// ── VIEWS ──
+function showView(view) {
+  document.getElementById('workView').style.display    = view === 'work'    ? '' : 'none';
+  document.getElementById('aboutView').classList.toggle('visible', view === 'about');
+  document.getElementById('contactView').classList.toggle('visible', view === 'contact');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  if (view === 'about') document.getElementById('aboutBtn').classList.add('active');
+  if (view === 'work')  document.getElementById('workBtn').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('aboutBtn').addEventListener('click', e => {
+  e.preventDefault();
+  const showing = document.getElementById('aboutView').classList.contains('visible');
+  showView(showing ? 'work' : 'about');
+});
+
+document.getElementById('contactBtn').addEventListener('click', e => {
+  e.preventDefault();
+  showView('contact');
+});
+
+// ── CONTACT FORM ──
+const contactForm    = document.getElementById('contactForm');
+const contactSuccess = document.getElementById('contactSuccess');
+document.querySelectorAll('.c-select').forEach(s =>
+  s.addEventListener('change', () => { s.style.color = '#fefefe'; })
+);
+contactForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = contactForm.querySelector('.c-submit');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+  try {
+    const res = await fetch(contactForm.action, {
+      method: 'POST',
+      body: new FormData(contactForm),
+      headers: { Accept: 'application/json' },
+    });
+    if (res.ok) {
+      contactForm.style.display = 'none';
+      contactSuccess.classList.add('show');
+    } else {
+      btn.textContent = 'Try again';
+      btn.disabled = false;
+    }
+  } catch {
+    btn.textContent = 'Try again';
+    btn.disabled = false;
+  }
+});
+
+loadAll();
+</script>
 </body>
 </html>
