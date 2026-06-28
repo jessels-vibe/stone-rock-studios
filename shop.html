@@ -56,7 +56,7 @@
   .tile-no-img { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #fefefe; }
   .tile-info { padding: 14px 16px 18px; }
   .tile-title { font-size: 13px; font-weight: 600; color: #fefefe; margin-bottom: 5px; line-height: 1.3; }
-  .tile-price { display: none; }
+  .tile-price { font-size: 12px; font-weight: 400; color: var(--muted); margin-top: 2px; }
   .status-msg { grid-column: 1/-1; padding: 80px 32px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fefefe; text-align: center; }
   /* SHOP LAYOUT */
   .shop-layout { display: flex; align-items: flex-start; }
@@ -66,8 +66,18 @@
   .sidebar-link:hover { color: #fefefe; }
   .sidebar-link.active { color: #fefefe; border-left-color: #fefefe; }
   .shop-main { flex: 1; min-width: 0; padding-bottom: 100px; }
-  .featured-wrap { padding-bottom: 12px; }
+  .featured-wrap { padding-bottom: 12px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .featured-header { padding: 32px var(--gap) 8px; }
+  .featured-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .featured-title { font-size: clamp(28px, 4vw, 44px); font-weight: 700; letter-spacing: -0.02em; color: #fefefe; line-height: 1; margin-bottom: 6px; }
+  .featured-sub { font-size: 12px; font-weight: 300; color: var(--muted); letter-spacing: 0.04em; padding-bottom: 20px; }
   .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); padding: 32px var(--gap) 14px; }
+
+  /* CREW CALLOUT */
+  .crew-callout { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 24px; margin: 0; background: #fefefe; color: #0a0a0a; flex-wrap: wrap; }
+  .crew-callout-text { }
+  .crew-callout-headline { font-size: 14px; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 3px; }
+  .crew-callout-sub { font-size: 11px; font-weight: 400; color: #555; }
   .dept-section { padding-bottom: 12px; }
   .dept-header { display: flex; align-items: baseline; gap: 10px; padding: 36px var(--gap) 14px; border-top: 1px solid var(--border); }
   .dept-header-name { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; }
@@ -261,8 +271,18 @@
     </div>
     <div id="shopNormal">
       <div class="featured-wrap" id="featuredWrap">
-        <div class="section-label">Best Selling</div>
+        <div class="featured-header">
+          <div class="featured-label">Best Selling</div>
+          <div class="featured-title">Fan Favorites</div>
+          <div class="featured-sub">The ones your crew keeps reaching for.</div>
+        </div>
         <div class="shop-grid" id="featuredGrid"></div>
+      </div>
+      <div class="crew-callout">
+        <div class="crew-callout-text">
+          <div class="crew-callout-headline">Outfitting your whole crew?</div>
+          <div class="crew-callout-sub">Buy 3 tees, get 1 free — applied automatically at checkout. No code needed.</div>
+        </div>
       </div>
       <div id="shopSections"><div class="status-msg">Loading</div></div>
     </div>
@@ -530,6 +550,7 @@ function tileHTML(p, mostPopular = false) {
     </div>
     <div class="tile-info">
       <div class="tile-title">${p.title}</div>
+      <div class="tile-price">${money(p.priceRange.minVariantPrice.amount, p.priceRange.minVariantPrice.currencyCode)}</div>
       ${mostPopular ? '<div class="tile-most-popular">Most Popular</div>' : ''}
       ${allSoldOut ? '<div class="tile-oos-label">Sold out</div>' : ''}
     </div>
