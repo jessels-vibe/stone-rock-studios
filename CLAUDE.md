@@ -176,6 +176,18 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-28 — Best Selling section + crew-buy callout + tile prices (shop.html)
+
+**What changed:** Three conversion-focused updates to push the shop harder.
+
+- **Best Selling section** — upgraded from a small label to a full header: "Fan Favorites" bold heading + "The ones your crew keeps reaching for." sub. Section now has `background: var(--surface)` and a bottom border to visually separate it from departments.
+- **Crew-buy callout** — white strip between Best Selling and the department sections: "Outfitting your whole crew? Buy 3 tees, get 1 free — applied automatically at checkout."
+- **Prices on tiles** — `.tile-price` was `display:none`, now shows the product's `minVariantPrice` on every tile. Removes a click of friction for price-sensitive browsers.
+
+**Why:** 94 sessions, 0 add-to-carts. Diagnosis: decision paralysis from 71 options + no clear price anchor + crew-buy deal buried in the banner.
+
+---
+
 ### 2026-06-28 — About page copy update (about.html)
 
 **What changed:** Replaced the two-paragraph studio bio with a single line: "The funniest production studio in the world."
