@@ -967,6 +967,14 @@ document.getElementById('atcBtn').onclick = async () => {
       : await cartCreate(v.id, qty);
     saveCart();
     refreshCartUI(true);
+    fbq('track', 'AddToCart', {
+      content_ids: [v.id],
+      content_name: activeProd.title,
+      content_type: 'product',
+      value: parseFloat(v.price?.amount || activeProd.priceRange.minVariantPrice.amount),
+      currency: v.price?.currencyCode || activeProd.priceRange.minVariantPrice.currencyCode,
+      num_items: qty
+    });
     btn.textContent = 'Added!';
     setTimeout(() => { btn.textContent = 'Add to Cart'; btn.disabled = false; }, 1400);
     closeModal();
