@@ -176,6 +176,22 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-28 — Hero size, mobile shop, about page content, redundant label removed
+
+**shop.html:**
+- Hero title shrunk from `clamp(48px,7vw,88px)` to `clamp(32px,5vw,56px)` — gets users to products faster
+- Hero padding reduced: `120px 36px 48px` → `80px 36px 32px`
+- Removed redundant "BEST SELLING" label above "Fan Favorites" heading
+- Mobile: tighter hero padding, smaller promo/crew callout text, `font-size:16px` on search input (prevents iOS auto-zoom on focus)
+
+**about.html:**
+- Added "Shop the Collection →" CTA button below the bio
+- Added Formspree contact form (same endpoint as index.html: `mwvdoqdb`) — Name, Email, Message fields
+- Updated `--muted` to `#aaa` to match shop page
+- Mobile: `font-size:16px` on inputs to prevent iOS zoom
+
+---
+
 ### 2026-06-28 — Best Selling section + crew-buy callout + tile prices (shop.html)
 
 **What changed:** Three conversion-focused updates to push the shop harder.
