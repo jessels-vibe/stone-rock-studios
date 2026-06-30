@@ -210,6 +210,26 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-06-30 — Department order, pricing, promo banner, checkout friction (shop.html)
+
+**What changed:** Four updates in one session.
+
+**Department order rewritten** — `DEPT_ORDER` reordered by on-set hierarchy (most to least bossy): Direction → Production → Talent → Camera → G&E → Sound → Art Department → Stunts → Construction → Hair & Makeup → Writing → Special Effects (On-Set) → VFX (On-Set) → Locations → Medical & Safety → Casting → Craft Services & Catering → Post (On-Set Liaisons) → Publicity. User moved Talent above Camera specifically.
+
+**Price raised to $24.99** — was $19.99. Reason: margin at $19.99 with Tag Stitch fulfillment ($8.99 shirt + ~$6 shipping = $14.99 cost) left only ~$5/sale, making ad spend unprofitable at realistic conversion rates. At $24.99 margin is ~$10/sale.
+
+**Free shipping on all orders** — changed from "Free Shipping on Orders Over $100" to "Free Shipping on All Orders". Shipping cost was baked into the new price. Removes checkout surprise that was likely causing abandonment.
+
+**Promo banner sub-copy updated** — "Applied automatically at checkout — no code needed" → "Buy 3 get 1 free applied automatically at checkout — no code needed" (clarifies what auto-applies).
+
+**Next up — checkout subdomain (not yet done):** Checkout currently sends customers to `stonerockstudios.myshopify.com` (new tab), which is a trust break. Plan is to add `shop.stonerockstudios.xyz` CNAME → `shops.myshopify.com` in GoDaddy, add it as custom domain in Shopify, then replace myshopify.com hostname in `checkoutUrl` before redirecting. Waiting on user to add DNS record and Shopify domain first.
+
+**Watch out for:**
+- Tag Stitch fulfillment cost is $8.99 + shipping — do not price below $22 or ad spend becomes unprofitable.
+- Free shipping is now promised on the site — make sure Shopify shipping settings reflect free shipping or the checkout will contradict the banner.
+
+---
+
 ### 2026-06-28 — Promo banner copy updates (shop.html)
 
 **What changed:** Two copy iterations on the promo banner deals text.
@@ -225,6 +245,16 @@ Final banner reads: **Buy 3, Get 1 Free · All Tees $19.99! · Free Shipping on 
 **What changed:** Reverted index.html back to the full portfolio (Firebase + YouTube playlist integration). Restored Work nav link in shop.html alongside Dispatch's About link.
 
 **Why:** Portfolio was temporarily hidden behind a coming soon page — now live again.
+
+---
+
+### 2026-06-29 — Meta Pixel added to index.html and about.html
+
+**What changed:** Added the Meta Pixel snippet (ID `1706510330484603`) to `index.html` and `about.html`.
+
+**Why:** Pixel was only present on `shop.html` — all homepage and about page visits were invisible to Meta Ads Manager. Meta was reporting 0 website events because traffic landing on the homepage never triggered the Pixel.
+
+**Watch out for:** All three pages now fire `PageView` on load. `shop.html` additionally fires `AddToCart` at line ~970. If a 4th page is ever added to the site, it needs the Pixel snippet too — there's no shared layout/template to inject it from.
 
 ---
 
