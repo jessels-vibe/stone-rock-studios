@@ -946,7 +946,10 @@ function refreshCartUI(animateBadge = false) {
   document.getElementById('cartTotalRow').style.display = showTotal ? 'flex' : 'none';
   document.getElementById('cartTotal').textContent = tot ? money(tot.amount, tot.currencyCode) : '';
 
-  document.getElementById('checkoutLink').href = cart?.checkoutUrl || '#';
+  const checkoutUrl = cart?.checkoutUrl
+    ? cart.checkoutUrl.replace('stonerockstudios.myshopify.com', 'shop.stonerockstudios.xyz')
+    : '#';
+  document.getElementById('checkoutLink').href = checkoutUrl;
 }
 
 document.getElementById('atcBtn').onclick = async () => {
