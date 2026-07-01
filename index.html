@@ -470,6 +470,12 @@ function openModal(ytId, cat, title, ratio) {
   modalNext.disabled = activeIdx >= activeVideos.length - 1;
   modalCounter.textContent = activeVideos.length > 1 ? `${activeIdx + 1} / ${activeVideos.length}` : '';
   modal.classList.add('open');
+  gtag('event', 'video_start', {
+    video_title: title,
+    video_provider: 'youtube',
+    video_url: `https://www.youtube.com/watch?v=${ytId}`,
+    video_category: cat
+  });
 }
 
 function navigateModal(dir) {
@@ -505,6 +511,7 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
     item.classList.add('selected');
     workDropdown.classList.remove('open');
+    gtag('event', 'select_content', { content_type: 'portfolio_filter', item_id: activeCat });
     const filtered = activeCat === 'all'
       ? allVideos
       : allVideos.filter(v => (v.tags?.length ? v.tags : [v.category]).includes(activeCat));
@@ -554,6 +561,8 @@ contactForm.addEventListener('submit', async e => {
     if (res.ok) {
       contactForm.style.display = 'none';
       contactSuccess.classList.add('show');
+      gtag('event', 'generate_lead', { form_location: 'portfolio' });
+      fbq('track', 'Lead');
     } else {
       btn.textContent = 'Try again';
       btn.disabled = false;

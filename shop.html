@@ -663,6 +663,8 @@ function updateActiveSidebarLink() {
 window.addEventListener('scroll', updateActiveSidebarLink, { passive: true });
 
 // ── SEARCH ────────────────────────────────────────
+let searchAnalyticsTimer = null;
+
 function searchShop(q) {
   q = q.trim().toLowerCase();
   const resultsEl = document.getElementById('searchResults');
@@ -672,6 +674,7 @@ function searchShop(q) {
   if (!q) {
     resultsEl.style.display = 'none';
     normalEl.style.display  = '';
+    clearTimeout(searchAnalyticsTimer);
     return;
   }
   const matches = products.filter(p => p.title.toLowerCase().includes(q));
@@ -683,6 +686,16 @@ function searchShop(q) {
     : '';
   normalEl.style.display  = 'none';
   resultsEl.style.display = 'block';
+
+  // fire analytics 800ms after user stops typing to avoid per-keystroke noise
+  clearTimeout(searchAnalyticsTimer);
+  if (q.length >= 2) {
+    const matchCount = matches.length;
+    searchAnalyticsTimer = setTimeout(() => {
+      gtag('event', 'search', { search_term: q });
+      if (matchCount > 0) gtag('event', 'view_search_results', { search_term: q });
+    }, 800);
+  }
 }
 
 // ── MODAL ─────────────────────────────────────────
@@ -708,6 +721,21 @@ function openModal(i) {
   updateAtcState();
   document.getElementById('productModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  const itemPrice = parseFloat(activeProd.priceRange.minVariantPrice.amount);
+  const itemCurrency = activeProd.priceRange.minVariantPrice.currencyCode;
+  gtag('event', 'view_item', {
+    currency: itemCurrency,
+    value: itemPrice,
+    items: [{ item_id: activeProd.id, item_name: activeProd.title, price: itemPrice, item_category: activeProd.department || '' }]
+  });
+  fbq('track', 'ViewContent', {
+    content_ids: [activeProd.id],
+    content_name: activeProd.title,
+    content_type: 'product',
+    value: itemPrice,
+    currency: itemCurrency
+  });
 }
 
 function closeModal() {
@@ -1003,13 +1031,27 @@ document.getElementById('atcBtn').onclick = async () => {
       : await cartCreate(v.id, qty);
     saveCart();
     refreshCartUI(true);
+    const atcPrice    = parseFloat(v.price?.amount || activeProd.priceRange.minVariantPrice.amount);
+    const atcCurrency = v.price?.currencyCode || activeProd.priceRange.minVariantPrice.currencyCode;
     fbq('track', 'AddToCart', {
       content_ids: [v.id],
       content_name: activeProd.title,
       content_type: 'product',
-      value: parseFloat(v.price?.amount || activeProd.priceRange.minVariantPrice.amount),
-      currency: v.price?.currencyCode || activeProd.priceRange.minVariantPrice.currencyCode,
+      value: atcPrice,
+      currency: atcCurrency,
       num_items: qty
+    });
+    gtag('event', 'add_to_cart', {
+      currency: atcCurrency,
+      value: atcPrice * qty,
+      items: [{
+        item_id: v.id,
+        item_name: activeProd.title,
+        price: atcPrice,
+        quantity: qty,
+        item_variant: v.title !== 'Default Title' ? v.title : undefined,
+        item_category: activeProd.department || ''
+      }]
     });
     btn.textContent = 'Added!';
     setTimeout(() => { btn.textContent = 'Add to Cart'; btn.disabled = false; }, 1400);
@@ -1028,11 +1070,24 @@ document.getElementById('cartList').addEventListener('click', async e => {
   if (!cart?.id) return;
 
   if (removeBtn) {
-    const lineId = removeBtn.dataset.lineId;
+    const lineId      = removeBtn.dataset.lineId;
+    const removedLine = cart.lines.edges.find(el => el.node.id === lineId)?.node;
     removeBtn.disabled = true;
     try {
       cart = await cartRemoveLine(cart.id, lineId);
       saveCart(); refreshCartUI();
+      if (removedLine) {
+        gtag('event', 'remove_from_cart', {
+          currency: removedLine.merchandise.price.currencyCode,
+          value: parseFloat(removedLine.merchandise.price.amount) * removedLine.quantity,
+          items: [{
+            item_id: removedLine.merchandise.id,
+            item_name: removedLine.merchandise.product.title,
+            price: parseFloat(removedLine.merchandise.price.amount),
+            quantity: removedLine.quantity
+          }]
+        });
+      }
     } catch(err) {
       removeBtn.disabled = false;
     }
@@ -1074,6 +1129,19 @@ document.getElementById('cartList').addEventListener('change', async e => {
 function openCart() {
   document.getElementById('cartDrawer').classList.add('open');
   document.getElementById('cartOverlay').classList.add('open');
+  if (cart?.lines?.edges?.length) {
+    const cost = cart.cost?.totalAmount;
+    gtag('event', 'view_cart', {
+      currency: cost?.currencyCode || 'USD',
+      value: parseFloat(cost?.amount || 0),
+      items: cart.lines.edges.map(({ node }) => ({
+        item_id: node.merchandise.id,
+        item_name: node.merchandise.product.title,
+        price: parseFloat(node.merchandise.price.amount),
+        quantity: node.quantity
+      }))
+    });
+  }
 }
 function closeCart() {
   document.getElementById('cartDrawer').classList.remove('open');
@@ -1117,6 +1185,32 @@ document.getElementById('discountRemove').addEventListener('click', async () => 
   document.getElementById('discountInput').value = '';
   document.getElementById('discountErr').style.display = 'none';
 });
+
+// ── ANALYTICS: checkout, search bar focus ─────────
+document.getElementById('checkoutLink').addEventListener('click', () => {
+  if (!cart?.lines?.edges?.length) return;
+  const cost  = cart.cost?.totalAmount;
+  const items = cart.lines.edges.map(({ node }) => ({
+    item_id: node.merchandise.id,
+    item_name: node.merchandise.product.title,
+    price: parseFloat(node.merchandise.price.amount),
+    quantity: node.quantity
+  }));
+  gtag('event', 'begin_checkout', {
+    currency: cost?.currencyCode || 'USD',
+    value: parseFloat(cost?.amount || 0),
+    items
+  });
+  fbq('track', 'InitiateCheckout', {
+    value: parseFloat(cost?.amount || 0),
+    currency: cost?.currencyCode || 'USD',
+    num_items: cart.lines.edges.reduce((s, { node }) => s + node.quantity, 0)
+  });
+});
+
+document.getElementById('shopSearch').addEventListener('focus', () => {
+  gtag('event', 'search_bar_focus', { page_location: window.location.href });
+}, { once: true });
 
 // ── INIT ──────────────────────────────────────────
 (async () => {
