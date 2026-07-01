@@ -46,6 +46,16 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ## Change Log
 
+---
+
+### 2026-07-01 — Meta Pixel added to seed.html and admin.html
+
+**What changed:** Meta Pixel snippet (ID `1706510330484603`) added to `seed.html` and `admin.html` inside `<head>`, matching the placement on the other three pages.
+
+**Why:** Diagnostic check revealed the Pixel was missing from both internal pages. All 5 pages now have GA4 + Meta Pixel firing in `<head>` on every page load.
+
+**Watch out for:** If any new page is ever added, it needs both the GA4 snippet and the Meta Pixel snippet manually — there is no shared layout to inject from.
+
 After every edit, append an entry here so future Claude instances understand what was built, why, and what to watch out for.
 
 ---
