@@ -50,6 +50,19 @@ After every edit, append an entry here so future Claude instances understand wha
 
 ---
 
+### 2026-07-01 — Fan Favorites alignment + search fix (shop.html)
+
+**What changed:** Two bug fixes to reduce friction for visitors.
+
+- **Fan Favorites alignment** — `.featured-header` left padding changed from `var(--gap)` (3px) to `20px`. On mobile, the sidebar collapses to a horizontal strip and the shop-main takes full width, so 3px padding made "Fan Favorites" / "The ones your crew keeps reaching for." start 17px to the left of the nav logo and hero text (both at 20px). Added a mobile override to also reduce top padding slightly. On desktop, this also aligns the featured header with the promo banner (which already used 20px internal padding).
+- **Search bar returning no results** — `searchShop()` was setting `resultsEl.style.display = ''` to "show" the results container, but `#searchResults` has `display: none` in CSS. Clearing the inline style caused it to revert to the CSS rule, hiding all results. Fixed by setting to `'block'` explicitly.
+
+**Watch out for:**
+- If `var(--gap)` is ever used for featured-header padding again, the mobile alignment will break — horizontal padding on featured-header should stay in px, not use the tile-gap variable.
+- The search bug pattern (setting `display = ''` to show an element that has `display: none` in CSS) could affect any similar toggle elsewhere. Always set to an explicit value ('block', 'flex', etc.) rather than clearing.
+
+---
+
 ### (Pre-existing) — Admin Dashboard (admin.html)
 
 **What it is:** A full Firebase-backed admin panel at `/admin.html` for managing the Stone Rock Studios video portfolio. Not built in this Claude session — documented here retroactively for future context.
