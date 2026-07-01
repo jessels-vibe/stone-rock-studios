@@ -48,6 +48,18 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-01 — Cart error handling, stale cart revalidation, tags filter fix
+
+**What changed:** Three silent bugs patched.
+
+- **Cart buttons frozen on network error** — remove, qty +/−, and variant change handlers in the cart drawer had no try/catch. If a Shopify API call failed mid-flight, the button would stay `disabled` forever. All three now catch errors and re-enable the button so the user can retry.
+- **Stale cart from localStorage** — `loadCartFromStorage` now calls `cartFetch()` (new function) to revalidate the stored cart against Shopify immediately on page load. Shows cached data instantly, then overwrites with fresh data. If the cart is expired on Shopify's end, localStorage is cleared.
+- **Category filter dropping videos on index.html** — `v.tags || [v.category]` treated an empty array `[]` as truthy, so videos with `tags: []` were silently excluded from department filters. Fixed to `v.tags?.length ? v.tags : [v.category]`.
+
+**Watch out for:** `loadCartFromStorage` is now `async`. The init IIFE doesn't await it (fire-and-forget) — the initial render happens immediately from cache, the Shopify refresh happens in background. This is intentional.
+
+---
+
 ### 2026-07-01 — Meta Pixel added to seed.html and admin.html
 
 **What changed:** Meta Pixel snippet (ID `1706510330484603`) added to `seed.html` and `admin.html` inside `<head>`, matching the placement on the other three pages.
