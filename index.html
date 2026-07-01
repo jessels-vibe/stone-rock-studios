@@ -507,7 +507,7 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     workDropdown.classList.remove('open');
     const filtered = activeCat === 'all'
       ? allVideos
-      : allVideos.filter(v => (v.tags || [v.category]).includes(activeCat));
+      : allVideos.filter(v => (v.tags?.length ? v.tags : [v.category]).includes(activeCat));
     renderGrid(filtered);
   });
 });

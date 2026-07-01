@@ -865,11 +865,35 @@ async function cartUpdateNote(cartId, note) {
   return data?.cartNoteUpdate?.cart;
 }
 
+async function cartFetch(cartId) {
+  const { data } = await gql(
+    `query CartGet($cartId:ID!){cart(id:$cartId){${CART_F}}}`,
+    { cartId }
+  );
+  return data?.cart;
+}
+
 function saveCart() { try { localStorage.setItem('srs_cart', JSON.stringify(cart)); } catch(e) {} }
-function loadCartFromStorage() {
+async function loadCartFromStorage() {
   try {
     const s = localStorage.getItem('srs_cart');
-    if (s) { cart = JSON.parse(s); refreshCartUI(); }
+    if (!s) return;
+    const stored = JSON.parse(s);
+    if (!stored?.id) return;
+    cart = stored;
+    refreshCartUI();
+    // revalidate against Shopify — prices/availability may be stale
+    const fresh = await cartFetch(stored.id);
+    if (fresh) {
+      cart = fresh;
+      saveCart();
+      refreshCartUI();
+    } else {
+      // cart expired on Shopify side
+      cart = null;
+      localStorage.removeItem('srs_cart');
+      refreshCartUI();
+    }
   } catch(e) {}
 }
 
@@ -1006,33 +1030,45 @@ document.getElementById('cartList').addEventListener('click', async e => {
   if (removeBtn) {
     const lineId = removeBtn.dataset.lineId;
     removeBtn.disabled = true;
-    cart = await cartRemoveLine(cart.id, lineId);
-    saveCart(); refreshCartUI();
+    try {
+      cart = await cartRemoveLine(cart.id, lineId);
+      saveCart(); refreshCartUI();
+    } catch(err) {
+      removeBtn.disabled = false;
+    }
   }
 
   if (qtyBtn) {
     const lineId = qtyBtn.dataset.lineId;
     const delta  = parseInt(qtyBtn.dataset.delta);
-    const line   = cart.lines.edges.find(e => e.node.id === lineId)?.node;
+    const line   = cart.lines.edges.find(el => el.node.id === lineId)?.node;
     if (!line) return;
     qtyBtn.disabled = true;
     const newQty = line.quantity + delta;
-    cart = newQty <= 0
-      ? await cartRemoveLine(cart.id, lineId)
-      : await cartUpdateLines(cart.id, [{ id: lineId, quantity: newQty }]);
-    saveCart(); refreshCartUI(delta > 0);
+    try {
+      cart = newQty <= 0
+        ? await cartRemoveLine(cart.id, lineId)
+        : await cartUpdateLines(cart.id, [{ id: lineId, quantity: newQty }]);
+      saveCart(); refreshCartUI(delta > 0);
+    } catch(err) {
+      qtyBtn.disabled = false;
+    }
   }
 });
 
 document.getElementById('cartList').addEventListener('change', async e => {
   const sel = e.target.closest('.cart-variant-sel');
   if (!sel || !cart?.id) return;
-  const lineId     = sel.dataset.lineId;
-  const qty        = parseInt(sel.dataset.qty);
-  const variantId  = sel.value;
+  const lineId    = sel.dataset.lineId;
+  const lineQty   = parseInt(sel.dataset.qty);
+  const variantId = sel.value;
   sel.disabled = true;
-  cart = await cartUpdateLines(cart.id, [{ id: lineId, merchandiseId: variantId, quantity: qty }]);
-  saveCart(); refreshCartUI();
+  try {
+    cart = await cartUpdateLines(cart.id, [{ id: lineId, merchandiseId: variantId, quantity: lineQty }]);
+    saveCart(); refreshCartUI();
+  } catch(err) {
+    sel.disabled = false;
+  }
 });
 
 function openCart() {
