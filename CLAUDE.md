@@ -248,6 +248,16 @@ Final banner reads: **Buy 3, Get 1 Free · All Tees $19.99! · Free Shipping on 
 
 ---
 
+### 2026-06-30 — GA4 tracking tag added to all pages
+
+**What changed:** Added Google Analytics 4 tag (`G-F0F5ZDTLY3`) immediately after `<head>` on all five HTML pages: `index.html`, `about.html`, `shop.html`, `seed.html`, `admin.html`.
+
+**Why:** Connected GA4 to Meta Ads for Shops performance reporting. Tag fires `PageView` on every page load and feeds data into the `G-F0F5ZDTLY3` property. Required for Meta to track the full journey from ad click → site action.
+
+**Watch out for:** If any new pages are added, the GA4 tag must be added manually — there is no shared layout to inject it from.
+
+---
+
 ### 2026-06-29 — Meta Pixel added to index.html and about.html
 
 **What changed:** Added the Meta Pixel snippet (ID `1706510330484603`) to `index.html` and `about.html`.
