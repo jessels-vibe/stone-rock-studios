@@ -174,7 +174,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
     </div>
     <a class="nav-link" id="aboutBtn" href="#">ABOUT</a>
     <a class="nav-link" href="shop.html">SHOP</a>
-    <a class="nav-cta" href="#contact" id="contactBtn">Get in Touch</a>
+    <a class="nav-cta" href="about.html">Get in Touch</a>
   </div>
 </nav>
 
@@ -536,10 +536,6 @@ document.getElementById('aboutBtn').addEventListener('click', e => {
   showView(showing ? 'work' : 'about');
 });
 
-document.getElementById('contactBtn').addEventListener('click', e => {
-  e.preventDefault();
-  showView('contact');
-});
 
 // ── CONTACT FORM ──
 const contactForm    = document.getElementById('contactForm');
