@@ -99,11 +99,6 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   .featured-sub { font-size: 12px; font-weight: 300; color: var(--muted); letter-spacing: 0.04em; padding-bottom: 20px; }
   .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); padding: 32px var(--gap) 14px; }
 
-  /* CREW CALLOUT */
-  .crew-callout { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 24px; margin: 0; background: #fefefe; color: #0a0a0a; flex-wrap: wrap; }
-  .crew-callout-text { }
-  .crew-callout-headline { font-size: 14px; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 3px; }
-  .crew-callout-sub { font-size: 11px; font-weight: 400; color: #555; }
   .dept-section { padding-bottom: 12px; }
   .dept-header { display: flex; align-items: baseline; gap: 10px; padding: 36px var(--gap) 14px; border-top: 1px solid var(--border); }
   .dept-header-name { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; }
@@ -290,9 +285,6 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
     .featured-header { padding: 24px 20px 8px; }
     .featured-title { font-size: 28px; }
     .featured-sub { font-size: 11px; }
-    .crew-callout { padding: 14px 16px; }
-    .crew-callout-headline { font-size: 13px; }
-    .crew-callout-sub { font-size: 10px; }
     .shop-search { font-size: 16px; } /* prevent iOS zoom on input focus */
   }
   @media (max-width: 480px) { .shop-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -358,14 +350,6 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
         </div>
         <div class="shop-grid" id="featuredGrid"></div>
       </div>
-      <div class="crew-callout">
-        <div class="crew-callout-text">
-          <div class="crew-callout-headline">Outfitting your whole crew?</div>
-          <div class="crew-callout-sub">Buy 3 tees, get 1 free — applied automatically at checkout. No code needed.</div>
-        </div>
-      </div>
-      <div id="shopSections"><div class="status-msg">Loading</div></div>
-
       <div class="suggest-section" id="suggestSection">
         <div class="suggest-label">Missing something?</div>
         <div class="suggest-title">Don't see your role?</div>
@@ -379,6 +363,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
         </form>
         <div class="suggest-success" id="suggestSuccess">Got it — we'll add it to the list.</div>
       </div>
+      <div id="shopSections"><div class="status-msg">Loading</div></div>
     </div>
   </div>
 </div>
