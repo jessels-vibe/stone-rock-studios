@@ -172,7 +172,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
         <div class="dropdown-item" data-cat="music">Music Videos</div>
       </div>
     </div>
-    <a class="nav-link" id="aboutBtn" href="#">ABOUT</a>
+    <a class="nav-link" href="about.html">ABOUT</a>
     <a class="nav-link" href="shop.html">SHOP</a>
     <a class="nav-cta" href="about.html">Get in Touch</a>
   </div>
@@ -530,11 +530,6 @@ function showView(view) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-document.getElementById('aboutBtn').addEventListener('click', e => {
-  e.preventDefault();
-  const showing = document.getElementById('aboutView').classList.contains('visible');
-  showView(showing ? 'work' : 'about');
-});
 
 
 // ── CONTACT FORM ──
