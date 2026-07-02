@@ -240,6 +240,25 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   @keyframes badge-pop { 0%{transform:scale(1)} 45%{transform:scale(1.55)} 100%{transform:scale(1)} }
   .cart-badge.pop { animation: badge-pop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
 
+  /* SHIRT SUGGESTION */
+  .suggest-section { background: #fefefe; color: #0a0a0a; padding: 36px 24px; margin-top: 12px; border-top: 1px solid #e8e8e8; }
+  .suggest-label { font-size: 9px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #888; margin-bottom: 10px; }
+  .suggest-title { font-size: clamp(22px, 3.5vw, 32px); font-weight: 700; letter-spacing: -0.02em; color: #0a0a0a; line-height: 1.1; margin-bottom: 8px; }
+  .suggest-sub { font-size: 12px; font-weight: 400; color: #555; letter-spacing: 0.02em; margin-bottom: 20px; line-height: 1.6; }
+  .suggest-row { display: flex; gap: 8px; max-width: 480px; }
+  .suggest-input { flex: 1; background: #fff; border: 1.5px solid #ddd; color: #0a0a0a; font-size: 13px; font-family: inherit; padding: 11px 14px; outline: none; transition: border-color 0.15s; border-radius: 2px; }
+  .suggest-input::placeholder { color: #aaa; }
+  .suggest-input:focus { border-color: #0a0a0a; }
+  .suggest-btn { background: #0a0a0a; color: #fefefe; border: none; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-family: inherit; padding: 0 20px; cursor: pointer; white-space: nowrap; border-radius: 2px; transition: opacity 0.2s; }
+  .suggest-btn:hover { opacity: 0.8; }
+  .suggest-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .suggest-success { display: none; font-size: 12px; color: #228b22; margin-top: 10px; letter-spacing: 0.02em; font-weight: 500; }
+  .suggest-success.show { display: block; }
+  @media (max-width: 768px) {
+    .suggest-section { padding: 28px 20px; }
+    .suggest-input { font-size: 16px; } /* prevent iOS zoom */
+  }
+
   @media (max-width: 1024px) { .shop-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 768px) {
     nav { padding: 0 20px; }
@@ -321,6 +340,20 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
         </div>
       </div>
       <div id="shopSections"><div class="status-msg">Loading</div></div>
+
+      <div class="suggest-section">
+        <div class="suggest-label">Missing something?</div>
+        <div class="suggest-title">Don't see your role?</div>
+        <div class="suggest-sub">We add new shirts based on demand. Drop your role below and we'll put it on the list.</div>
+        <form class="suggest-form" id="suggestForm" action="https://formspree.io/f/mwvdoqdb" method="POST">
+          <input type="hidden" name="_subject" value="Shirt suggestion">
+          <div class="suggest-row">
+            <input class="suggest-input" type="text" name="role" placeholder="Your role or department…" required autocomplete="off" maxlength="80">
+            <button class="suggest-btn" type="submit">Suggest it</button>
+          </div>
+        </form>
+        <div class="suggest-success" id="suggestSuccess">Got it — we'll add it to the list.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -1184,6 +1217,28 @@ document.getElementById('discountRemove').addEventListener('click', async () => 
   saveCart(); refreshCartUI();
   document.getElementById('discountInput').value = '';
   document.getElementById('discountErr').style.display = 'none';
+});
+
+// ── SHIRT SUGGESTION FORM ─────────────────────────
+document.getElementById('suggestForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn   = e.target.querySelector('.suggest-btn');
+  const input = e.target.querySelector('.suggest-input');
+  const role  = input.value.trim();
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const res = await fetch(e.target.action, {
+      method: 'POST', body: new FormData(e.target), headers: { Accept: 'application/json' }
+    });
+    if (res.ok) {
+      e.target.style.display = 'none';
+      document.getElementById('suggestSuccess').classList.add('show');
+      gtag('event', 'shirt_suggestion', { suggested_role: role });
+      gtag('event', 'generate_lead', { form_location: 'shirt_suggestion' });
+    } else {
+      btn.disabled = false; btn.textContent = 'Suggest it';
+    }
+  } catch { btn.disabled = false; btn.textContent = 'Suggest it'; }
 });
 
 // ── ANALYTICS: checkout, search bar focus ─────────
