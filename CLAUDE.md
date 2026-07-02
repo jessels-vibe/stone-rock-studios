@@ -375,6 +375,22 @@ Final banner reads: **Buy 3, Get 1 Free · All Tees $19.99! · Free Shipping on 
 
 ---
 
+### 2026-07-02 — "Don't see your role?" nudge link + zero-results inline form (shop.html)
+
+**What changed:** Two new entry points to the shirt suggestion form.
+
+- **Suggest nudge below search bar** — A small "Don't see your role? Suggest it →" text link always visible below the search input. Clicking smooth-scrolls to `#suggestSection` (the existing bottom form). Fires `suggest_nudge_click` GA4 event. Implemented as a `<span id="suggestNudge">` with a click listener to avoid anchor-scroll jank on mobile.
+- **Zero-results inline form** — When search returns 0 matches, `searchShop()` shows `#searchZeroState` below the results grid. Shows "We don't have that one yet." + "Drop your role below and we'll put it on the list." + an inline suggest form (same Formspree endpoint `mwvdoqdb`). The input is pre-filled with the search query (capitalised) so the user sees "gaffer" already in the field. Fires `shirt_suggestion` (with `source: 'search_zero_state'`) + `generate_lead` GA4 on success. Zero state is hidden when query is cleared or results are found.
+
+**Why:** The bottom form was invisible — users had to scroll past all products to find it. The nudge anchors it near discovery and the zero-results state catches high-intent users exactly when they hit a gap.
+
+**Watch out for:**
+- `#zeroSuggestForm` and the bottom `#suggestForm` post to the same Formspree endpoint — both land in the same inbox. The hidden `_subject` field value ("Shirt suggestion") is the same; the GA4 `source` param distinguishes where it came from.
+- Pre-fill uses `q.charAt(0).toUpperCase() + q.slice(1)` (capitalises first letter only). If the query is multi-word, only the first character is capitalised.
+- Zero-state success hides the form but keeps `#zeroSuggestSuccess` showing. If the user clears search and searches something else, the zero state re-appears but `show` is checked so the pre-fill is skipped — success message persists for the session.
+
+---
+
 ### 2026-06-26 — Fix "Most Popular" label appearing on all non-first dept tiles (shop.html)
 
 **What changed:** One-line fix in `renderShop()` — changed `byDept[dept].map(tileHTML)` to `byDept[dept].map(p => tileHTML(p))`.

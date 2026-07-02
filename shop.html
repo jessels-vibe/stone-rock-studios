@@ -254,6 +254,18 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   .suggest-btn:disabled { opacity: 0.45; cursor: not-allowed; }
   .suggest-success { display: none; font-size: 12px; color: #228b22; margin-top: 10px; letter-spacing: 0.02em; font-weight: 500; }
   .suggest-success.show { display: block; }
+
+  /* SUGGEST NUDGE */
+  .suggest-nudge { padding: 0 var(--gap) 16px; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+  .suggest-nudge-link { color: var(--text); font-weight: 600; text-decoration: none; cursor: pointer; border-bottom: 1px solid #333; padding-bottom: 1px; transition: border-color 0.2s; }
+  .suggest-nudge-link:hover { border-bottom-color: #fefefe; }
+
+  /* SEARCH ZERO STATE */
+  .search-zero-state { display: none; padding: 32px var(--gap) 48px; }
+  .search-zero-state.show { display: block; }
+  .zero-state-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: #fefefe; margin-bottom: 6px; }
+  .zero-state-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; letter-spacing: 0.03em; line-height: 1.6; }
+
   @media (max-width: 768px) {
     .suggest-section { padding: 28px 20px; }
     .suggest-input { font-size: 16px; } /* prevent iOS zoom */
@@ -321,9 +333,22 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
     <div class="shop-search-wrap">
       <input class="shop-search" type="search" id="shopSearch" placeholder="Search shirts…" oninput="searchShop(this.value)" autocomplete="off">
     </div>
+    <div class="suggest-nudge">Don't see your role? <span class="suggest-nudge-link" id="suggestNudge">Suggest it →</span></div>
     <div id="searchResults">
       <div class="search-results-label" id="searchResultsLabel"></div>
       <div class="shop-grid" style="padding: 0 var(--gap);" id="searchGrid"></div>
+      <div class="search-zero-state" id="searchZeroState">
+        <div class="zero-state-title">We don't have that one yet.</div>
+        <div class="zero-state-sub">Drop your role below and we'll put it on the list.</div>
+        <form class="suggest-form" id="zeroSuggestForm" action="https://formspree.io/f/mwvdoqdb" method="POST">
+          <input type="hidden" name="_subject" value="Shirt suggestion">
+          <div class="suggest-row" style="max-width:420px">
+            <input class="suggest-input" type="text" name="role" id="zeroSuggestInput" placeholder="Your role or department…" required autocomplete="off" maxlength="80">
+            <button class="suggest-btn" type="submit">Suggest it</button>
+          </div>
+        </form>
+        <div class="suggest-success" id="zeroSuggestSuccess">Got it — we'll add it to the list.</div>
+      </div>
     </div>
     <div id="shopNormal">
       <div class="featured-wrap" id="featuredWrap">
@@ -341,7 +366,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
       </div>
       <div id="shopSections"><div class="status-msg">Loading</div></div>
 
-      <div class="suggest-section">
+      <div class="suggest-section" id="suggestSection">
         <div class="suggest-label">Missing something?</div>
         <div class="suggest-title">Don't see your role?</div>
         <div class="suggest-sub">We add new shirts based on demand. Drop your role below and we'll put it on the list.</div>
@@ -704,9 +729,11 @@ function searchShop(q) {
   const normalEl  = document.getElementById('shopNormal');
   const grid      = document.getElementById('searchGrid');
   const label     = document.getElementById('searchResultsLabel');
+  const zeroEl    = document.getElementById('searchZeroState');
   if (!q) {
     resultsEl.style.display = 'none';
     normalEl.style.display  = '';
+    zeroEl.classList.remove('show');
     clearTimeout(searchAnalyticsTimer);
     return;
   }
@@ -717,6 +744,15 @@ function searchShop(q) {
   grid.innerHTML = matches.length
     ? matches.map(p => tileHTML(p)).join('')
     : '';
+  if (!matches.length) {
+    zeroEl.classList.add('show');
+    const zeroInput = document.getElementById('zeroSuggestInput');
+    if (!document.getElementById('zeroSuggestSuccess').classList.contains('show')) {
+      zeroInput.value = q.charAt(0).toUpperCase() + q.slice(1);
+    }
+  } else {
+    zeroEl.classList.remove('show');
+  }
   normalEl.style.display  = 'none';
   resultsEl.style.display = 'block';
 
@@ -1266,6 +1302,32 @@ document.getElementById('checkoutLink').addEventListener('click', () => {
 document.getElementById('shopSearch').addEventListener('focus', () => {
   gtag('event', 'search_bar_focus', { page_location: window.location.href });
 }, { once: true });
+
+document.getElementById('suggestNudge').addEventListener('click', () => {
+  document.getElementById('suggestSection').scrollIntoView({ behavior: 'smooth' });
+  gtag('event', 'suggest_nudge_click', { location: 'search_bar' });
+});
+
+document.getElementById('zeroSuggestForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn   = e.target.querySelector('.suggest-btn');
+  const input = document.getElementById('zeroSuggestInput');
+  const role  = input.value.trim();
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const res = await fetch(e.target.action, {
+      method: 'POST', body: new FormData(e.target), headers: { Accept: 'application/json' }
+    });
+    if (res.ok) {
+      e.target.style.display = 'none';
+      document.getElementById('zeroSuggestSuccess').classList.add('show');
+      gtag('event', 'shirt_suggestion', { suggested_role: role, source: 'search_zero_state' });
+      gtag('event', 'generate_lead', { form_location: 'search_zero_state' });
+    } else {
+      btn.disabled = false; btn.textContent = 'Suggest it';
+    }
+  } catch { btn.disabled = false; btn.textContent = 'Suggest it'; }
+});
 
 // ── INIT ──────────────────────────────────────────
 (async () => {
