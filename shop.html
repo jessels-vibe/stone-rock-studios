@@ -331,15 +331,18 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
       <div class="shop-grid" style="padding: 0 var(--gap);" id="searchGrid"></div>
       <div class="search-zero-state" id="searchZeroState">
         <div class="zero-state-title">We don't have that one yet.</div>
-        <div class="zero-state-sub">Drop your role below and we'll put it on the list.</div>
+        <div class="zero-state-sub">Drop your role and email below — we'll notify you when it's added.</div>
         <form class="suggest-form" id="zeroSuggestForm" action="https://formspree.io/f/mwvdoqdb" method="POST">
           <input type="hidden" name="_subject" value="Shirt suggestion">
           <div class="suggest-row" style="max-width:420px">
             <input class="suggest-input" type="text" name="role" id="zeroSuggestInput" placeholder="Your role or department…" required autocomplete="off" maxlength="80">
+          </div>
+          <div class="suggest-row" style="max-width:420px;margin-top:8px">
+            <input class="suggest-input" type="email" name="email" placeholder="Your email (optional) — we'll notify you" autocomplete="email" maxlength="120">
             <button class="suggest-btn" type="submit">Suggest it</button>
           </div>
         </form>
-        <div class="suggest-success" id="zeroSuggestSuccess">Got it — we'll add it to the list.</div>
+        <div class="suggest-success" id="zeroSuggestSuccess">Got it — we'll notify you when it's added.</div>
       </div>
     </div>
     <div id="shopNormal">
@@ -353,15 +356,18 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
       <div class="suggest-section" id="suggestSection">
         <div class="suggest-label">Missing something?</div>
         <div class="suggest-title">Don't see your role?</div>
-        <div class="suggest-sub">We add new shirts based on demand. Drop your role below and we'll put it on the list.</div>
+        <div class="suggest-sub">We add new shirts based on demand. Drop your role below — leave your email and we'll notify you when it's added.</div>
         <form class="suggest-form" id="suggestForm" action="https://formspree.io/f/mwvdoqdb" method="POST">
           <input type="hidden" name="_subject" value="Shirt suggestion">
           <div class="suggest-row">
             <input class="suggest-input" type="text" name="role" placeholder="Your role or department…" required autocomplete="off" maxlength="80">
+          </div>
+          <div class="suggest-row" style="margin-top:8px">
+            <input class="suggest-input" type="email" name="email" placeholder="Your email (optional) — we'll notify you when it's added" autocomplete="email" maxlength="120">
             <button class="suggest-btn" type="submit">Suggest it</button>
           </div>
         </form>
-        <div class="suggest-success" id="suggestSuccess">Got it — we'll add it to the list.</div>
+        <div class="suggest-success" id="suggestSuccess">Got it — we'll notify you when it's added.</div>
       </div>
       <div id="shopSections"><div class="status-msg">Loading</div></div>
     </div>
