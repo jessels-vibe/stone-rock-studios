@@ -48,6 +48,21 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-04 — Email field added to shirt suggestion forms (shop.html)
+
+**What changed:** Both suggestion forms now include an optional email input so visitors can be notified when their requested shirt is added.
+
+- **Bottom `#suggestSection` form** — email input stacked below the role input, above the submit button. Sub-copy updated: "Drop your role below — leave your email and we'll notify you when it's added." Success message updated to "Got it — we'll notify you when it's added."
+- **Zero-results `#zeroSuggestForm`** — same treatment. Sub-copy: "Drop your role and email below — we'll notify you when it's added." Success message updated to match.
+
+**Why:** Email was optional (not `required`) to avoid blocking users who just want to suggest without getting notified.
+
+**How email arrives:** Formspree sends both `role` and `email` fields in the submission email to the inbox tied to endpoint `mwvdoqdb`. No JS changes needed — both handlers use `new FormData(e.target)` which automatically picks up any `name` attributes.
+
+**Watch out for:** Formspree free tier has a 50 submissions/month limit. If volume grows, upgrade the plan or switch to a paid endpoint.
+
+---
+
 ### 2026-07-01 — Cart error handling, stale cart revalidation, tags filter fix
 
 **What changed:** Three silent bugs patched.
