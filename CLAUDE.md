@@ -48,6 +48,14 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-06 — Sort size options in modal (shop.html)
+
+**What changed:** Size pills in the product modal now render in XS→S→M→L→XL→2XL→3XL→4XL→5XL→6XL order. Previously Shopify returned variants in creation order, which had S appearing last.
+
+**How:** Added `SIZE_ORDER` constant. In `renderOpts()`, when the option name matches `/size/i`, values are sorted against `SIZE_ORDER` before mapping to pills. Any size not in the list falls to the end.
+
+---
+
 ### 2026-07-04 — Email field added to shirt suggestion forms (shop.html)
 
 **What changed:** Both suggestion forms now include an optional email input so visitors can be notified when their requested shirt is added.
