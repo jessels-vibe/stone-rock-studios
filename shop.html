@@ -456,6 +456,7 @@ const COLOR_HEX = {
   'athletic heather':'#b0b0b0','sport grey':'#999','dark heather':'#555',
 };
 const LIGHT = new Set(['white','cream','yellow','gold','tan','sand']);
+const SIZE_ORDER = ['XS','S','M','L','XL','2XL','3XL','4XL','5XL','6XL'];
 
 async function gql(query, variables = {}) {
   const r = await fetch(API, {
@@ -835,7 +836,15 @@ function renderOpts() {
 
   c.innerHTML = opts.map(opt => {
     const isColor = /colou?r/i.test(opt.name);
-    const pills = opt.values.map(val => {
+    const isSize  = /size/i.test(opt.name);
+    const values  = isSize
+      ? [...opt.values].sort((a, b) => {
+          const ai = SIZE_ORDER.indexOf(a.toUpperCase());
+          const bi = SIZE_ORDER.indexOf(b.toUpperCase());
+          return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+        })
+      : opt.values;
+    const pills = values.map(val => {
       const test = { ...selOpts, [opt.name]: val };
       const v = activeProd.variants.find(v => v.selectedOptions.every(o => test[o.name] === o.value));
       const oos = v && !v.availableForSale;
