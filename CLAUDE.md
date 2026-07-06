@@ -48,6 +48,12 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-06 — 100% cotton label in product modal (shop.html)
+
+**What changed:** Added a static "100% cotton" line below the price in the product modal. Styled as small uppercase muted text (`#888`, 10px, 0.12em tracking). Same for all products — hardcoded in HTML, not pulled from Shopify.
+
+---
+
 ### 2026-07-06 — Sort size options in modal (shop.html)
 
 **What changed:** Size pills in the product modal now render in XS→S→M→L→XL→2XL→3XL→4XL→5XL→6XL order. Previously Shopify returned variants in creation order, which had S appearing last.
