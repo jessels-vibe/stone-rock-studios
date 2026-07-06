@@ -48,6 +48,12 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-06 — Remove Buy 3 Get 1 Free from promo banner (shop.html)
+
+**What changed:** Removed "Buy 3, Get 1 Free" pill and its divider from the promo banner. Updated sub-copy from "Buy 3 get 1 free applied automatically at checkout" to "Free shipping applied automatically at checkout." Discount deactivated in Shopify.
+
+---
+
 ### 2026-07-06 — 100% cotton label in product modal (shop.html)
 
 **What changed:** Added a static "100% cotton" line below the price in the product modal. Styled as small uppercase muted text (`#888`, 10px, 0.12em tracking). Same for all products — hardcoded in HTML, not pulled from Shopify.
