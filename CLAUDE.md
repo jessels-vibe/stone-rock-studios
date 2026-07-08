@@ -48,6 +48,31 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-07 — Manual video entry + Hulu support (admin.html, index.html)
+
+**What changed:** Added support for portfolio entries that live on external platforms (Hulu, Vimeo, etc.) rather than YouTube.
+
+**Admin (`admin.html`):**
+- Add Video modal now has a YouTube / Manual Entry tab toggle.
+- Manual Entry form: title, thumbnail upload (to Firebase Storage at `thumbnails/ext_<timestamp>`), external link, category, aspect ratio, featured toggle.
+- Manual entries stored with `isManual: true` and `videoId: ext_<timestamp>`.
+- Hulu added to `detectPlatformLabel()`.
+- `refreshThumbnail()` guards against calling YouTube API on manual entries (`v.isManual` early return).
+
+**Index (`index.html`):**
+- `openModal()` refactored to accept a full video object instead of individual params `(ytId, cat, title, ratio)`. All callers updated.
+- Manual entries open a modal showing the thumbnail fullscreen with a darkening overlay and a centered "Watch on [Platform]" CTA button. YouTube entries unchanged.
+- `closeModal()` now also resets ext content visibility and iframe display style.
+- Hulu added to `platformIcon()` (green rounded-square H icon) and new `platformName()` helper added.
+- Modal HTML: `#modalExtContent`, `#modalExtThumb`, `#modalExtOverlay`, `#modalExtBtn` added inside `.modal-video`.
+
+**Watch out for:**
+- The Hulu badge click goes directly to the external URL (existing `stopPropagation` on `.tile-ext-link` handles this). The thumbnail click opens the in-site modal — badge is the only exit point.
+- `isManual` must be `true` (not just truthy) for the ext modal to show — entries synced from YouTube will never have this field set.
+- `ext_<timestamp>` IDs are unique by construction but will appear as `ext_1234567890` in the admin video ID column — expected.
+
+---
+
 ### 2026-07-06 — Remove Buy 3 Get 1 Free from promo banner (shop.html)
 
 **What changed:** Removed "Buy 3, Get 1 Free" pill and its divider from the promo banner. Updated sub-copy from "Buy 3 get 1 free applied automatically at checkout" to "Free shipping applied automatically at checkout." Discount deactivated in Shopify.
