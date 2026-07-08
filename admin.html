@@ -234,6 +234,12 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   .preview-title-text { font-size: 12px; font-weight: 600; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .preview-meta { font-size: 10px; color: var(--muted); font-family: monospace; }
   .fetch-error { font-size: 11px; color: var(--red); margin-top: 8px; }
+  .modal-type-row { display:flex; border:1px solid var(--border); margin-bottom:20px; }
+  .modal-type-btn { flex:1; padding:9px; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; background:transparent; border:none; color:var(--muted); cursor:pointer; font-family:inherit; transition:all 0.12s; }
+  .modal-type-btn.active { background:var(--surface2); color:var(--text); }
+  .manual-thumb-drop { width:100%; height:90px; background:#1a1a1a; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; margin-bottom:8px; overflow:hidden; cursor:pointer; transition:border-color 0.15s; }
+  .manual-thumb-drop:hover { border-color:#444; }
+  .manual-thumb-drop img { width:100%; height:100%; object-fit:cover; display:none; }
 
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -394,23 +400,76 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   <div class="modal-box">
     <button class="modal-close-btn" onclick="closeAddModal()">✕</button>
     <div class="modal-title">Add Video</div>
-    <div class="form-group">
-      <label class="form-label">YouTube URL or Video ID</label>
-      <input class="form-input" type="text" id="addVideoInput" placeholder="https://youtu.be/ABC123 or ABC123">
+
+    <div class="modal-type-row">
+      <button class="modal-type-btn active" id="typeYouTube" onclick="switchModalType('youtube')">YouTube</button>
+      <button class="modal-type-btn" id="typeManual" onclick="switchModalType('manual')">Manual Entry</button>
     </div>
-    <button class="btn btn-ghost" onclick="fetchVideoPreview()" style="margin-bottom:4px">Fetch Video</button>
-    <div class="fetch-error" id="fetchError"></div>
-    <div id="previewCard" style="display:none">
-      <div class="preview-card">
-        <div class="preview-thumb"><img id="previewThumb" src=""></div>
-        <div class="preview-info">
-          <div class="preview-title-text" id="previewTitleText"></div>
-          <div class="preview-meta" id="previewIdText"></div>
+
+    <!-- YOUTUBE SECTION -->
+    <div id="youtubeSection">
+      <div class="form-group">
+        <label class="form-label">YouTube URL or Video ID</label>
+        <input class="form-input" type="text" id="addVideoInput" placeholder="https://youtu.be/ABC123 or ABC123">
+      </div>
+      <button class="btn btn-ghost" onclick="fetchVideoPreview()" style="margin-bottom:4px">Fetch Video</button>
+      <div class="fetch-error" id="fetchError"></div>
+      <div id="previewCard" style="display:none">
+        <div class="preview-card">
+          <div class="preview-thumb"><img id="previewThumb" src=""></div>
+          <div class="preview-info">
+            <div class="preview-title-text" id="previewTitleText"></div>
+            <div class="preview-meta" id="previewIdText"></div>
+          </div>
         </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="cat-select" id="addCatSelect" style="width:100%;padding:8px 10px;font-size:12px">
+            <option value="moto">Moto</option><option value="food">Food & Drink</option>
+            <option value="lifestyle">Lifestyle</option><option value="documentary">Documentary</option>
+            <option value="events">Event Coverage</option><option value="realestate">Real Estate</option>
+            <option value="reels">Social Reels</option><option value="music">Music Videos</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Aspect Ratio</label>
+          <select class="cat-select" id="addRatioSelect" style="width:100%;padding:8px 10px;font-size:12px">
+            <option value="16:9">16:9 — Standard Landscape</option>
+            <option value="9:16">9:16 — Vertical / Short</option>
+            <option value="1:1">1:1 — Square</option>
+            <option value="4:3">4:3 — Classic</option>
+            <option value="4:5">4:5 — Portrait</option>
+            <option value="21:9">21:9 — Cinematic Wide</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:20px">
+          <span class="toggle-pill toggle-featured" id="addFeaturedToggle" onclick="this.classList.toggle('on')">★ Featured</span>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="confirmAddVideo()">Add to List</button>
+      </div>
+    </div>
+
+    <!-- MANUAL ENTRY SECTION -->
+    <div id="manualSection" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input class="form-input" type="text" id="manualTitle" placeholder="Video title">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Thumbnail</label>
+        <div class="manual-thumb-drop" id="manualThumbDrop" onclick="document.getElementById('manualThumbInput').click()">
+          <img id="manualThumbImg" src="" alt="">
+          <span id="manualThumbLabel" style="font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase">↑ Upload Image</span>
+        </div>
+        <input type="file" id="manualThumbInput" accept="image/*" style="display:none" onchange="previewManualThumb(this)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">External Link (Hulu, Vimeo, etc.)</label>
+        <input class="form-input" type="text" id="manualLink" placeholder="https://www.hulu.com/watch/...">
       </div>
       <div class="form-group">
         <label class="form-label">Category</label>
-        <select class="cat-select" id="addCatSelect" style="width:100%;padding:8px 10px;font-size:12px">
+        <select class="cat-select" id="manualCatSelect" style="width:100%;padding:8px 10px;font-size:12px">
           <option value="moto">Moto</option><option value="food">Food & Drink</option>
           <option value="lifestyle">Lifestyle</option><option value="documentary">Documentary</option>
           <option value="events">Event Coverage</option><option value="realestate">Real Estate</option>
@@ -419,7 +478,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
       </div>
       <div class="form-group">
         <label class="form-label">Aspect Ratio</label>
-        <select class="cat-select" id="addRatioSelect" style="width:100%;padding:8px 10px;font-size:12px">
+        <select class="cat-select" id="manualRatioSelect" style="width:100%;padding:8px 10px;font-size:12px">
           <option value="16:9">16:9 — Standard Landscape</option>
           <option value="9:16">9:16 — Vertical / Short</option>
           <option value="1:1">1:1 — Square</option>
@@ -428,11 +487,13 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
           <option value="21:9">21:9 — Cinematic Wide</option>
         </select>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:20px">
-        <span class="toggle-pill toggle-featured" id="addFeaturedToggle" onclick="this.classList.toggle('on')">★ Featured</span>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <span class="toggle-pill toggle-featured" id="manualFeaturedToggle" onclick="this.classList.toggle('on')">★ Featured</span>
       </div>
-      <button class="btn btn-primary" style="width:100%" onclick="confirmAddVideo()">Add to List</button>
+      <div class="fetch-error" id="manualError"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:4px" id="manualAddBtn" onclick="confirmAddManual()">Add to List</button>
     </div>
+
   </div>
 </div>
 
@@ -897,6 +958,7 @@ function hidePreview() {
 // ── EXTERNAL LINK ──
 function detectPlatformLabel(url) {
   if (!url) return '';
+  if (url.includes('hulu.com')) return 'Hulu';
   if (url.includes('youtube.com') || url.includes('youtu.be')) return 'YouTube';
   if (url.includes('instagram.com')) return 'Instagram';
   if (url.includes('tiktok.com')) return 'TikTok';
@@ -917,7 +979,7 @@ function updateField(videoId, field, value) {
 
 async function refreshThumbnail(videoId, btn) {
   const v = videos.find(x => x.videoId === videoId);
-  if (!v) return;
+  if (!v || v.isManual) return;
   btn.classList.add('spinning');
   try {
     const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YT_API_KEY}`);
@@ -1054,12 +1116,82 @@ function filterSidebar(el) {
 function searchVideos(q) { currentSearch = q; renderList(); }
 
 // ── ADD MODAL ──
+let manualThumbFile = null;
+
+function switchModalType(type) {
+  document.getElementById('youtubeSection').style.display = type === 'youtube' ? '' : 'none';
+  document.getElementById('manualSection').style.display  = type === 'manual'  ? '' : 'none';
+  document.getElementById('typeYouTube').classList.toggle('active', type === 'youtube');
+  document.getElementById('typeManual').classList.toggle('active',  type === 'manual');
+}
+
+function previewManualThumb(input) {
+  const file = input.files[0];
+  if (!file) return;
+  manualThumbFile = file;
+  const img = document.getElementById('manualThumbImg');
+  img.src = URL.createObjectURL(file);
+  img.style.display = 'block';
+  document.getElementById('manualThumbLabel').style.display = 'none';
+}
+
+async function confirmAddManual() {
+  const title = document.getElementById('manualTitle').value.trim();
+  const link  = document.getElementById('manualLink').value.trim();
+  const err   = document.getElementById('manualError');
+  err.textContent = '';
+  if (!title)          { err.textContent = 'Title is required.';     return; }
+  if (!manualThumbFile){ err.textContent = 'Thumbnail is required.'; return; }
+  if (!link)           { err.textContent = 'External link is required.'; return; }
+
+  const btn = document.getElementById('manualAddBtn');
+  btn.textContent = 'Uploading…'; btn.disabled = true;
+  try {
+    const videoId = 'ext_' + Date.now();
+    const ref = storage.ref(`thumbnails/${videoId}`);
+    await ref.put(manualThumbFile);
+    const thumbUrl = await ref.getDownloadURL();
+
+    const catVal   = document.getElementById('manualCatSelect').value;
+    const ratio    = document.getElementById('manualRatioSelect').value;
+    const portrait = RATIO_MAP[ratio]?.portrait || false;
+    const featured = document.getElementById('manualFeaturedToggle').classList.contains('on');
+
+    videos.push({
+      videoId, title, thumbnail: thumbUrl,
+      category: catVal, categoryLabel: CAT_LABELS[catVal],
+      tags: [catVal], portrait, aspectRatio: ratio,
+      featured, visible: true, isManual: true,
+      externalLink: link, order: videos.length, addedAt: Date.now()
+    });
+    markDirty(); detectDuplicates(); renderAll(); closeAddModal();
+  } catch(e) {
+    err.textContent = 'Upload failed: ' + e.message;
+    btn.textContent = 'Add to List'; btn.disabled = false;
+  }
+}
+
 function openAddModal() {
   document.getElementById('addModal').classList.add('open');
+  // YouTube tab
   document.getElementById('addVideoInput').value = '';
   document.getElementById('previewCard').style.display = 'none';
   document.getElementById('fetchError').textContent = '';
   document.getElementById('addFeaturedToggle').classList.remove('on');
+  // Manual tab
+  document.getElementById('manualTitle').value = '';
+  document.getElementById('manualLink').value  = '';
+  const img = document.getElementById('manualThumbImg');
+  img.src = ''; img.style.display = 'none';
+  document.getElementById('manualThumbLabel').style.display = '';
+  document.getElementById('manualThumbInput').value = '';
+  document.getElementById('manualError').textContent = '';
+  document.getElementById('manualFeaturedToggle').classList.remove('on');
+  document.getElementById('manualAddBtn').textContent = 'Add to List';
+  document.getElementById('manualAddBtn').disabled = false;
+  manualThumbFile = null;
+  // Always start on YouTube tab
+  switchModalType('youtube');
   pendingAdd = null;
 }
 

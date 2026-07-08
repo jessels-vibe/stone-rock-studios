@@ -120,6 +120,11 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   .modal-nav.prev { left: 16px; }
   .modal-nav.next { right: 16px; }
   .modal-nav:disabled { opacity: 0; pointer-events: none; }
+  #modalExtContent { display: none; position: absolute; inset: 0; flex-direction: column; align-items: center; justify-content: center; }
+  #modalExtContent.visible { display: flex; }
+  #modalExtThumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #modalExtOverlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+  #modalExtBtn { position: relative; z-index: 2; background: #fff; color: #000; padding: 14px 36px; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; transition: opacity 0.2s; font-family: inherit; }
   .modal-counter { position: absolute; top: -38px; left: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; color: #fefefe; line-height: 22px; }
   .modal-meta { padding: 14px 0 0; }
   .modal-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #fefefe; margin-bottom: 5px; }
@@ -226,6 +231,11 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
     <button class="modal-close" id="modalClose">✕</button>
     <div class="modal-video">
       <iframe id="modalFrame" src="" allowfullscreen allow="autoplay"></iframe>
+      <div id="modalExtContent">
+        <img id="modalExtThumb" src="" alt="">
+        <div id="modalExtOverlay"></div>
+        <a id="modalExtBtn" href="" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch on Hulu</a>
+      </div>
     </div>
     <div class="modal-meta">
       <div class="modal-cat" id="modalCat"></div>
@@ -355,10 +365,21 @@ function buildRows(videos) {
   return rows;
 }
 
+function platformName(url) {
+  if (!url) return 'Link';
+  if (url.includes('hulu.com'))    return 'Hulu';
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'YouTube';
+  if (url.includes('instagram.com')) return 'Instagram';
+  if (url.includes('tiktok.com'))  return 'TikTok';
+  return 'Link';
+}
+
 function platformIcon(url) {
   if (!url) return '';
   let svg = '';
-  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+  if (url.includes('hulu.com')) {
+    svg = '<svg viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="4" fill="#1CE783"/><path d="M7 7v10M17 7v10M7 12h10" stroke="#000" stroke-width="2.5" stroke-linecap="round"/></svg>';
+  } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
     svg = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.2 2.8 12 2.8 12 2.8s-4.2 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2.1C.7 15.5 1 17.6 1 17.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.6 21.8 12 21.8 12 21.8s4.2 0 6.8-.2c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.2v-2.1C23.3 9.1 23 7 23 7zm-13.5 8.5v-7.3l8 3.7-8 3.6z"/></svg>';
   } else if (url.includes('instagram.com')) {
     svg = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8 0 3.2 0 3.6-.1 4.8-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.9.1-3.2 0-3.6 0-4.8-.1-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.6-.1-4.8 0-3.2 0-3.6.1-4.8C2.4 3.9 4 2.3 7.2 2.3c1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1.0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4A6.2 6.2 0 0012 5.8zm0 10.2a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg>';
@@ -391,7 +412,7 @@ function makeTile(v, cols, rowSize) {
 
   tile.addEventListener('click', () => {
     activeIdx = activeVideos.indexOf(v);
-    openModal(v.videoId, v.categoryLabel, displayTitle, ratio);
+    openModal(v);
   });
 
   return tile;
@@ -456,38 +477,58 @@ const modalPrev    = document.getElementById('modalPrev');
 const modalNext    = document.getElementById('modalNext');
 const modalCounter = document.getElementById('modalCounter');
 
-function openModal(ytId, cat, title, ratio) {
+function openModal(v) {
+  const ratio = v.aspectRatio || (v.portrait ? '9:16' : '16:9');
+  const displayTitle = v.customTitle || v.title;
+  const cat = v.categoryLabel || '';
   const isPortrait = ['9:16','4:5'].includes(ratio);
   const mw = MODAL_WIDTH[ratio]   || (isPortrait ? 'min(360px,52vw)' : 'min(900px,92vw)');
   const mp = MODAL_PADDING[ratio] || (isPortrait ? 177.78 : 56.25);
   modalInner.className = `modal-inner ${isPortrait ? 'portrait' : 'landscape'}`;
   modalInner.style.width = mw;
   modalInner.querySelector('.modal-video').style.paddingBottom = mp + '%';
-  modalFrame.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&modestbranding=1&rel=0`;
   document.getElementById('modalCat').textContent   = cat;
-  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalTitle').textContent = displayTitle;
   modalPrev.disabled = activeIdx <= 0;
   modalNext.disabled = activeIdx >= activeVideos.length - 1;
   modalCounter.textContent = activeVideos.length > 1 ? `${activeIdx + 1} / ${activeVideos.length}` : '';
+
+  const extContent = document.getElementById('modalExtContent');
+  if (v.isManual && v.externalLink) {
+    modalFrame.src = '';
+    modalFrame.style.display = 'none';
+    extContent.classList.add('visible');
+    document.getElementById('modalExtThumb').src = v.thumbnail;
+    const btn = document.getElementById('modalExtBtn');
+    btn.href = v.externalLink;
+    btn.textContent = 'Watch on ' + platformName(v.externalLink);
+  } else {
+    modalFrame.style.display = '';
+    extContent.classList.remove('visible');
+    modalFrame.src = `https://www.youtube.com/embed/${v.videoId}?autoplay=1&modestbranding=1&rel=0`;
+    gtag('event', 'video_start', {
+      video_title: displayTitle,
+      video_provider: 'youtube',
+      video_url: `https://www.youtube.com/watch?v=${v.videoId}`,
+      video_category: cat
+    });
+  }
   modal.classList.add('open');
-  gtag('event', 'video_start', {
-    video_title: title,
-    video_provider: 'youtube',
-    video_url: `https://www.youtube.com/watch?v=${ytId}`,
-    video_category: cat
-  });
 }
 
 function navigateModal(dir) {
   const next = activeIdx + dir;
   if (next < 0 || next >= activeVideos.length) return;
   activeIdx = next;
-  const v = activeVideos[activeIdx];
-  const ratio = v.aspectRatio || (v.portrait ? '9:16' : '16:9');
-  openModal(v.videoId, v.categoryLabel, v.customTitle || v.title, ratio);
+  openModal(activeVideos[activeIdx]);
 }
 
-function closeModal() { modal.classList.remove('open'); modalFrame.src = ''; }
+function closeModal() {
+  modal.classList.remove('open');
+  modalFrame.src = '';
+  modalFrame.style.display = '';
+  document.getElementById('modalExtContent').classList.remove('visible');
+}
 document.getElementById('modalClose').addEventListener('click', closeModal);
 modalPrev.addEventListener('click', e => { e.stopPropagation(); navigateModal(-1); });
 modalNext.addEventListener('click', e => { e.stopPropagation(); navigateModal(1); });
