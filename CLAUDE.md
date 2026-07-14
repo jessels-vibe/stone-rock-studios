@@ -48,6 +48,37 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-14 — Brand guidelines applied (index.html, about.html, shop.html)
+
+**What changed:** Implemented official Stone Rock Studios brand guidelines across all three public-facing pages.
+
+**Typography:**
+- Font family changed from `"Helvetica Neue", Helvetica, 'Inter'...` to `'Inter', sans-serif` — Inter is now first priority
+- Google Fonts link updated to load only weight 600 (SemiBold); removed 300, 400, 500, 700
+- All `font-weight: 700` (bold) and `font-weight: 300` (light) changed to 600 throughout
+- Letter-spacing tightened: large positive values (0.1em–0.25em) replaced with -0.01em; headlines use -0.03em to -0.04em
+
+**Colors:**
+- Brand palette is strictly black and white (#000000 and #FFFFFF)
+- `--black` changed from `#0a0a0a` → `#000000`; `--text` from `#f0f0f0` → `#ffffff`
+- All `#fefefe` occurrences replaced with `#ffffff`
+- Muted/secondary states use `rgba(255,255,255,0.45)` (white opacity) rather than gray codes
+- Borders use `rgba(255,255,255,0.08)`; hover states use proportionally higher opacity
+
+**Casing:**
+- Removed all `text-transform: uppercase` from CSS (nav, labels, buttons, categories, sidebar, drawers)
+- Fixed hardcoded uppercase HTML nav text: "WORK" → "Work", "ABOUT" → "About", "SHOP" → "Shop"
+
+**Corners:**
+- `border-radius: 0` applied to: play button, ext-link badge, cart badge, color swatches, modal dots, suggest inputs/buttons
+
+**Watch out for:**
+- If new UI elements are added, do not use `text-transform: uppercase`, rounded corners, or positive letter-spacing — brand says no all caps and all sharp edges
+- Font weight should stay at 600 (SemiBold) for all text, including body copy
+- Only use #000000 and #ffffff; avoid grays (use white/black opacity for hierarchy)
+
+---
+
 ### 2026-07-07 — Manual video entry + Hulu support (admin.html, index.html)
 
 **What changed:** Added support for portfolio entries that live on external platforms (Hulu, Vimeo, etc.) rather than YouTube.
