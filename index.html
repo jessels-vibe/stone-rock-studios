@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet">
 <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -48,41 +48,41 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   button, input, select, textarea { font-family: inherit; }
   :root {
-    --black: #0a0a0a;
-    --surface: #111111;
-    --border: #1e1e1e;
-    --text: #f0f0f0;
-    --muted: #555;
+    --black: #000000;
+    --surface: #0d0d0d;
+    --border: rgba(255,255,255,0.08);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.45);
     --gap: 3px;
   }
-  html { background: var(--black); color: var(--text); font-family: "Helvetica Neue", Helvetica, 'Inter', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  html { background: var(--black); color: var(--text); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 32px; height: 52px;
-    background: rgba(10,10,10,0.96);
+    background: rgba(0,0,0,0.96);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
-  .nav-logo { font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); text-decoration: none; }
+  .nav-logo { font-weight: 600; font-size: 12px; letter-spacing: -0.01em; color: var(--text); text-decoration: none; }
   .nav-links { display: flex; gap: 40px; align-items: center; }
-  .nav-link { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
+  .nav-link { font-size: 11px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
   .nav-link:hover, .nav-link.active { color: var(--text); }
-  .nav-cta { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); background: var(--text); padding: 7px 16px; text-decoration: none; transition: opacity 0.2s; }
+  .nav-cta { font-size: 11px; font-weight: 600; letter-spacing: -0.01em; color: var(--black); background: var(--text); padding: 7px 16px; text-decoration: none; transition: opacity 0.2s; }
   .nav-cta:hover { opacity: 0.8; }
   .dropdown-wrapper { position: relative; }
   .dropdown-arrow { margin-left: 4px; display: inline-block; transition: transform 0.2s; font-size: 10px; }
   .dropdown-wrapper.open .dropdown-arrow { transform: rotate(180deg); }
-  .dropdown-menu { position: absolute; top: calc(100% + 16px); right: 0; background: #151515; border: 1px solid var(--border); min-width: 170px; opacity: 0; pointer-events: none; transform: translateY(-6px); transition: opacity 0.15s, transform 0.15s; }
+  .dropdown-menu { position: absolute; top: calc(100% + 16px); right: 0; background: #000000; border: 1px solid var(--border); min-width: 170px; opacity: 0; pointer-events: none; transform: translateY(-6px); transition: opacity 0.15s, transform 0.15s; }
   .dropdown-wrapper.open .dropdown-menu { opacity: 1; pointer-events: all; transform: translateY(0); }
-  .dropdown-item { display: block; padding: 10px 18px; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: color 0.12s, background 0.12s; border-bottom: 1px solid var(--border); }
+  .dropdown-item { display: block; padding: 10px 18px; font-size: 11px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); cursor: pointer; transition: color 0.12s, background 0.12s; border-bottom: 1px solid var(--border); }
   .dropdown-item:last-child { border-bottom: none; }
-  .dropdown-item:hover { color: var(--text); background: #1c1c1c; }
+  .dropdown-item:hover { color: var(--text); background: #0a0a0a; }
   .dropdown-item.selected { color: var(--text); }
   .hero { padding: 120px 36px 56px; }
-  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #fefefe; margin-bottom: 18px; }
-  .hero-title { font-weight: 700; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.03em; color: var(--text); margin-bottom: 14px; }
-  .hero-sub { font-size: 13px; font-weight: 300; color: #fefefe; letter-spacing: 0.06em; }
+  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: #ffffff; margin-bottom: 18px; }
+  .hero-title { font-weight: 600; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.04em; color: var(--text); margin-bottom: 14px; }
+  .hero-sub { font-size: 13px; font-weight: 600; color: #ffffff; letter-spacing: -0.01em; }
   #grid { padding: 0 var(--gap); display: flex; flex-direction: column; gap: var(--gap); }
   .grid-row { display: flex; gap: var(--gap); align-items: flex-start; }
   .tile { position: relative; overflow: hidden; cursor: pointer; background: var(--surface); flex-shrink: 0; }
@@ -93,17 +93,17 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   .tile-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.05) 45%, transparent 70%); opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; padding: 18px 20px; }
   .tile:hover .tile-overlay { opacity: 1; }
   .tile-info-left { flex: 1; min-width: 0; }
-  .tile-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 5px; }
+  .tile-cat { font-size: 9px; font-weight: 600; letter-spacing: -0.01em; color: rgba(255,255,255,0.45); margin-bottom: 5px; }
   .tile-title { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.25; }
-  .tile-role { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; letter-spacing: 0.06em; }
+  .tile-role { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; letter-spacing: -0.01em; }
   .tile-client { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.25; text-align: right; flex-shrink: 0; padding-left: 12px; max-width: 45%; }
-  .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.75); width: 46px; height: 46px; background: rgba(255,255,255,0.12); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; }
+  .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.75); width: 46px; height: 46px; background: rgba(255,255,255,0.12); backdrop-filter: blur(10px); border-radius: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; }
   .play-btn svg { margin-left: 3px; }
   .tile:hover .play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  .tile-ext-link { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s; z-index: 2; text-decoration: none; }
+  .tile-ext-link { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); border-radius: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s; z-index: 2; text-decoration: none; }
   .tile:hover .tile-ext-link { opacity: 1; }
   .tile-ext-link svg { width: 14px; height: 14px; }
-  .status-msg { padding: 80px 32px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fefefe; text-align: center; }
+  .status-msg { padding: 80px 32px; font-size: 11px; letter-spacing: -0.01em; color: #ffffff; text-align: center; }
   .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.94); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
   .modal-backdrop.open { opacity: 1; pointer-events: all; }
   .modal-inner { position: relative; transform: scale(0.97); transition: transform 0.25s; }
@@ -124,29 +124,29 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   #modalExtContent.visible { display: flex; }
   #modalExtThumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   #modalExtOverlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
-  #modalExtBtn { position: relative; z-index: 2; background: #fff; color: #000; padding: 14px 36px; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; transition: opacity 0.2s; font-family: inherit; }
-  .modal-counter { position: absolute; top: -38px; left: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; color: #fefefe; line-height: 22px; }
+  #modalExtBtn { position: relative; z-index: 2; background: #fff; color: #000; padding: 14px 36px; font-size: 11px; font-weight: 600; letter-spacing: -0.01em; text-decoration: none; transition: opacity 0.2s; font-family: inherit; }
+  .modal-counter { position: absolute; top: -38px; left: 0; font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: #ffffff; line-height: 22px; }
   .modal-meta { padding: 14px 0 0; }
-  .modal-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #fefefe; margin-bottom: 5px; }
-  .modal-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+  .modal-cat { font-size: 9px; font-weight: 600; letter-spacing: -0.01em; color: #ffffff; margin-bottom: 5px; }
+  .modal-title { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
   .about-section { display: none; padding: 130px 36px 80px; max-width: 580px; }
   .about-section.visible { display: block; }
-  .about-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 24px; line-height: 0.95; }
-  .about-section p { font-size: 15px; font-weight: 300; line-height: 1.85; color: #fefefe; margin-bottom: 16px; }
+  .about-section h2 { font-weight: 600; font-size: 60px; letter-spacing: -0.04em; margin-bottom: 24px; line-height: 0.95; }
+  .about-section p { font-size: 15px; font-weight: 600; line-height: 1.85; color: #ffffff; margin-bottom: 16px; }
   .contact-section { display: none; padding: 130px 36px 80px; max-width: 580px; }
   .contact-section.visible { display: block; }
-  .contact-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 8px; line-height: 0.95; }
-  .contact-lead { font-size: 13px; font-weight: 300; color: #fefefe; letter-spacing: 0.06em; margin-bottom: 36px; }
+  .contact-section h2 { font-weight: 600; font-size: 60px; letter-spacing: -0.04em; margin-bottom: 8px; line-height: 0.95; }
+  .contact-lead { font-size: 13px; font-weight: 600; color: #ffffff; letter-spacing: -0.01em; margin-bottom: 36px; }
   .c-form { display: flex; flex-direction: column; gap: 12px; }
-  .c-input, .c-select, .c-textarea { background: var(--surface); border: 1px solid var(--border); color: #fefefe; font-family: inherit; font-size: 13px; letter-spacing: 0.02em; padding: 13px 16px; width: 100%; outline: none; transition: border-color 0.2s; -webkit-appearance: none; border-radius: 0; }
-  .c-input::placeholder, .c-textarea::placeholder { color: #333; }
+  .c-input, .c-select, .c-textarea { background: var(--surface); border: 1px solid var(--border); color: #ffffff; font-family: inherit; font-size: 13px; letter-spacing: -0.01em; padding: 13px 16px; width: 100%; outline: none; transition: border-color 0.2s; -webkit-appearance: none; border-radius: 0; }
+  .c-input::placeholder, .c-textarea::placeholder { color: rgba(255,255,255,0.25); }
   .c-input:focus, .c-select:focus, .c-textarea:focus { border-color: #444; }
   .c-select { color: #555; cursor: pointer; }
   .c-textarea { resize: vertical; min-height: 120px; }
-  .c-submit { background: #fefefe; color: var(--black); border: none; padding: 14px 32px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: opacity 0.2s; margin-top: 8px; }
+  .c-submit { background: #ffffff; color: var(--black); border: none; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer; font-family: inherit; transition: opacity 0.2s; margin-top: 8px; }
   .c-submit:hover { opacity: 0.8; }
   .c-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .c-success { display: none; font-size: 13px; color: #fefefe; padding-top: 24px; letter-spacing: 0.04em; }
+  .c-success { display: none; font-size: 13px; color: #ffffff; padding-top: 24px; letter-spacing: -0.01em; }
   .c-success.show { display: block; }
   @media (max-width: 768px) {
     .grid-row { flex-wrap: wrap; }
@@ -164,7 +164,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   <a class="nav-logo" href="javascript:void(0)" onclick="showView('work')">Stone Rock Studios</a>
   <div class="nav-links">
     <div class="dropdown-wrapper" id="workDropdown">
-      <span class="nav-link active" id="workBtn">WORK <span class="dropdown-arrow">↓</span></span>
+      <span class="nav-link active" id="workBtn">Work <span class="dropdown-arrow">↓</span></span>
       <div class="dropdown-menu" id="dropdownMenu">
         <div class="dropdown-item selected" data-cat="all">All Work</div>
         <div class="dropdown-item" data-cat="moto">Moto</div>
@@ -177,8 +177,8 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
         <div class="dropdown-item" data-cat="music">Music Videos</div>
       </div>
     </div>
-    <a class="nav-link" href="about.html">ABOUT</a>
-    <a class="nav-link" href="shop.html">SHOP</a>
+    <a class="nav-link" href="about.html">About</a>
+    <a class="nav-link" href="shop.html">Shop</a>
     <a class="nav-cta" href="about.html">Get in Touch</a>
   </div>
 </nav>

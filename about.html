@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet">
 <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -47,49 +47,49 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
-    --black: #0a0a0a;
-    --surface: #111111;
-    --border: #1e1e1e;
-    --text: #f0f0f0;
-    --muted: #aaa;
+    --black: #000000;
+    --surface: #0d0d0d;
+    --border: rgba(255,255,255,0.08);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.45);
   }
-  html { background: var(--black); color: var(--text); font-family: "Helvetica Neue", Helvetica, 'Inter', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  html { background: var(--black); color: var(--text); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 32px; height: 52px;
-    background: rgba(10,10,10,0.96);
+    background: rgba(0,0,0,0.96);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
-  .nav-logo { font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); text-decoration: none; }
+  .nav-logo { font-weight: 600; font-size: 12px; letter-spacing: -0.01em; color: var(--text); text-decoration: none; }
   .nav-links { display: flex; gap: 40px; align-items: center; }
-  .nav-link { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .nav-link { font-size: 11px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); text-decoration: none; transition: color 0.2s; }
   .nav-link:hover, .nav-link.active { color: var(--text); }
-  .nav-cta { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); background: var(--text); padding: 7px 16px; text-decoration: none; transition: opacity 0.2s; }
+  .nav-cta { font-size: 11px; font-weight: 600; letter-spacing: -0.01em; color: var(--black); background: var(--text); padding: 7px 16px; text-decoration: none; transition: opacity 0.2s; }
   .nav-cta:hover { opacity: 0.8; }
 
   .about-section { padding: 130px 36px 60px; max-width: 580px; }
-  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
-  .about-section h2 { font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin-bottom: 24px; line-height: 0.95; }
-  .about-section p { font-size: 15px; font-weight: 300; line-height: 1.85; color: #fefefe; margin-bottom: 16px; }
+  .hero-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); margin-bottom: 18px; }
+  .about-section h2 { font-weight: 600; font-size: 60px; letter-spacing: -0.04em; margin-bottom: 24px; line-height: 0.95; }
+  .about-section p { font-size: 15px; font-weight: 600; line-height: 1.85; color: #ffffff; margin-bottom: 16px; }
 
   .shop-cta-wrap { padding: 0 36px 60px; }
-  .shop-cta { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); background: var(--text); padding: 13px 28px; text-decoration: none; transition: opacity 0.2s; }
+  .shop-cta { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: -0.01em; color: var(--black); background: var(--text); padding: 13px 28px; text-decoration: none; transition: opacity 0.2s; }
   .shop-cta:hover { opacity: 0.8; }
 
   .contact-wrap { padding: 0 36px 100px; max-width: 580px; }
-  .contact-label { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; border-top: 1px solid var(--border); padding-top: 48px; }
-  .contact-wrap h3 { font-weight: 700; font-size: 40px; letter-spacing: -0.02em; margin-bottom: 32px; line-height: 0.95; }
+  .contact-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); margin-bottom: 18px; border-top: 1px solid var(--border); padding-top: 48px; }
+  .contact-wrap h3 { font-weight: 600; font-size: 40px; letter-spacing: -0.03em; margin-bottom: 32px; line-height: 0.95; }
   .c-form { display: flex; flex-direction: column; gap: 12px; }
-  .c-input, .c-textarea { background: var(--surface); border: 1px solid var(--border); color: #fefefe; font-family: inherit; font-size: 13px; letter-spacing: 0.02em; padding: 13px 16px; width: 100%; outline: none; transition: border-color 0.2s; border-radius: 0; }
-  .c-input::placeholder, .c-textarea::placeholder { color: #444; }
-  .c-input:focus, .c-textarea:focus { border-color: #444; }
+  .c-input, .c-textarea { background: var(--surface); border: 1px solid var(--border); color: #ffffff; font-family: inherit; font-size: 13px; letter-spacing: -0.01em; padding: 13px 16px; width: 100%; outline: none; transition: border-color 0.2s; border-radius: 0; }
+  .c-input::placeholder, .c-textarea::placeholder { color: rgba(255,255,255,0.25); }
+  .c-input:focus, .c-textarea:focus { border-color: rgba(255,255,255,0.25); }
   .c-textarea { resize: vertical; min-height: 120px; }
-  .c-submit { background: #fefefe; color: var(--black); border: none; padding: 14px 32px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: opacity 0.2s; margin-top: 8px; }
+  .c-submit { background: #ffffff; color: var(--black); border: none; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer; font-family: inherit; transition: opacity 0.2s; margin-top: 8px; }
   .c-submit:hover { opacity: 0.8; }
   .c-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .c-success { display: none; font-size: 13px; color: #fefefe; padding-top: 24px; letter-spacing: 0.04em; }
+  .c-success { display: none; font-size: 13px; color: #ffffff; padding-top: 24px; letter-spacing: -0.01em; }
   .c-success.show { display: block; }
 
   @media (max-width: 768px) {
