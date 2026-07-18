@@ -48,6 +48,16 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-18 — Meta Pixel deduplication (shop.html)
+
+**What changed:** Removed `fbq('track', 'AddToCart')` and `fbq('track', 'InitiateCheckout')` browser pixel calls from `shop.html`. Shopify's Facebook & Instagram channel (now set to Maximum data sharing) fires both events server-side via CAPI with hashed customer identity data. The browser-side versions fired without any identity context, causing double-counting and 0.0/10 event match quality on those events. GA4 `add_to_cart` and `begin_checkout` events are unchanged.
+
+**What the browser pixel still fires:** `PageView` (shop page load) and `ViewContent` (product modal open) — Shopify doesn't fire these on the custom domain.
+
+**Watch out for:** If Shopify's Facebook & Instagram channel is ever disconnected or downgraded from Maximum, AddToCart and Purchase would go untracked on the Meta side entirely — there's no browser fallback for those events anymore.
+
+---
+
 ### 2026-07-18 — Mobile nav fix; favicon and OG image (index.html, about.html, shop.html, favicon.png, og-image.png)
 
 **What changed:** Three fixes in one commit.
