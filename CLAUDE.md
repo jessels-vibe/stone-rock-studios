@@ -48,6 +48,20 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-18 — Mobile nav fix; favicon and OG image (index.html, about.html, shop.html, favicon.png, og-image.png)
+
+**What changed:** Three fixes in one commit.
+
+**Mobile nav wrapping** — Nav logo changed from plain text "Stone Rock Studios" to `Stone Rock<br>Studios` with `line-height: 1.25`, giving the preferred 2-line layout. Previously the logo was wrapping to 3 lines because `.nav-links` gap was 40px and "Get in Touch" was present, leaving no horizontal room for the logo text. Mobile override now sets `.nav-links { gap: 16px }` and `.nav-cta { display: none }`.
+
+**Favicon + OG image** — Brand logo PNG copied to `favicon.png` and `og-image.png` in the project root. Both filenames were already referenced in `<head>` across all pages — they just didn't exist. `<link rel="apple-touch-icon">` added to all three pages for iOS home screen icon support.
+
+**Watch out for:**
+- "Get in Touch" is hidden on mobile; the contact form is still reachable by navigating to About and scrolling.
+- If more nav links are added in future, re-check mobile spacing — at 16px gap with 4 items it fits comfortably, but 5+ might squeeze the logo again.
+
+---
+
 ### 2026-07-18 — Fix "Don't see your role?" nudge left padding on mobile (shop.html)
 
 **What changed:** `.suggest-nudge` left padding changed from `var(--gap)` (3px) to `20px`. Same root cause as the featured-header fix — `var(--gap)` is the tile grid gap, not a content margin, so it left the nudge text nearly flush with the shop-main edge on mobile.
