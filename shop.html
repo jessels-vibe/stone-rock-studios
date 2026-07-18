@@ -1105,14 +1105,6 @@ document.getElementById('atcBtn').onclick = async () => {
     refreshCartUI(true);
     const atcPrice    = parseFloat(v.price?.amount || activeProd.priceRange.minVariantPrice.amount);
     const atcCurrency = v.price?.currencyCode || activeProd.priceRange.minVariantPrice.currencyCode;
-    fbq('track', 'AddToCart', {
-      content_ids: [v.id],
-      content_name: activeProd.title,
-      content_type: 'product',
-      value: atcPrice,
-      currency: atcCurrency,
-      num_items: qty
-    });
     gtag('event', 'add_to_cart', {
       currency: atcCurrency,
       value: atcPrice * qty,
@@ -1294,11 +1286,6 @@ document.getElementById('checkoutLink').addEventListener('click', () => {
     currency: cost?.currencyCode || 'USD',
     value: parseFloat(cost?.amount || 0),
     items
-  });
-  fbq('track', 'InitiateCheckout', {
-    value: parseFloat(cost?.amount || 0),
-    currency: cost?.currencyCode || 'USD',
-    num_items: cart.lines.edges.reduce((s, { node }) => s + node.quantity, 0)
   });
 });
 
