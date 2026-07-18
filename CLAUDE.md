@@ -48,6 +48,14 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-18 — Fix "Don't see your role?" nudge left padding on mobile (shop.html)
+
+**What changed:** `.suggest-nudge` left padding changed from `var(--gap)` (3px) to `20px`. Same root cause as the featured-header fix — `var(--gap)` is the tile grid gap, not a content margin, so it left the nudge text nearly flush with the shop-main edge on mobile.
+
+**Watch out for:** Any element using `padding: 0 var(--gap)` as content left-padding will have the same misalignment on mobile. Content margins should use `20px` px values, not `var(--gap)`.
+
+---
+
 ### 2026-07-14 — Brand guidelines applied (index.html, about.html, shop.html)
 
 **What changed:** Implemented official Stone Rock Studios brand guidelines across all three public-facing pages.
