@@ -14,6 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stone Rock Studios</title>
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet">
@@ -64,7 +65,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
-  .nav-logo { font-weight: 600; font-size: 12px; letter-spacing: -0.01em; color: var(--text); text-decoration: none; }
+  .nav-logo { font-weight: 600; font-size: 12px; letter-spacing: -0.01em; line-height: 1.25; color: var(--text); text-decoration: none; }
   .nav-links { display: flex; gap: 40px; align-items: center; }
   .nav-link { font-size: 11px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
   .nav-link:hover, .nav-link.active { color: var(--text); }
@@ -153,6 +154,8 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
     .tile { width: 100% !important; }
     .tile.portrait { width: calc(50% - var(--gap) / 2) !important; }
     nav { padding: 0 20px; }
+    .nav-links { gap: 16px; }
+    .nav-cta { display: none; }
     .hero { padding: 90px 20px 48px; }
     .contact-section { padding: 90px 20px 60px; }
     .contact-section h2 { font-size: 42px; }
@@ -161,7 +164,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
 </head>
 <body>
 <nav>
-  <a class="nav-logo" href="javascript:void(0)" onclick="showView('work')">Stone Rock Studios</a>
+  <a class="nav-logo" href="javascript:void(0)" onclick="showView('work')">Stone Rock<br>Studios</a>
   <div class="nav-links">
     <div class="dropdown-wrapper" id="workDropdown">
       <span class="nav-link active" id="workBtn">Work <span class="dropdown-arrow">↓</span></span>

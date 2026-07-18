@@ -14,6 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shop — Stone Rock Studios</title>
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet">
@@ -56,7 +57,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
 
   /* NAV */
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 52px; background: rgba(0,0,0,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
-  .nav-logo { font-weight: 600; font-size: 12px; letter-spacing: -0.01em; color: var(--text); text-decoration: none; }
+  .nav-logo { font-weight: 600; font-size: 12px; letter-spacing: -0.01em; line-height: 1.25; color: var(--text); text-decoration: none; }
   .nav-links { display: flex; gap: 40px; align-items: center; }
   .nav-link { font-size: 11px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); text-decoration: none; transition: color 0.2s; }
   .nav-link:hover, .nav-link.active { color: var(--text); }
@@ -270,6 +271,8 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
   @media (max-width: 1024px) { .shop-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 768px) {
     nav { padding: 0 20px; }
+    .nav-links { gap: 16px; }
+    .nav-cta { display: none; }
     .hero { padding: 72px 20px 24px; }
     .hero-title { font-size: clamp(28px, 8vw, 40px); }
     .shop-grid { grid-template-columns: repeat(2, 1fr); }
@@ -294,7 +297,7 @@ src="https://www.facebook.com/tr?id=1706510330484603&ev=PageView&noscript=1"
 <body>
 
 <nav>
-  <a class="nav-logo" href="index.html">Stone Rock Studios</a>
+  <a class="nav-logo" href="index.html">Stone Rock<br>Studios</a>
   <div class="nav-links">
     <a class="nav-link" href="index.html">Work</a>
     <a class="nav-link" href="about.html">About</a>
