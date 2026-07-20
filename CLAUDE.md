@@ -48,6 +48,16 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-20 — Unify browser pixel to Shopify CAPI pixel (all pages)
+
+**What changed:** Replaced pixel ID `1706510330484603` ("Stone Rock Website") with `1275243804483057` ("Stone Rock Studios's pixel") in all 5 HTML files: shop.html, index.html, about.html, seed.html, admin.html.
+
+**Why:** The ad campaign was updated to optimize against pixel `1275243804483057` (the Shopify-connected pixel that receives CAPI Purchase events). The old browser pixel (`1706510330484603`) was a separate dataset — PageView and ViewContent events from product browsing were invisible to the campaign. Now all browser events (PageView, ViewContent, Lead) flow into the same pixel as Shopify's CAPI events, giving the campaign full funnel visibility.
+
+**Watch out for:** The old pixel `1706510330484603` ("Stone Rock Website") still exists in Meta Business Manager but is now effectively unused. Do not reference it for any new ad campaigns. All pixel work going forward uses `1275243804483057` only.
+
+---
+
 ### 2026-07-18 — Meta Pixel deduplication (shop.html)
 
 **What changed:** Removed `fbq('track', 'AddToCart')` and `fbq('track', 'InitiateCheckout')` browser pixel calls from `shop.html`. Shopify's Facebook & Instagram channel (now set to Maximum data sharing) fires both events server-side via CAPI with hashed customer identity data. The browser-side versions fired without any identity context, causing double-counting and 0.0/10 event match quality on those events. GA4 `add_to_cart` and `begin_checkout` events are unchanged.
