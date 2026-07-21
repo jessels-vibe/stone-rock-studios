@@ -292,6 +292,10 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
     .shop-search { font-size: 16px; } /* prevent iOS zoom on input focus */
   }
   @media (max-width: 480px) { .shop-grid { grid-template-columns: repeat(2, 1fr); } }
+  footer { padding: 40px 36px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
+  .footer-logo { width: 72px; height: auto; display: block; }
+  .footer-year { font-size: 11px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); }
+  @media (max-width: 768px) { footer { padding: 28px 20px; } .footer-logo { width: 56px; } }
 </style>
 </head>
 <body>
@@ -1326,5 +1330,9 @@ document.getElementById('zeroSuggestForm').addEventListener('submit', async e =>
   loadCartFromStorage();
 })();
 </script>
+<footer>
+  <img src="logo.png" alt="Stone Rock Studios" class="footer-logo">
+  <span class="footer-year">2026</span>
+</footer>
 </body>
 </html>
