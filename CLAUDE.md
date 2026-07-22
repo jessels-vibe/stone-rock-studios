@@ -48,6 +48,20 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-22 — Sync blocklist + automatic hidden-video ordering (admin.html)
+
+**Sync blocklist:**
+When a synced YouTube video is deleted from the admin, its videoId is written to `db.ref('syncBlocklist')` in Firebase. On load, the blocklist is read and merged into the `existing` set that sync checks — so deleted (or manually replaced) videos never get re-added by a future sync. Applies to single delete and bulk delete. Manual entries (`isManual: true` / `ext_*` IDs) are excluded from the blocklist since they don't live in YouTube playlists.
+
+**Automatic hidden-to-bottom ordering:**
+Hidden videos now automatically sink below all visible videos whenever visibility changes — single toggle, bulk hide/show, or drag-and-drop. `sinkHiddenToBottom()` does a stable sort: all visible videos first (preserving their relative order), then all hidden (preserving their relative order), then rewrites `order` indices. This means you can never accidentally leave a hidden video sitting above a visible one.
+
+**Watch out for:**
+- Blocklist entries in Firebase (`syncBlocklist/`) are permanent — if you ever want a deleted video to be re-synced, you'd need to remove it from that node manually in Firebase console.
+- Showing a previously hidden video places it at the end of the visible section (bottom of visible, top of hidden). Drag it up to the desired position after showing.
+
+---
+
 ### 2026-07-20 — Unify browser pixel to Shopify CAPI pixel (all pages)
 
 **What changed:** Replaced pixel ID `1706510330484603` ("Stone Rock Website") with `1275243804483057` ("Stone Rock Studios's pixel") in all 5 HTML files: shop.html, index.html, about.html, seed.html, admin.html.

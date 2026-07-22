@@ -589,6 +589,7 @@ let dragSrc = null;
 let pendingAdd = null;
 let selectedIds = new Set();
 let dupeIds = new Set();
+let syncBlocklist = new Set();
 
 // ── AUTH ──
 auth.onAuthStateChanged(user => {
@@ -626,7 +627,8 @@ function signOut() {
 async function loadVideos() {
   setStatus('Loading...');
   try {
-    const snap = await db.ref('videos').get();
+    const [snap, blockSnap] = await Promise.all([db.ref('videos').get(), db.ref('syncBlocklist').get()]);
+    syncBlocklist = new Set(Object.keys(blockSnap.val() || {}));
     const data = snap.val();
     videos = data ? Object.values(data).sort((a,b) => a.order - b.order) : [];
     // Ensure all videos have an aspectRatio field
@@ -719,7 +721,7 @@ async function syncFromYouTube() {
   const btn = document.getElementById('syncBtn');
   btn.textContent = 'Syncing...'; btn.disabled = true; setStatus('Fetching...');
   try {
-    const existing = new Set(videos.map(v => v.videoId));
+    const existing = new Set([...videos.map(v => v.videoId), ...syncBlocklist]);
     const newVideos = [];
     for (const p of PLAYLISTS) {
       for (const pid of p.ids) {
@@ -896,6 +898,7 @@ function renderList() {
 
     row.addEventListener('dragend', () => {
       document.querySelectorAll('.video-row').forEach(r => r.classList.remove('dragging','drag-over'));
+      sinkHiddenToBottom();
       renderAll();
     });
 
@@ -1020,14 +1023,20 @@ function toggleField(videoId, field, el) {
   markDirty(); renderStats(); renderSidebarCounts();
 }
 
+function sinkHiddenToBottom() {
+  const visible = videos.filter(v => v.visible);
+  const hidden = videos.filter(v => !v.visible);
+  videos.length = 0;
+  videos.push(...visible, ...hidden);
+  videos.forEach((v, i) => v.order = i);
+}
+
 function toggleVisible(videoId, el) {
   const v = videos.find(x => x.videoId === videoId);
   if (!v) return;
   v.visible = !v.visible;
-  el.className = `toggle-pill ${v.visible ? 'toggle-visible on' : 'toggle-hidden-pill on'}`;
-  el.textContent = v.visible ? '● Visible' : '✕ Hidden';
-  el.closest('.video-row').classList.toggle('is-hidden', !v.visible);
-  markDirty(); renderStats(); renderSidebarCounts();
+  sinkHiddenToBottom();
+  markDirty(); renderAll();
 }
 
 function deleteVideo(videoId) {
@@ -1035,6 +1044,10 @@ function deleteVideo(videoId) {
   if (!v || !confirm(`Delete "${v.title}"?`)) return;
   videos = videos.filter(x => x.videoId !== videoId);
   selectedIds.delete(videoId);
+  if (!v.isManual && /^[A-Za-z0-9_-]{11}$/.test(videoId)) {
+    syncBlocklist.add(videoId);
+    db.ref('syncBlocklist/' + videoId).set(true);
+  }
   markDirty(); detectDuplicates(); renderAll();
 }
 
@@ -1081,6 +1094,7 @@ function bulkSetFeatured(val) {
 
 function bulkSetVisible(val) {
   selectedIds.forEach(id => { const v = videos.find(x => x.videoId === id); if (v) v.visible = val; });
+  sinkHiddenToBottom();
   markDirty(); renderAll();
 }
 
@@ -1099,6 +1113,14 @@ function bulkSetCategory(cat) {
 
 function bulkDelete() {
   if (!selectedIds.size || !confirm(`Delete ${selectedIds.size} selected video${selectedIds.size>1?'s':''}?`)) return;
+  const updates = {};
+  videos.forEach(v => {
+    if (selectedIds.has(v.videoId) && !v.isManual && /^[A-Za-z0-9_-]{11}$/.test(v.videoId)) {
+      syncBlocklist.add(v.videoId);
+      updates['syncBlocklist/' + v.videoId] = true;
+    }
+  });
+  if (Object.keys(updates).length) db.ref().update(updates);
   videos = videos.filter(v => !selectedIds.has(v.videoId));
   selectedIds.clear();
   markDirty(); detectDuplicates(); renderAll();
