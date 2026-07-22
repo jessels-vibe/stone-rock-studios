@@ -627,8 +627,10 @@ function signOut() {
 async function loadVideos() {
   setStatus('Loading...');
   try {
-    const [snap, blockSnap] = await Promise.all([db.ref('videos').get(), db.ref('syncBlocklist').get()]);
-    syncBlocklist = new Set(Object.keys(blockSnap.val() || {}));
+    const snap = await db.ref('videos').get();
+    db.ref('syncBlocklist').get().then(blockSnap => {
+      syncBlocklist = new Set(Object.keys(blockSnap.val() || {}));
+    }).catch(() => {});
     const data = snap.val();
     videos = data ? Object.values(data).sort((a,b) => a.order - b.order) : [];
     // Ensure all videos have an aspectRatio field
