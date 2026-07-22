@@ -1,1 +1,1 @@
-this is for accessing only stonrockstudios.xyz website
+this is for accessing only stonerockstudios.xyz website
