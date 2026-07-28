@@ -48,6 +48,27 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-07-28 — Traffic Analytics panel (admin.html)
+
+**What changed:** Added a "Traffic" section to the admin sidebar that shows a full GA4 analytics dashboard — no separate tab needed.
+
+**Features:**
+- Sessions by day bar chart (spikes auto-highlighted white at >2.5× daily average)
+- Traffic sources table: channel group + source/medium breakdown with percentage share bars
+- Landing pages table: top 25 landing pages by session count, with page name and user counts
+- Summary stats: Sessions, Users, New Users, Returning, Engaged Sessions
+- Date range toggle: 7d / 30d / 90d
+- Refresh button + timestamp
+
+**Setup (one-time):** Requires a GA4 Property ID (numeric, from GA4 Admin → Property details) and an OAuth 2.0 Client ID from Google Cloud Console (APIs & Services → Credentials, Web Application type, with `https://stonerockstudios.xyz` as an authorized JavaScript origin). Credentials are saved to `localStorage` — only needs to be entered once per browser. Uses Google Identity Services for the OAuth popup; the GA4 Data API token lasts ~1 hour (reconnect button appears when expired).
+
+**Watch out for:**
+- The OAuth client must have the Google Analytics Data API enabled in Google Cloud Console (APIs & Services → Library → "Google Analytics Data API").
+- Token is in-memory only (no persistence). Refreshing the admin page requires re-clicking "Connect" (the credentials auto-fill but the token must be re-fetched). This is by design — storing OAuth tokens in localStorage is a security anti-pattern.
+- `sessionDefaultChannelGroup` dimension in GA4 uses Google's channel grouping rules (Organic Search, Direct, Referral, etc.) — not custom channel groups.
+
+---
+
 ### 2026-07-22 — Sync blocklist + automatic hidden-video ordering (admin.html)
 
 **Sync blocklist:**
