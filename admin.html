@@ -85,7 +85,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .sidebar-item.active .sidebar-count { color: var(--text); }
 
   /* MAIN */
-  .main { flex: 1; overflow-y: auto; padding: 24px 28px; }
+  .main { flex: 1; overflow-y: auto; padding: 24px 28px; position: relative; }
   .main-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
   .main-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
   .main-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
@@ -283,6 +283,10 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .camp-prize { margin-top: 3px; font-size: 11px; font-weight: 600; color: var(--muted); }
   .camp-deadline { margin-top: 8px; font-size: 10px; font-weight: 600; color: #333; }
   .camp-empty { text-align: center; padding: 60px 32px; font-size: 11px; color: var(--muted); line-height: 1.7; }
+
+  /* ADS PANEL */
+  #adsPanel { display: none; flex-direction: column; position: absolute; inset: 0; }
+  #adsPanel iframe { flex: 1; border: none; width: 100%; height: 100%; display: block; }
 </style>
 </head>
 <body>
@@ -349,6 +353,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
       <div class="sidebar-label">Analytics</div>
       <div class="sidebar-item" data-filter="traffic" onclick="filterSidebar(this)">↗ Traffic</div>
       <div class="sidebar-item" data-filter="campaigns" onclick="filterSidebar(this)">◈ Campaigns <span class="sidebar-count" id="cnt-campaigns"></span></div>
+      <div class="sidebar-item" data-filter="ads" onclick="filterSidebar(this)">$ Ads</div>
     </div>
 
     <div class="main">
@@ -528,6 +533,10 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
           </div>
         </div>
         <div id="campGrid" class="camp-grid"></div>
+      </div>
+
+      <div id="adsPanel">
+        <iframe id="adsFrame" src="http://localhost:5173" title="Ad Dashboard"></iframe>
       </div>
     </div>
   </div>
@@ -1273,6 +1282,7 @@ function filterSidebar(el) {
   currentFilter = el.dataset.filter;
   if (currentFilter === 'traffic') { showTrafficPanel(); return; }
   if (currentFilter === 'campaigns') { showCampaignsPanel(); return; }
+  if (currentFilter === 'ads') { showAdsPanel(); return; }
   showVideoPanel();
   document.getElementById('mainTitle').textContent = el.textContent.replace(/\d+/g,'').trim();
   renderList();
@@ -1472,16 +1482,21 @@ let ga4PropertyId = localStorage.getItem(GA4_PROP_KEY) || '';
 let ga4ClientId = localStorage.getItem(GA4_CLIENT_KEY) || '';
 let trafficDateRange = '30';
 
+function hidePanels() {
+  ['videoPanel','trafficPanel','campaignsPanel','adsPanel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
 function showVideoPanel() {
+  hidePanels();
   document.getElementById('videoPanel').style.display = '';
-  document.getElementById('trafficPanel').style.display = 'none';
-  document.getElementById('campaignsPanel').style.display = 'none';
 }
 
 function showTrafficPanel() {
-  document.getElementById('videoPanel').style.display = 'none';
+  hidePanels();
   document.getElementById('trafficPanel').style.display = '';
-  document.getElementById('campaignsPanel').style.display = 'none';
   const propInput = document.getElementById('ga4PropertyInput');
   const clientInput = document.getElementById('ga4ClientIdInput');
   if (propInput && ga4PropertyId) propInput.value = ga4PropertyId;
@@ -1658,10 +1673,14 @@ function renderSourcesTable(rows, total) {
 const SPEC_AD_URL = 'https://jessels-vibe.github.io/spec-ad-tracker/data.json';
 
 function showCampaignsPanel() {
-  document.getElementById('videoPanel').style.display = 'none';
-  document.getElementById('trafficPanel').style.display = 'none';
+  hidePanels();
   document.getElementById('campaignsPanel').style.display = '';
   loadCampaigns();
+}
+
+function showAdsPanel() {
+  hidePanels();
+  document.getElementById('adsPanel').style.display = 'flex';
 }
 
 async function loadCampaigns() {
