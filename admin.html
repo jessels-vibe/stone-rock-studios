@@ -270,6 +270,19 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .t-page { font-family: monospace; font-size: 10px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pct-bar-wrap { display: inline-block; width: 36px; height: 3px; background: var(--surface2); border: 1px solid var(--border); margin-right: 4px; vertical-align: middle; }
   .pct-bar { height: 100%; background: var(--text); }
+
+  /* CAMPAIGNS PANEL */
+  .camp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 3px; }
+  .camp-card { display: block; text-decoration: none; color: var(--text); background: var(--surface); border: 1px solid var(--border); transition: border-color 0.12s; }
+  .camp-card:hover { border-color: #444; }
+  .camp-logo { background: #fff; height: 100px; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .camp-logo img { max-height: 52px; max-width: 100%; object-fit: contain; display: block; }
+  .camp-logo-fallback { width: 52px; height: 52px; background: #000; display: none; align-items: center; justify-content: center; font-size: 22px; font-weight: 600; color: #fff; }
+  .camp-body { padding: 12px 16px 16px; }
+  .camp-company { font-size: 12px; font-weight: 600; letter-spacing: -0.01em; }
+  .camp-prize { margin-top: 3px; font-size: 11px; font-weight: 600; color: var(--muted); }
+  .camp-deadline { margin-top: 8px; font-size: 10px; font-weight: 600; color: #333; }
+  .camp-empty { text-align: center; padding: 60px 32px; font-size: 11px; color: var(--muted); line-height: 1.7; }
 </style>
 </head>
 <body>
@@ -335,6 +348,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
       <div class="sidebar-item" data-filter="dupes" onclick="filterSidebar(this)">⚠ Duplicates <span class="sidebar-count" id="cnt-dupes">0</span></div>
       <div class="sidebar-label">Analytics</div>
       <div class="sidebar-item" data-filter="traffic" onclick="filterSidebar(this)">↗ Traffic</div>
+      <div class="sidebar-item" data-filter="campaigns" onclick="filterSidebar(this)">◈ Campaigns <span class="sidebar-count" id="cnt-campaigns"></span></div>
     </div>
 
     <div class="main">
@@ -500,6 +514,20 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
             </div>
           </div>
         </div>
+      </div>
+
+      <div id="campaignsPanel" style="display:none">
+        <div class="main-header" style="margin-bottom:16px">
+          <div>
+            <div class="main-title">Active Competitions</div>
+            <div class="main-sub" id="campStatus"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-ghost btn-sm" onclick="loadCampaigns()">↺ Refresh</button>
+            <button class="btn btn-ghost btn-sm" onclick="window.open('https://jessels-vibe.github.io/spec-ad-tracker/')">↗ Full Site</button>
+          </div>
+        </div>
+        <div id="campGrid" class="camp-grid"></div>
       </div>
     </div>
   </div>
@@ -1244,6 +1272,7 @@ function filterSidebar(el) {
   el.classList.add('active');
   currentFilter = el.dataset.filter;
   if (currentFilter === 'traffic') { showTrafficPanel(); return; }
+  if (currentFilter === 'campaigns') { showCampaignsPanel(); return; }
   showVideoPanel();
   document.getElementById('mainTitle').textContent = el.textContent.replace(/\d+/g,'').trim();
   renderList();
@@ -1446,11 +1475,13 @@ let trafficDateRange = '30';
 function showVideoPanel() {
   document.getElementById('videoPanel').style.display = '';
   document.getElementById('trafficPanel').style.display = 'none';
+  document.getElementById('campaignsPanel').style.display = 'none';
 }
 
 function showTrafficPanel() {
   document.getElementById('videoPanel').style.display = 'none';
   document.getElementById('trafficPanel').style.display = '';
+  document.getElementById('campaignsPanel').style.display = 'none';
   const propInput = document.getElementById('ga4PropertyInput');
   const clientInput = document.getElementById('ga4ClientIdInput');
   if (propInput && ga4PropertyId) propInput.value = ga4PropertyId;
@@ -1621,6 +1652,73 @@ function renderSourcesTable(rows, total) {
     const pct = total > 0 ? ((s/total)*100).toFixed(1) : '0.0';
     return `<tr><td class="t-cell t-channel">${channel}</td><td class="t-cell t-source">${sm}</td><td class="t-cell t-num">${s.toLocaleString()}</td><td class="t-cell t-pct"><span class="pct-bar-wrap"><span class="pct-bar" style="width:${pct}%"></span></span>${pct}%</td></tr>`;
   }).join('');
+}
+
+// ── CAMPAIGNS / SPEC-AD TRACKER ──
+const SPEC_AD_URL = 'https://jessels-vibe.github.io/spec-ad-tracker/data.json';
+
+function showCampaignsPanel() {
+  document.getElementById('videoPanel').style.display = 'none';
+  document.getElementById('trafficPanel').style.display = 'none';
+  document.getElementById('campaignsPanel').style.display = '';
+  loadCampaigns();
+}
+
+async function loadCampaigns() {
+  setCampStatus('Loading...');
+  try {
+    const r = await fetch(SPEC_AD_URL + '?_=' + Date.now());
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    data.sort((a, b) => (b.date_found || '').localeCompare(a.date_found || ''));
+    const cnt = document.getElementById('cnt-campaigns');
+    if (cnt) cnt.textContent = data.length || '';
+    if (!data.length) {
+      document.getElementById('campGrid').innerHTML = '<div class="camp-empty">No active competitions right now.<br>Scraper runs daily at 1pm UTC.</div>';
+      setCampStatus('No competitions found');
+      return;
+    }
+    document.getElementById('campGrid').innerHTML = data.map(campCardHTML).join('');
+    setCampStatus(`${data.length} active · Updated ${data[0].date_found || ''}`);
+  } catch(e) {
+    setCampStatus('Error: ' + e.message);
+    document.getElementById('campGrid').innerHTML = '<div class="camp-empty">Failed to load competition data.</div>';
+  }
+}
+
+function campCardHTML(entry) {
+  const logoSrc = `https://logo.clearbit.com/${entry.logo_url}`;
+  const initial = (entry.company || '?')[0].toUpperCase();
+  const dl = entry.deadline ? formatCampDeadline(entry.deadline) : '';
+  return `<a class="camp-card" href="${entry.source_url}" target="_blank" rel="noopener noreferrer">
+    <div class="camp-logo">
+      <img src="${logoSrc}" alt="${entry.company}" onerror="campLogoFallback(this)">
+      <div class="camp-logo-fallback">${initial}</div>
+    </div>
+    <div class="camp-body">
+      <div class="camp-company">${entry.company}</div>
+      <div class="camp-prize">${entry.prize}</div>
+      ${dl ? `<div class="camp-deadline">${dl}</div>` : ''}
+    </div>
+  </a>`;
+}
+
+function campLogoFallback(img) {
+  img.style.display = 'none';
+  img.nextElementSibling.style.display = 'flex';
+}
+
+function formatCampDeadline(dl) {
+  try {
+    const [y, m, d] = dl.split('-');
+    const date = new Date(Number(y), Number(m) - 1, Number(d));
+    return 'Deadline: ' + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch { return 'Deadline: ' + dl; }
+}
+
+function setCampStatus(msg) {
+  const el = document.getElementById('campStatus');
+  if (el) el.textContent = msg;
 }
 
 function renderLandingTable(rows, total) {
