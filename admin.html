@@ -244,6 +244,32 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+
+  /* TRAFFIC ANALYTICS PANEL */
+  .ga4-setup-box { background: var(--surface2); border: 1px solid var(--border); padding: 28px; max-width: 500px; }
+  .ga4-setup-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .ga4-setup-desc { font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .ga4-help-text { font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .ga4-code { background: #1a1a1a; padding: 1px 5px; font-family: monospace; font-size: 10px; }
+  .date-range-tabs { display: flex; background: var(--surface); border: 1px solid var(--border); }
+  .date-tab { padding: 5px 14px; font-size: 10px; font-weight: 600; background: transparent; border: none; color: var(--muted); cursor: pointer; font-family: inherit; transition: all 0.12s; }
+  .date-tab:hover { color: var(--text); }
+  .date-tab.active { background: var(--surface2); color: var(--text); }
+  .traffic-section { margin-bottom: 12px; background: var(--surface); border: 1px solid var(--border); padding: 16px 20px; }
+  .traffic-section-title { font-size: 9px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .chart-container { width: 100%; min-height: 80px; }
+  .chart-empty { font-size: 11px; color: var(--muted); text-align: center; padding: 24px; }
+  .traffic-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+  .traffic-table { border-collapse: collapse; width: 100%; }
+  .t-head { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 0 8px 8px 0; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .t-head.t-num, .t-cell.t-num { text-align: right; padding-right: 0; }
+  .t-head.t-pct, .t-cell.t-pct { text-align: right; padding-right: 0; white-space: nowrap; }
+  .t-cell { padding: 7px 8px 7px 0; border-bottom: 1px solid #141414; color: var(--text); font-size: 11px; vertical-align: middle; }
+  .t-channel { font-weight: 600; }
+  .t-source { color: var(--muted); font-size: 10px; }
+  .t-page { font-family: monospace; font-size: 10px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pct-bar-wrap { display: inline-block; width: 36px; height: 3px; background: var(--surface2); border: 1px solid var(--border); margin-right: 4px; vertical-align: middle; }
+  .pct-bar { height: 100%; background: var(--text); }
 </style>
 </head>
 <body>
@@ -307,9 +333,12 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
       <div class="sidebar-item" data-filter="hidden" onclick="filterSidebar(this)">Hidden <span class="sidebar-count" id="cnt-hidden">0</span></div>
       <div class="sidebar-item" data-filter="portrait" onclick="filterSidebar(this)">↕ Vertical <span class="sidebar-count" id="cnt-portrait">0</span></div>
       <div class="sidebar-item" data-filter="dupes" onclick="filterSidebar(this)">⚠ Duplicates <span class="sidebar-count" id="cnt-dupes">0</span></div>
+      <div class="sidebar-label">Analytics</div>
+      <div class="sidebar-item" data-filter="traffic" onclick="filterSidebar(this)">↗ Traffic</div>
     </div>
 
     <div class="main">
+      <div id="videoPanel">
       <!-- SAVE BAR -->
       <div class="save-bar" id="saveBar">
         <div class="save-bar-text"><span class="dot"></span> Unsaved changes</div>
@@ -391,6 +420,87 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
       </div>
 
       <div class="video-list" id="videoList"></div>
+      </div><!-- #videoPanel -->
+
+      <div id="trafficPanel" style="display:none">
+        <div id="ga4SetupPanel">
+          <div class="main-header" style="margin-bottom:24px">
+            <div>
+              <div class="main-title">Traffic Analytics</div>
+              <div class="main-sub">Connect Google Analytics 4 to view site traffic data</div>
+            </div>
+          </div>
+          <div class="ga4-setup-box">
+            <div class="ga4-setup-title">Connect Google Analytics 4</div>
+            <div class="ga4-setup-desc">Enter your GA4 Property ID and an OAuth 2.0 Client ID. One-time setup — credentials are saved in your browser.</div>
+            <div class="form-group" style="margin-top:20px">
+              <label class="form-label">GA4 Property ID</label>
+              <input class="form-input" id="ga4PropertyInput" type="text" placeholder="e.g. 123456789">
+              <div class="ga4-help-text">Find in GA4 → Admin → Property → Property details (the numeric ID, not the G- measurement ID)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">OAuth 2.0 Client ID</label>
+              <input class="form-input" id="ga4ClientIdInput" type="text" placeholder="e.g. 123456789-abc.apps.googleusercontent.com">
+              <div class="ga4-help-text">Create at console.cloud.google.com → APIs &amp; Services → Credentials → OAuth 2.0 Client IDs (Web Application type). Add <code class="ga4-code">https://stonerockstudios.xyz</code> as an authorized JavaScript origin, and enable the Google Analytics Data API in the Library.</div>
+            </div>
+            <button class="btn btn-primary" onclick="connectGA4()" style="margin-top:8px">Connect Google Analytics</button>
+          </div>
+        </div>
+        <div id="ga4DataPanel" style="display:none">
+          <div class="main-header" style="margin-bottom:16px">
+            <div>
+              <div class="main-title">Traffic Analytics</div>
+              <div class="main-sub" id="trafficStatus"></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="date-range-tabs">
+                <button class="date-tab active" onclick="setDateRange('7',this)">7d</button>
+                <button class="date-tab" onclick="setDateRange('30',this)">30d</button>
+                <button class="date-tab" onclick="setDateRange('90',this)">90d</button>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="loadTrafficData()">↺ Refresh</button>
+              <button class="btn btn-ghost btn-sm" onclick="disconnectGA4()" style="color:var(--muted)">Disconnect</button>
+            </div>
+          </div>
+          <div class="stats-bar" style="margin-bottom:16px">
+            <div class="stat"><div class="stat-num" id="tStatSessions">—</div><div class="stat-label">Sessions</div></div>
+            <div class="stat"><div class="stat-num" id="tStatUsers">—</div><div class="stat-label">Users</div></div>
+            <div class="stat"><div class="stat-num" style="color:var(--green)" id="tStatNew">—</div><div class="stat-label">New Users</div></div>
+            <div class="stat"><div class="stat-num" style="color:var(--blue)" id="tStatReturning">—</div><div class="stat-label">Returning</div></div>
+            <div class="stat"><div class="stat-num" style="color:var(--yellow)" id="tStatEngaged">—</div><div class="stat-label">Engaged Sessions</div></div>
+          </div>
+          <div class="traffic-section">
+            <div class="traffic-section-title">Sessions by day</div>
+            <div id="sessionsChartContainer" class="chart-container"></div>
+          </div>
+          <div class="traffic-tables">
+            <div class="traffic-section">
+              <div class="traffic-section-title">Traffic sources</div>
+              <table class="traffic-table">
+                <thead><tr>
+                  <th class="t-head">Channel</th>
+                  <th class="t-head">Source / Medium</th>
+                  <th class="t-head t-num">Sessions</th>
+                  <th class="t-head t-pct">Share</th>
+                </tr></thead>
+                <tbody id="sourcesTableBody"></tbody>
+              </table>
+            </div>
+            <div class="traffic-section">
+              <div class="traffic-section-title">Landing pages</div>
+              <table class="traffic-table">
+                <thead><tr>
+                  <th class="t-head">Page</th>
+                  <th class="t-head t-num">Sessions</th>
+                  <th class="t-head t-num">Users</th>
+                  <th class="t-head t-pct">Share</th>
+                </tr></thead>
+                <tbody id="landingPagesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1133,6 +1243,8 @@ function filterSidebar(el) {
   document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
   currentFilter = el.dataset.filter;
+  if (currentFilter === 'traffic') { showTrafficPanel(); return; }
+  showVideoPanel();
   document.getElementById('mainTitle').textContent = el.textContent.replace(/\d+/g,'').trim();
   renderList();
 }
@@ -1322,6 +1434,207 @@ document.addEventListener('keydown', e => {
     if (dirty) saveChanges();
   }
 });
+
+// ── GA4 TRAFFIC ANALYTICS ──
+const GA4_PROP_KEY = 'srs_ga4_property_id';
+const GA4_CLIENT_KEY = 'srs_ga4_client_id';
+let gaAccessToken = null;
+let ga4PropertyId = localStorage.getItem(GA4_PROP_KEY) || '';
+let ga4ClientId = localStorage.getItem(GA4_CLIENT_KEY) || '';
+let trafficDateRange = '30';
+
+function showVideoPanel() {
+  document.getElementById('videoPanel').style.display = '';
+  document.getElementById('trafficPanel').style.display = 'none';
+}
+
+function showTrafficPanel() {
+  document.getElementById('videoPanel').style.display = 'none';
+  document.getElementById('trafficPanel').style.display = '';
+  const propInput = document.getElementById('ga4PropertyInput');
+  const clientInput = document.getElementById('ga4ClientIdInput');
+  if (propInput && ga4PropertyId) propInput.value = ga4PropertyId;
+  if (clientInput && ga4ClientId) clientInput.value = ga4ClientId;
+  if (gaAccessToken) {
+    document.getElementById('ga4SetupPanel').style.display = 'none';
+    document.getElementById('ga4DataPanel').style.display = '';
+    loadTrafficData();
+  } else {
+    document.getElementById('ga4SetupPanel').style.display = '';
+    document.getElementById('ga4DataPanel').style.display = 'none';
+  }
+}
+
+function connectGA4() {
+  const propInput = document.getElementById('ga4PropertyInput');
+  const clientInput = document.getElementById('ga4ClientIdInput');
+  ga4PropertyId = (propInput?.value || '').trim();
+  ga4ClientId = (clientInput?.value || '').trim();
+  localStorage.setItem(GA4_PROP_KEY, ga4PropertyId);
+  localStorage.setItem(GA4_CLIENT_KEY, ga4ClientId);
+  if (!ga4PropertyId || !ga4ClientId) { alert('Enter both Property ID and OAuth Client ID.'); return; }
+  const doAuth = () => {
+    const tc = google.accounts.oauth2.initTokenClient({
+      client_id: ga4ClientId,
+      scope: 'https://www.googleapis.com/auth/analytics.readonly',
+      callback: (resp) => {
+        if (resp.error) { alert('Auth failed: ' + resp.error); return; }
+        gaAccessToken = resp.access_token;
+        document.getElementById('ga4SetupPanel').style.display = 'none';
+        document.getElementById('ga4DataPanel').style.display = '';
+        loadTrafficData();
+      }
+    });
+    tc.requestAccessToken({ prompt: 'consent' });
+  };
+  if (window.google?.accounts?.oauth2) { doAuth(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://accounts.google.com/gsi/client';
+  s.onload = doAuth;
+  document.head.appendChild(s);
+}
+
+function disconnectGA4() {
+  gaAccessToken = null;
+  document.getElementById('ga4SetupPanel').style.display = '';
+  document.getElementById('ga4DataPanel').style.display = 'none';
+}
+
+function setDateRange(days, btn) {
+  trafficDateRange = days;
+  document.querySelectorAll('.date-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  loadTrafficData();
+}
+
+async function fetchGA4Report(body) {
+  const r = await fetch(
+    `https://analyticsdata.googleapis.com/v1beta/properties/${ga4PropertyId}:runReport`,
+    { method: 'POST', headers: { 'Authorization': `Bearer ${gaAccessToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+  );
+  if (r.status === 401) {
+    gaAccessToken = null;
+    document.getElementById('ga4SetupPanel').style.display = '';
+    document.getElementById('ga4DataPanel').style.display = 'none';
+    throw new Error('Token expired — reconnect to continue.');
+  }
+  if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || `API error ${r.status}`); }
+  return r.json();
+}
+
+async function loadTrafficData() {
+  setTrafficStatus('Loading...');
+  try {
+    const start = `${trafficDateRange}daysAgo`;
+    const [sessData, srcData, landData] = await Promise.all([
+      fetchGA4Report({
+        dateRanges: [{ startDate: start, endDate: 'today' }],
+        dimensions: [{ name: 'date' }],
+        metrics: [{ name: 'sessions' }, { name: 'activeUsers' }, { name: 'newUsers' }, { name: 'engagedSessions' }],
+        orderBys: [{ dimension: { dimensionName: 'date' } }]
+      }),
+      fetchGA4Report({
+        dateRanges: [{ startDate: start, endDate: 'today' }],
+        dimensions: [{ name: 'sessionDefaultChannelGroup' }, { name: 'sessionSourceMedium' }],
+        metrics: [{ name: 'sessions' }],
+        orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+        limit: 25
+      }),
+      fetchGA4Report({
+        dateRanges: [{ startDate: start, endDate: 'today' }],
+        dimensions: [{ name: 'landingPagePlusQueryString' }],
+        metrics: [{ name: 'sessions' }, { name: 'activeUsers' }],
+        orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+        limit: 25
+      })
+    ]);
+    renderTrafficDashboard(sessData, srcData, landData);
+    setTrafficStatus('Updated ' + new Date().toLocaleTimeString());
+  } catch(e) { setTrafficStatus('Error: ' + e.message); }
+}
+
+function setTrafficStatus(msg) {
+  const el = document.getElementById('trafficStatus');
+  if (el) el.textContent = msg;
+}
+
+function renderTrafficDashboard(sessData, srcData, landData) {
+  let totalSessions = 0, totalUsers = 0, totalNew = 0, totalEngaged = 0;
+  const daily = [];
+  (sessData.rows || []).forEach(r => {
+    const s = +r.metricValues[0].value, u = +r.metricValues[1].value,
+          n = +r.metricValues[2].value, e2 = +r.metricValues[3].value;
+    totalSessions += s; totalUsers += u; totalNew += n; totalEngaged += e2;
+    daily.push({ date: r.dimensionValues[0].value, sessions: s });
+  });
+  document.getElementById('tStatSessions').textContent = totalSessions.toLocaleString();
+  document.getElementById('tStatUsers').textContent = totalUsers.toLocaleString();
+  document.getElementById('tStatNew').textContent = totalNew.toLocaleString();
+  document.getElementById('tStatReturning').textContent = Math.max(0, totalUsers - totalNew).toLocaleString();
+  document.getElementById('tStatEngaged').textContent = totalEngaged.toLocaleString();
+  renderSessionsChart(daily, totalSessions);
+  renderSourcesTable(srcData.rows || [], totalSessions);
+  renderLandingTable(landData.rows || [], totalSessions);
+}
+
+function renderSessionsChart(daily, totalSessions) {
+  const el = document.getElementById('sessionsChartContainer');
+  if (!daily.length) { el.innerHTML = '<div class="chart-empty">No session data for this period.</div>'; return; }
+  const avg = totalSessions / daily.length;
+  const maxS = Math.max(...daily.map(d => d.sessions), 1);
+  const W = 680, H = 120, PL = 36, PB = 22, PR = 8, PT = 8;
+  const cW = W - PL - PR, cH = H - PB - PT;
+  const bW = Math.max(2, Math.floor(cW / daily.length) - 1);
+  const step = daily.length <= 7 ? 1 : daily.length <= 14 ? 2 : 7;
+
+  const bars = daily.map((d, i) => {
+    const x = PL + (i / daily.length) * cW + (cW / daily.length - bW) / 2;
+    const bH = (d.sessions / maxS) * cH;
+    const y = PT + cH - bH;
+    const isSpike = d.sessions > avg * 2.5 && d.sessions > 3;
+    const lbl = `${d.date.slice(4,6)}/${d.date.slice(6,8)}: ${d.sessions.toLocaleString()} sessions${isSpike?' ↑ spike':''}`;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bW}" height="${Math.max(bH,1).toFixed(1)}" fill="${isSpike?'#ffffff':'rgba(255,255,255,0.3)'}"><title>${lbl}</title></rect>`;
+  }).join('');
+
+  const gridLines = [0, Math.round(maxS/2), maxS].map(v => {
+    const y = PT + cH - (v / maxS) * cH;
+    const lbl = v >= 1000 ? (v/1000).toFixed(1)+'k' : v;
+    return `<text x="${PL-4}" y="${y}" text-anchor="end" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.3)" font-family="inherit">${lbl}</text><line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="rgba(255,255,255,0.06)"/>`;
+  }).join('');
+
+  const xLabels = daily.map((d, i) => {
+    if (i % step !== 0 && i !== daily.length-1) return '';
+    const x = PL + (i / daily.length) * cW + (cW / daily.length)/2;
+    return `<text x="${x.toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.3)" font-family="inherit">${d.date.slice(4,6)}/${d.date.slice(6,8)}</text>`;
+  }).join('');
+
+  el.innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}" style="overflow:visible;display:block">${gridLines}${bars}${xLabels}</svg>`;
+}
+
+function renderSourcesTable(rows, total) {
+  const body = document.getElementById('sourcesTableBody');
+  if (!rows.length) { body.innerHTML = '<tr><td colspan="4" class="t-cell" style="text-align:center;color:var(--muted);padding:16px">No data</td></tr>'; return; }
+  body.innerHTML = rows.map(r => {
+    const channel = r.dimensionValues[0].value;
+    const sm = r.dimensionValues[1].value;
+    const s = +r.metricValues[0].value;
+    const pct = total > 0 ? ((s/total)*100).toFixed(1) : '0.0';
+    return `<tr><td class="t-cell t-channel">${channel}</td><td class="t-cell t-source">${sm}</td><td class="t-cell t-num">${s.toLocaleString()}</td><td class="t-cell t-pct"><span class="pct-bar-wrap"><span class="pct-bar" style="width:${pct}%"></span></span>${pct}%</td></tr>`;
+  }).join('');
+}
+
+function renderLandingTable(rows, total) {
+  const body = document.getElementById('landingPagesTableBody');
+  if (!rows.length) { body.innerHTML = '<tr><td colspan="4" class="t-cell" style="text-align:center;color:var(--muted);padding:16px">No data</td></tr>'; return; }
+  body.innerHTML = rows.map(r => {
+    const page = r.dimensionValues[0].value;
+    const s = +r.metricValues[0].value;
+    const u = +r.metricValues[1].value;
+    const pct = total > 0 ? ((s/total)*100).toFixed(1) : '0.0';
+    const disp = (page === '/' || page === '') ? '/ (homepage)' : page.length > 45 ? page.slice(0,43)+'…' : page;
+    return `<tr><td class="t-cell t-page" title="${page}">${disp}</td><td class="t-cell t-num">${s.toLocaleString()}</td><td class="t-cell t-num">${u.toLocaleString()}</td><td class="t-cell t-pct"><span class="pct-bar-wrap"><span class="pct-bar" style="width:${pct}%"></span></span>${pct}%</td></tr>`;
+  }).join('');
+}
 </script>
 </body>
 </html>
