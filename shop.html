@@ -920,6 +920,12 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const btn = document.getElementById('shareBtn');
   const url = window.location.href;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: activeProd.title + ' — Stone Rock Studios', url });
+    } catch {}
+    return;
+  }
   try {
     await navigator.clipboard.writeText(url);
   } catch {
