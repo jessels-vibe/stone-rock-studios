@@ -407,7 +407,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
       </div>
       <button class="atc-btn" id="atcBtn">Add to Cart</button>
       <div class="atc-note" id="atcNote"></div>
-      <button class="share-btn" id="shareBtn">Copy shareable link</button>
+      <button class="share-btn" id="shareBtn">Share this shirt!</button>
     </div>
   </div>
 </div>
@@ -931,7 +931,7 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
     document.body.removeChild(tmp);
   }
   btn.textContent = 'Link copied!';
-  setTimeout(() => { btn.textContent = 'Copy shareable link'; }, 2000);
+  setTimeout(() => { btn.textContent = 'Share this shirt!'; }, 2000);
 });
 
 // ── CART ──────────────────────────────────────────
