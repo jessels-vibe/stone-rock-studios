@@ -256,13 +256,12 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .suggest-success.show { display: block; }
 
   /* PHOTO STRIP */
-  /* PHOTO MARQUEE */
-  @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
   .photo-marquee { border-top: 1px solid var(--border); }
   .photo-marquee-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); padding: 28px 0 12px 20px; }
-  .photo-marquee-viewport { position: relative; height: 180px; overflow: hidden; }
-  .photo-marquee-track { position: absolute; top: 0; left: 0; display: flex; gap: var(--gap); animation: marquee 40s linear infinite; }
-  .photo-marquee-track img { height: 180px; width: auto; object-fit: cover; flex-shrink: 0; display: block; }
+  .photo-marquee-viewport { height: 180px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; scroll-snap-type: x mandatory; }
+  .photo-marquee-viewport::-webkit-scrollbar { display: none; }
+  .photo-marquee-track { display: flex; gap: var(--gap); padding: 0 20px; width: max-content; }
+  .photo-marquee-track img { height: 180px; width: auto; object-fit: cover; flex-shrink: 0; display: block; scroll-snap-align: start; }
   @media (max-width: 768px) { .photo-marquee-viewport { height: 120px; } .photo-marquee-track img { height: 120px; } }
 
   /* SUGGEST NUDGE */
@@ -378,14 +377,6 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
         <div class="photo-marquee-label">On Set</div>
         <div class="photo-marquee-viewport">
         <div class="photo-marquee-track">
-          <img src="images%20for%20website/IMG_1326.jpeg" alt="On set" loading="lazy">
-          <img src="images%20for%20website/IMG_6068.JPG" alt="On set" loading="lazy">
-          <img src="images%20for%20website/IMG_6022.JPG" alt="On set" loading="lazy">
-          <img src="images%20for%20website/IMG_1349.jpeg" alt="On set" loading="lazy">
-          <img src="images%20for%20website/IMG_6028.JPG" alt="On set" loading="lazy">
-          <img src="images%20for%20website/IMG_1333.jpeg" alt="On set" loading="lazy">
-          <img src="images%20for%20website/IMG_6016.JPG" alt="On set" loading="lazy">
-          <img src="images%20for%20website/IMG_6018.JPG" alt="On set" loading="lazy">
           <img src="images%20for%20website/IMG_1326.jpeg" alt="On set" loading="lazy">
           <img src="images%20for%20website/IMG_6068.JPG" alt="On set" loading="lazy">
           <img src="images%20for%20website/IMG_6022.JPG" alt="On set" loading="lazy">
