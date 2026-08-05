@@ -262,7 +262,10 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .photo-strip-scroll { display: flex; gap: var(--gap); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .photo-strip-scroll::-webkit-scrollbar { display: none; }
   .photo-strip-scroll img { height: 340px; width: auto; object-fit: cover; flex-shrink: 0; display: block; }
-  @media (max-width: 768px) { .photo-strip-scroll img { height: 220px; width: 72vw; object-fit: cover; } }
+  @media (max-width: 768px) {
+    .photo-strip-scroll { display: grid; grid-template-columns: 1fr 1fr; overflow-x: visible; gap: var(--gap); }
+    .photo-strip-scroll img { height: 180px; width: 100%; flex-shrink: unset; }
+  }
 
   /* SUGGEST NUDGE */
   .suggest-nudge { padding: 0 var(--gap) 16px 20px; font-size: 11px; color: var(--muted); letter-spacing: -0.01em; }
