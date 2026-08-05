@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /seed.html
+
+Sitemap: https://stonerockstudios.xyz/sitemap.xml

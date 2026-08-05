@@ -12,7 +12,7 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop — Stone Rock Studios</title>
+<title>Film Crew T-Shirts & Apparel | Stone Rock Studios</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,16 +36,17 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
 <script async type="text/javascript" src="https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=YvXr4f"></script>
-<meta name="description" content="Stone Rock Studios Merch — film crew tees for every department. For your cast and crew.">
+<meta name="description" content="Film crew tees for every department — Director, PA, DP, Grip, Gaffer, Script Supervisor and 70+ roles. 100% cotton, $24.99, free shipping on all orders.">
+<link rel="canonical" id="canonical" href="https://stonerockstudios.xyz/shop.html">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://stonerockstudios.xyz/shop.html">
-<meta property="og:title" content="Shop — Stone Rock Studios">
-<meta property="og:description" content="Film crew tees for every department. For your cast and crew.">
-<meta property="og:image" content="https://stonerockstudios.xyz/og-image.png">
+<meta property="og:url" id="og-url" content="https://stonerockstudios.xyz/shop.html">
+<meta property="og:title" id="og-title" content="Film Crew T-Shirts & Apparel | Stone Rock Studios">
+<meta property="og:description" id="og-desc" content="Film crew tees for every department — Director, PA, DP, Grip, Gaffer, Script Supervisor and 70+ roles. 100% cotton, $24.99, free shipping.">
+<meta property="og:image" id="og-image" content="https://stonerockstudios.xyz/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Shop — Stone Rock Studios">
-<meta name="twitter:description" content="Film crew tees for every department. For your cast and crew.">
-<meta name="twitter:image" content="https://stonerockstudios.xyz/og-image.png">
+<meta name="twitter:title" id="tw-title" content="Film Crew T-Shirts & Apparel | Stone Rock Studios">
+<meta name="twitter:description" id="tw-desc" content="Film crew tees for every department — Director, PA, DP, Grip, Gaffer, Script Supervisor and 70+ roles. 100% cotton, $24.99, free shipping.">
+<meta name="twitter:image" id="tw-image" content="https://stonerockstudios.xyz/og-image.png">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   button, input, select, textarea { font-family: inherit; }
@@ -769,6 +770,103 @@ function searchShop(q) {
   }
 }
 
+// ── SEO ───────────────────────────────────────────
+function injectStructuredData() {
+  const s = document.createElement('script');
+  s.type = 'application/ld+json';
+  s.text = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Film Crew T-Shirts — Stone Rock Studios",
+    "description": "Film crew tees for every department. Director, PA, DP, Grip, Gaffer, and 70+ roles.",
+    "numberOfItems": products.length,
+    "itemListElement": products.map((p, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": p.title,
+      "url": `https://stonerockstudios.xyz/shop.html?product=${encodeURIComponent(p.title)}`,
+      "image": p.featuredImage?.url || ''
+    }))
+  });
+  document.head.appendChild(s);
+
+  const org = document.createElement('script');
+  org.type = 'application/ld+json';
+  org.text = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Stone Rock Studios",
+    "url": "https://stonerockstudios.xyz",
+    "logo": "https://stonerockstudios.xyz/footer-logo.png"
+  });
+  document.head.appendChild(org);
+}
+
+function setProductMeta(p) {
+  const title = `${p.title} — Film Crew Tee | Stone Rock Studios`;
+  const desc  = `${p.title} from Stone Rock Studios. 100% cotton film crew tee${p.department ? ' for ' + p.department : ''}. $24.99, free shipping on all orders.`;
+  const img   = p.featuredImage?.url || 'https://stonerockstudios.xyz/og-image.png';
+  const url   = `https://stonerockstudios.xyz/shop.html?product=${encodeURIComponent(p.title)}`;
+
+  document.title = title;
+  document.querySelector('meta[name="description"]').setAttribute('content', desc);
+  document.getElementById('canonical').setAttribute('href', url);
+  document.getElementById('og-title').setAttribute('content', title);
+  document.getElementById('og-desc').setAttribute('content', desc);
+  document.getElementById('og-image').setAttribute('content', img);
+  document.getElementById('og-url').setAttribute('content', url);
+  document.getElementById('tw-title').setAttribute('content', title);
+  document.getElementById('tw-desc').setAttribute('content', desc);
+  document.getElementById('tw-image').setAttribute('content', img);
+
+  const old = document.getElementById('product-ld');
+  if (old) old.remove();
+  const s = document.createElement('script');
+  s.id   = 'product-ld';
+  s.type = 'application/ld+json';
+  s.text = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": p.title,
+    "image": p.images.length ? p.images.map(i => i.url) : (p.featuredImage ? [p.featuredImage.url] : []),
+    "description": `${p.title} from Stone Rock Studios. Premium 100% cotton film crew apparel${p.department ? ' for ' + p.department : ''}. Available in multiple sizes and colors.`,
+    "brand": { "@type": "Brand", "name": "Stone Rock Studios" },
+    "category": p.department || "Film Crew Apparel",
+    "sku": p.id,
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": parseFloat(p.priceRange.minVariantPrice.amount),
+      "priceCurrency": p.priceRange.minVariantPrice.currencyCode,
+      "offerCount": p.variants.filter(v => v.availableForSale).length,
+      "availability": p.variants.some(v => v.availableForSale)
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock"
+    }
+  });
+  document.head.appendChild(s);
+}
+
+function resetMeta() {
+  const title = 'Film Crew T-Shirts & Apparel | Stone Rock Studios';
+  const desc  = 'Film crew tees for every department — Director, PA, DP, Grip, Gaffer, Script Supervisor and 70+ roles. 100% cotton, $24.99, free shipping on all orders.';
+  const img   = 'https://stonerockstudios.xyz/og-image.png';
+  const url   = 'https://stonerockstudios.xyz/shop.html';
+
+  document.title = title;
+  document.querySelector('meta[name="description"]').setAttribute('content', desc);
+  document.getElementById('canonical').setAttribute('href', url);
+  document.getElementById('og-title').setAttribute('content', title);
+  document.getElementById('og-desc').setAttribute('content', desc);
+  document.getElementById('og-image').setAttribute('content', img);
+  document.getElementById('og-url').setAttribute('content', url);
+  document.getElementById('tw-title').setAttribute('content', title);
+  document.getElementById('tw-desc').setAttribute('content', desc);
+  document.getElementById('tw-image').setAttribute('content', img);
+
+  const old = document.getElementById('product-ld');
+  if (old) old.remove();
+}
+
 // ── MODAL ─────────────────────────────────────────
 let activeProd = null, activeImgs = [], imgIdx = 0, qty = 1, selOpts = {};
 
@@ -811,6 +909,8 @@ function openModal(i) {
   const shareUrl = new URL(window.location.href);
   shareUrl.searchParams.set('product', activeProd.title);
   history.replaceState(null, '', shareUrl.toString());
+
+  setProductMeta(activeProd);
 }
 
 function closeModal() {
@@ -819,6 +919,8 @@ function closeModal() {
   const closeUrl = new URL(window.location.href);
   closeUrl.searchParams.delete('product');
   history.replaceState(null, '', closeUrl.toString());
+
+  resetMeta();
 }
 
 function renderImages() {
@@ -1360,6 +1462,7 @@ document.getElementById('zeroSuggestForm').addEventListener('submit', async e =>
 (async () => {
   try { await fetchProducts(); } catch(e) { console.error(e); }
   renderShop();
+  injectStructuredData();
   loadCartFromStorage();
 
   const params = new URLSearchParams(window.location.search);
