@@ -163,6 +163,8 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .atc-btn:hover { opacity: 0.85; }
   .atc-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .atc-note { font-size: 11px; color: #ffffff; text-align: center; margin-top: 10px; min-height: 14px; }
+  .share-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: -0.01em; font-family: inherit; padding: 8px 14px; cursor: pointer; transition: color 0.2s, border-color 0.2s; margin-top: 10px; width: 100%; }
+  .share-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
 
   /* CART DRAWER */
   .cart-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.55); opacity: 0; pointer-events: none; transition: opacity 0.25s; }
@@ -405,6 +407,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
       </div>
       <button class="atc-btn" id="atcBtn">Add to Cart</button>
       <div class="atc-note" id="atcNote"></div>
+      <button class="share-btn" id="shareBtn">Copy shareable link</button>
     </div>
   </div>
 </div>
@@ -804,11 +807,18 @@ function openModal(i) {
     value: itemPrice,
     currency: itemCurrency
   });
+
+  const shareUrl = new URL(window.location.href);
+  shareUrl.searchParams.set('product', activeProd.title);
+  history.replaceState(null, '', shareUrl.toString());
 }
 
 function closeModal() {
   document.getElementById('productModal').classList.remove('open');
   document.body.style.overflow = '';
+  const closeUrl = new URL(window.location.href);
+  closeUrl.searchParams.delete('product');
+  history.replaceState(null, '', closeUrl.toString());
 }
 
 function renderImages() {
@@ -906,6 +916,23 @@ document.getElementById('qtyPlus').onclick  = () => { qty++; document.getElement
 document.getElementById('modalClose').onclick = closeModal;
 document.getElementById('productModal').addEventListener('click', e => { if (e.target.id === 'productModal') closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('shareBtn');
+  const url = window.location.href;
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch {
+    const tmp = document.createElement('input');
+    tmp.value = url;
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+  }
+  btn.textContent = 'Link copied!';
+  setTimeout(() => { btn.textContent = 'Copy shareable link'; }, 2000);
+});
 
 // ── CART ──────────────────────────────────────────
 let cart = null;
@@ -1328,6 +1355,17 @@ document.getElementById('zeroSuggestForm').addEventListener('submit', async e =>
   try { await fetchProducts(); } catch(e) { console.error(e); }
   renderShop();
   loadCartFromStorage();
+
+  const params = new URLSearchParams(window.location.search);
+  const productParam = params.get('product');
+  const qParam = params.get('q');
+  if (productParam) {
+    const idx = products.findIndex(p => p.title === productParam);
+    if (idx !== -1) openModal(idx);
+  } else if (qParam) {
+    document.getElementById('shopSearch').value = qParam;
+    searchShop(qParam);
+  }
 })();
 </script>
 <footer>
