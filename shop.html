@@ -945,6 +945,15 @@ function goImg(i) { imgIdx = i; renderImages(); }
 document.getElementById('imgPrev').onclick = () => { if (imgIdx > 0) goImg(imgIdx - 1); };
 document.getElementById('imgNext').onclick = () => { if (imgIdx < activeImgs.length - 1) goImg(imgIdx + 1); };
 
+let touchStartX = 0;
+document.getElementById('imgPane').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+document.getElementById('imgPane').addEventListener('touchend', e => {
+  const delta = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(delta) < 40) return;
+  if (delta > 0 && imgIdx < activeImgs.length - 1) goImg(imgIdx + 1);
+  if (delta < 0 && imgIdx > 0) goImg(imgIdx - 1);
+}, { passive: true });
+
 function activeVariant() {
   return activeProd?.variants.find(v => v.selectedOptions.every(o => selOpts[o.name] === o.value));
 }
