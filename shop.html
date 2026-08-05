@@ -258,7 +258,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   /* PHOTO STRIP */
   .photo-marquee { border-top: 1px solid var(--border); }
   .photo-marquee-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); padding: 28px 0 12px 20px; }
-  .photo-marquee-viewport { height: 180px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; scroll-snap-type: x mandatory; }
+  .photo-marquee-viewport { height: 180px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; scroll-snap-type: x proximity; touch-action: pan-x; }
   .photo-marquee-viewport::-webkit-scrollbar { display: none; }
   .photo-marquee-track { display: flex; gap: var(--gap); padding: 0 20px; width: max-content; }
   .photo-marquee-track img { height: 180px; width: auto; object-fit: cover; flex-shrink: 0; display: block; scroll-snap-align: start; }
