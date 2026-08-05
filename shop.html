@@ -255,6 +255,14 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .suggest-success { display: none; font-size: 12px; color: rgba(0,0,0,0.6); margin-top: 10px; letter-spacing: -0.01em; font-weight: 600; }
   .suggest-success.show { display: block; }
 
+  /* PHOTO STRIP */
+  .photo-strip { border-top: 1px solid var(--border); padding-top: 0; }
+  .photo-strip-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); padding: 28px var(--gap) 12px 20px; }
+  .photo-strip-scroll { display: flex; gap: var(--gap); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .photo-strip-scroll::-webkit-scrollbar { display: none; }
+  .photo-strip-scroll img { height: 340px; width: auto; object-fit: cover; flex-shrink: 0; display: block; }
+  @media (max-width: 768px) { .photo-strip-scroll img { height: 240px; } }
+
   /* SUGGEST NUDGE */
   .suggest-nudge { padding: 0 var(--gap) 16px 20px; font-size: 11px; color: var(--muted); letter-spacing: -0.01em; }
   .suggest-nudge-link { color: var(--text); font-weight: 600; text-decoration: none; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 1px; transition: border-color 0.2s; }
@@ -363,6 +371,19 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
           <div class="featured-title">Fan Favorites</div>
         </div>
         <div class="shop-grid" id="featuredGrid"></div>
+      </div>
+      <div class="photo-strip">
+        <div class="photo-strip-label">On Set</div>
+        <div class="photo-strip-scroll">
+          <img src="images%20for%20website/IMG_1326.jpeg" alt="On set wearing Production Assistant tee" loading="lazy">
+          <img src="images%20for%20website/IMG_1349.jpeg" alt="On set wearing Production Assistant tee" loading="lazy">
+          <img src="images%20for%20website/IMG_6068.JPG" alt="On set wearing Production Assistant tee" loading="lazy">
+          <img src="images%20for%20website/IMG_6022.JPG" alt="On set wearing Production Assistant tee" loading="lazy">
+          <img src="images%20for%20website/IMG_1333.jpeg" alt="On set wearing Production Assistant tee" loading="lazy">
+          <img src="images%20for%20website/IMG_6028.JPG" alt="On set wearing Production Assistant tee" loading="lazy">
+          <img src="images%20for%20website/IMG_6016.JPG" alt="On set wearing Production Assistant tee" loading="lazy">
+          <img src="images%20for%20website/IMG_6018.JPG" alt="On set wearing Production Assistant tee" loading="lazy">
+        </div>
       </div>
       <div class="suggest-section" id="suggestSection">
         <div class="suggest-title">Don't see your role?</div>
