@@ -258,10 +258,9 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   /* PHOTO STRIP */
   .photo-marquee { border-top: 1px solid var(--border); }
   .photo-marquee-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); padding: 28px 0 12px 20px; }
-  .photo-marquee-viewport { height: 180px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; scroll-snap-type: x proximity; touch-action: pan-x; }
-  .photo-marquee-viewport::-webkit-scrollbar { display: none; }
-  .photo-marquee-track { display: flex; gap: var(--gap); padding: 0 20px; width: max-content; }
-  .photo-marquee-track img { height: 180px; width: auto; object-fit: cover; flex-shrink: 0; display: block; scroll-snap-align: start; }
+  .photo-marquee-viewport { height: 180px; overflow: hidden; }
+  .photo-marquee-track { display: flex; gap: var(--gap); padding: 0 20px; width: max-content; will-change: transform; }
+  .photo-marquee-track img { height: 180px; width: auto; object-fit: cover; flex-shrink: 0; display: block; pointer-events: none; user-select: none; }
   @media (max-width: 768px) { .photo-marquee-viewport { height: 120px; } .photo-marquee-track img { height: 120px; } }
 
   /* SUGGEST NUDGE */
@@ -747,6 +746,53 @@ function updateActiveSidebarLink() {
   );
 }
 window.addEventListener('scroll', updateActiveSidebarLink, { passive: true });
+
+// ── PHOTO STRIP DRAG ──────────────────────────────
+(function() {
+  const vp    = document.querySelector('.photo-marquee-viewport');
+  const track = document.querySelector('.photo-marquee-track');
+  if (!vp || !track) return;
+
+  let startX = 0, startY = 0, originX = 0, isDragging = false, isHoriz = null;
+
+  function getX() {
+    const t = window.getComputedStyle(track).transform;
+    return t === 'none' ? 0 : new DOMMatrix(t).m41;
+  }
+
+  function clamp(x) {
+    return Math.max(-(track.scrollWidth - vp.clientWidth), Math.min(0, x));
+  }
+
+  vp.addEventListener('touchstart', e => {
+    startX  = e.touches[0].clientX;
+    startY  = e.touches[0].clientY;
+    originX = getX();
+    isDragging = true;
+    isHoriz = null;
+    track.style.transition = 'none';
+  }, { passive: true });
+
+  vp.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    if (isHoriz === null) isHoriz = Math.abs(dx) > Math.abs(dy);
+    if (!isHoriz) return;
+    e.preventDefault();
+    track.style.transform = `translateX(${clamp(originX + dx)}px)`;
+  }, { passive: false });
+
+  function settle() {
+    if (!isDragging || !isHoriz) { isDragging = false; return; }
+    isDragging = false;
+    track.style.transition = 'transform 0.25s ease-out';
+    track.style.transform  = `translateX(${clamp(getX())}px)`;
+  }
+
+  vp.addEventListener('touchend',    settle, { passive: true });
+  vp.addEventListener('touchcancel', settle, { passive: true });
+})();
 
 // ── SEARCH ────────────────────────────────────────
 let searchAnalyticsTimer = null;
