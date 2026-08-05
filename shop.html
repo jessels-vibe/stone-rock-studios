@@ -49,7 +49,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
 <meta name="twitter:image" id="tw-image" content="https://stonerockstudios.xyz/og-image.png">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { overflow-x: hidden; max-width: 100%; }
+  html { overflow-x: hidden; }
   button, input, select, textarea { font-family: inherit; }
   :root {
     --black: #000000; --surface: #0d0d0d; --surface2: #0a0a0a;
@@ -94,7 +94,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .sidebar-link { display: block; font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); text-decoration: none; padding: 8px 20px; margin-bottom: 1px; transition: color 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 2px solid transparent; }
   .sidebar-link:hover { color: #ffffff; }
   .sidebar-link.active { color: #ffffff; border-left-color: #ffffff; }
-  .shop-main { flex: 1; min-width: 0; padding-bottom: 100px; overflow-x: hidden; }
+  .shop-main { flex: 1; min-width: 0; padding-bottom: 100px; }
   .featured-wrap { padding-bottom: 12px; background: var(--surface); border-bottom: 1px solid var(--border); }
   .featured-header { padding: 32px 20px 8px; }
   .featured-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); margin-bottom: 10px; }
@@ -257,12 +257,12 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .suggest-success.show { display: block; }
 
   /* PHOTO STRIP */
-  .photo-strip { border-top: 1px solid var(--border); padding-top: 0; overflow: hidden; max-width: 100%; }
+  .photo-strip { border-top: 1px solid var(--border); }
   .photo-strip-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); padding: 28px var(--gap) 12px 20px; }
-  .photo-strip-scroll { display: flex; gap: var(--gap); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch; width: 100%; }
+  .photo-strip-scroll { display: flex; gap: var(--gap); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .photo-strip-scroll::-webkit-scrollbar { display: none; }
   .photo-strip-scroll img { height: 340px; width: auto; object-fit: cover; flex-shrink: 0; display: block; }
-  @media (max-width: 768px) { .photo-strip-scroll img { height: 240px; } }
+  @media (max-width: 768px) { .photo-strip-scroll img { height: 220px; width: 72vw; object-fit: cover; } }
 
   /* SUGGEST NUDGE */
   .suggest-nudge { padding: 0 var(--gap) 16px 20px; font-size: 11px; color: var(--muted); letter-spacing: -0.01em; }
