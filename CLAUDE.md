@@ -48,6 +48,24 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-08-05 — Shareable product links (shop.html)
+
+**What changed:** Products in the shop are now shareable via URL.
+
+**How it works:**
+- When a product modal opens, the browser URL silently updates to `?product=Director+Tee` (using `history.replaceState`). No page reload — just the address bar changes.
+- When the modal closes, the param is removed from the URL.
+- A "Copy shareable link" button at the bottom of the modal copies the current URL to clipboard and shows "Link copied!" for 2 seconds.
+- On page load, if `?product=` is in the URL, the matching product modal opens automatically. If `?q=` is in the URL (search query), it pre-fills the search bar and runs the search.
+
+**Share flow:** Open any shirt → hit "Copy shareable link" → send the URL → recipient lands with that exact shirt's modal already open.
+
+**Watch out for:**
+- Product lookup on load uses an exact title match (`p.title === productParam`). If a product title changes in Shopify, existing shared links for that product will silently fail (no modal opens, no error shown).
+- `?q=` fallback does a substring search — useful for constructing search links manually but less precise than `?product=`.
+
+---
+
 ### 2026-07-28 — Traffic Analytics panel (admin.html)
 
 **What changed:** Added a "Traffic" section to the admin sidebar that shows a full GA4 analytics dashboard — no separate tab needed.
