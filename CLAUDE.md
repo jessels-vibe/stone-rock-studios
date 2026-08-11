@@ -48,6 +48,25 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-08-10 — Replace campaigns panel with ad dashboard (admin.html, ad-dashboard/)
+
+**What changed:** The admin Campaigns panel previously linked out to a spec-ad-tracker (competition scraper) which was the wrong tool entirely. Replaced it with the existing React/Vite ad campaign manager (`/ad-dashboard/`) that pulls live data from Pinterest and Meta ad accounts.
+
+**How it works:**
+- `/ad-dashboard/` is a built React app deployed as static files in the repo. It serves at `stonerockstudios.xyz/ad-dashboard/`.
+- The campaigns panel in `admin.html` is now a full-screen iframe pointing to `/ad-dashboard/`.
+- API tokens (Pinterest, Meta, TikTok, Google) are stored in the browser's `localStorage` — no secrets baked into the build. When you open the app and a platform isn't connected, it shows a token-entry form (password field + Save & Connect button). After saving, the page reloads and data loads automatically.
+- `localStorage` keys: `srs_pinterest_token`, `srs_pinterest_account`, `srs_meta_token`, `srs_meta_accounts`, `srs_tiktok_token`, `srs_tiktok_advertiser`, `srs_google_token`, `srs_google_customer`.
+- Vite base path is set to `/ad-dashboard/` so all built asset paths are correct.
+- API calls go directly to the platform APIs (not through a proxy): `api.pinterest.com`, `graph.facebook.com`, `business-api.tiktok.com`.
+
+**Watch out for:**
+- Tokens are per-browser — entering them on one device doesn't carry to another. Each browser/device needs the tokens entered once.
+- `isPinterestConnected()` now checks `localStorage` (was previously always assumed connected). If Pinterest shows "Connect" form, enter the token and account ID.
+- The `ad-dashboard/` source lives at `/Users/jesseschneider/ad-dashboard/` (not inside the SRS repo). After any source changes, rebuild with `npm run build` in that directory and copy `dist/` contents to `stone-rock-studios/ad-dashboard/`. The `.gitignore` was updated to no longer exclude `ad-dashboard/`.
+
+---
+
 ### 2026-08-05 — Shareable product links (shop.html)
 
 **What changed:** Products in the shop are now shareable via URL.
