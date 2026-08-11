@@ -272,21 +272,8 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .pct-bar { height: 100%; background: var(--text); }
 
   /* CAMPAIGNS PANEL */
-  .camp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 3px; }
-  .camp-card { display: block; text-decoration: none; color: var(--text); background: var(--surface); border: 1px solid var(--border); transition: border-color 0.12s; }
-  .camp-card:hover { border-color: #444; }
-  .camp-logo { background: #fff; height: 100px; display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .camp-logo img { max-height: 52px; max-width: 100%; object-fit: contain; display: block; }
-  .camp-logo-fallback { width: 52px; height: 52px; background: #000; display: none; align-items: center; justify-content: center; font-size: 22px; font-weight: 600; color: #fff; }
-  .camp-body { padding: 12px 16px 16px; }
-  .camp-company { font-size: 12px; font-weight: 600; letter-spacing: -0.01em; }
-  .camp-prize { margin-top: 3px; font-size: 11px; font-weight: 600; color: var(--muted); }
-  .camp-deadline { margin-top: 8px; font-size: 10px; font-weight: 600; color: #333; }
-  .camp-empty { text-align: center; padding: 60px 32px; font-size: 11px; color: var(--muted); line-height: 1.7; }
-
-  /* ADS PANEL */
-  #adsPanel { display: none; flex-direction: column; position: absolute; inset: 0; }
-  #adsPanel iframe { flex: 1; border: none; width: 100%; height: 100%; display: block; }
+  #campaignsPanel { display: none; flex-direction: column; position: absolute; inset: 0; }
+  #campaignsPanel iframe { flex: 1; border: none; width: 100%; height: 100%; display: block; }
 </style>
 </head>
 <body>
@@ -521,21 +508,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
       </div>
 
       <div id="campaignsPanel" style="display:none">
-        <div class="main-header" style="margin-bottom:16px">
-          <div>
-            <div class="main-title">Active Competitions</div>
-            <div class="main-sub" id="campStatus"></div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <button class="btn btn-ghost btn-sm" onclick="loadCampaigns()">↺ Refresh</button>
-            <button class="btn btn-ghost btn-sm" onclick="window.open('https://jessels-vibe.github.io/spec-ad-tracker/')">↗ Full Site</button>
-          </div>
-        </div>
-        <div id="campGrid" class="camp-grid"></div>
-      </div>
-
-      <div id="adsPanel">
-        <iframe id="adsFrame" src="http://localhost:5173" title="Ad Dashboard"></iframe>
+        <iframe src="/ad-dashboard/" title="Ad Campaign Manager"></iframe>
       </div>
     </div>
   </div>
@@ -1482,7 +1455,7 @@ let ga4ClientId = localStorage.getItem(GA4_CLIENT_KEY) || '';
 let trafficDateRange = '30';
 
 function hidePanels() {
-  ['videoPanel','trafficPanel','campaignsPanel','adsPanel'].forEach(id => {
+  ['videoPanel','trafficPanel','campaignsPanel'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
@@ -1668,75 +1641,10 @@ function renderSourcesTable(rows, total) {
   }).join('');
 }
 
-// ── CAMPAIGNS / SPEC-AD TRACKER ──
-const SPEC_AD_URL = 'https://jessels-vibe.github.io/spec-ad-tracker/data.json';
-
+// ── CAMPAIGNS ──
 function showCampaignsPanel() {
   hidePanels();
-  document.getElementById('campaignsPanel').style.display = '';
-  loadCampaigns();
-}
-
-function showAdsPanel() {
-  hidePanels();
-  document.getElementById('adsPanel').style.display = 'flex';
-}
-
-async function loadCampaigns() {
-  setCampStatus('Loading...');
-  try {
-    const r = await fetch(SPEC_AD_URL + '?_=' + Date.now());
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const data = await r.json();
-    data.sort((a, b) => (b.date_found || '').localeCompare(a.date_found || ''));
-    const cnt = document.getElementById('cnt-campaigns');
-    if (cnt) cnt.textContent = data.length || '';
-    if (!data.length) {
-      document.getElementById('campGrid').innerHTML = '<div class="camp-empty">No active competitions right now.<br>Scraper runs daily at 1pm UTC.</div>';
-      setCampStatus('No competitions found');
-      return;
-    }
-    document.getElementById('campGrid').innerHTML = data.map(campCardHTML).join('');
-    setCampStatus(`${data.length} active · Updated ${data[0].date_found || ''}`);
-  } catch(e) {
-    setCampStatus('Error: ' + e.message);
-    document.getElementById('campGrid').innerHTML = '<div class="camp-empty">Failed to load competition data.</div>';
-  }
-}
-
-function campCardHTML(entry) {
-  const logoSrc = `https://logo.clearbit.com/${entry.logo_url}`;
-  const initial = (entry.company || '?')[0].toUpperCase();
-  const dl = entry.deadline ? formatCampDeadline(entry.deadline) : '';
-  return `<a class="camp-card" href="${entry.source_url}" target="_blank" rel="noopener noreferrer">
-    <div class="camp-logo">
-      <img src="${logoSrc}" alt="${entry.company}" onerror="campLogoFallback(this)">
-      <div class="camp-logo-fallback">${initial}</div>
-    </div>
-    <div class="camp-body">
-      <div class="camp-company">${entry.company}</div>
-      <div class="camp-prize">${entry.prize}</div>
-      ${dl ? `<div class="camp-deadline">${dl}</div>` : ''}
-    </div>
-  </a>`;
-}
-
-function campLogoFallback(img) {
-  img.style.display = 'none';
-  img.nextElementSibling.style.display = 'flex';
-}
-
-function formatCampDeadline(dl) {
-  try {
-    const [y, m, d] = dl.split('-');
-    const date = new Date(Number(y), Number(m) - 1, Number(d));
-    return 'Deadline: ' + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch { return 'Deadline: ' + dl; }
-}
-
-function setCampStatus(msg) {
-  const el = document.getElementById('campStatus');
-  if (el) el.textContent = msg;
+  document.getElementById('campaignsPanel').style.display = 'flex';
 }
 
 function renderLandingTable(rows, total) {
