@@ -48,6 +48,38 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 
 ---
 
+### 2026-08-18 — SEO overhaul (index.html, about.html, shop.html, sitemap.xml)
+
+**What changed:** Full SEO pass targeting "videographer Los Angeles", "cinematographer Los Angeles", "real estate videographer", "moto video production", "commercial video production", and "film crew t-shirts".
+
+**index.html:**
+- Title: "Stone Rock Studios | Los Angeles Videographers & Cinematographers"
+- Meta description: includes real estate, moto, commercial, cinematographer, videographer keywords
+- Added canonical tag, theme-color meta
+- Added JSON-LD: Organization + ProfessionalService schema with full service type list
+- Hero-title `<div>` changed to `<h1>` (same CSS class, visually identical)
+- Video thumbnail alt text now uses `"${displayTitle} — ${categoryLabel} video by Stone Rock Studios"`
+
+**about.html:**
+- Title: "Los Angeles Video Production Company | Stone Rock Studios"
+- Meta description: keyword-rich, includes all service categories
+- Added canonical tag, theme-color meta
+- Added JSON-LD: Organization + ProfessionalService schema
+- `<h2>` → `<h1>` (CSS rule updated from `.about-section h2` to `.about-section h1`)
+
+**shop.html:**
+- Added theme-color meta
+- Added JSON-LD: Store schema with OfferCatalog for film crew t-shirts
+- Cart item images: `alt=""` → `alt="${m.product.title}"`
+
+**sitemap.xml:**
+- Added `<lastmod>2026-08-18</lastmod>` to all three URLs
+- about.html priority bumped from 0.5 → 0.7
+
+**Watch out for:** JSON-LD service types in index.html and about.html should be kept in sync if the business focus changes. The `ProfessionalService` schema's `serviceType` array is what Google uses for "near me" and category searches.
+
+---
+
 ### 2026-08-10 — Replace campaigns panel with ad dashboard (admin.html, ad-dashboard/)
 
 **What changed:** The admin Campaigns panel previously linked out to a spec-ad-tracker (competition scraper) which was the wrong tool entirely. Replaced it with the existing React/Vite ad campaign manager (`/ad-dashboard/`) that pulls live data from Pinterest and Meta ad accounts.
