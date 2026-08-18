@@ -38,6 +38,50 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
 <script async type="text/javascript" src="https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=YvXr4f"></script>
 <meta name="description" content="Film crew tees for every department — Director, PA, DP, Grip, Gaffer, Script Supervisor and 70+ roles. 100% cotton, $24.99, free shipping on all orders.">
 <link rel="canonical" id="canonical" href="https://stonerockstudios.xyz/shop.html">
+<meta name="theme-color" content="#000000">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Store",
+  "name": "Stone Rock Studios Shop",
+  "url": "https://stonerockstudios.xyz/shop.html",
+  "description": "Film crew t-shirts for every department — Director, DP, Grip, Gaffer, PA, Script Supervisor and 70+ roles. 100% cotton, $24.99, free shipping.",
+  "image": "https://stonerockstudios.xyz/og-image.png",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Los Angeles",
+    "addressRegion": "CA",
+    "addressCountry": "US"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Film Crew T-Shirts",
+    "description": "T-shirts for every film and TV production crew role — Director, Producer, DP, Camera, Grip, Gaffer, Sound, Art Department, Stunts, and more.",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Product",
+          "name": "Film Crew T-Shirts",
+          "description": "100% cotton t-shirts for film and TV crew roles. $24.99 with free shipping.",
+          "brand": { "@type": "Brand", "name": "Stone Rock Studios" },
+          "material": "100% cotton",
+          "offers": {
+            "@type": "Offer",
+            "price": "24.99",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": { "@type": "MonetaryAmount", "value": "0", "currency": "USD" }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+</script>
 <meta property="og:type" content="website">
 <meta property="og:url" id="og-url" content="https://stonerockstudios.xyz/shop.html">
 <meta property="og:title" id="og-title" content="Film Crew T-Shirts & Apparel | Stone Rock Studios">
@@ -1190,7 +1234,7 @@ function refreshCartUI(animateBadge = false) {
     const hasVariants = variants.length > 1 || (variants[0] && variants[0].title !== 'Default Title');
     return `<div class="cart-item">
       <div class="cart-item-img-wrap">
-        ${m.image?.url ? `<img class="cart-item-img" src="${m.image.url}" alt="">` : ''}
+        ${m.image?.url ? `<img class="cart-item-img" src="${m.image.url}" alt="${m.product.title}">` : ''}
       </div>
       <div class="cart-item-body">
         <div class="cart-item-head">
