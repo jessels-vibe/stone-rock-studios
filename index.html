@@ -135,8 +135,8 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .dropdown-item:last-child { border-bottom: none; }
   .dropdown-item:hover { color: var(--text); background: #0a0a0a; }
   .dropdown-item.selected { color: var(--text); }
-  .hero { padding: 120px 36px 56px; }
-  .filter-heading { display: none; padding: 0 36px 40px; font-weight: 600; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.04em; color: var(--text); text-align: right; }
+  .hero { padding: 120px 36px 56px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .filter-heading { display: none; font-weight: 600; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.04em; color: var(--text); text-align: right; }
   .hero-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: #ffffff; margin-bottom: 18px; }
   .hero-title { font-weight: 600; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.04em; color: var(--text); margin-bottom: 14px; }
   .hero-sub { font-size: 13px; font-weight: 600; color: #ffffff; letter-spacing: -0.01em; }
@@ -255,10 +255,12 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
 
 <div id="workView">
   <div class="hero">
-    <div class="hero-label">Selected Work</div>
-    <h1 class="hero-title">Stone Rock<br>Studios</h1>
+    <div>
+      <div class="hero-label">Selected Work</div>
+      <h1 class="hero-title">Stone Rock<br>Studios</h1>
+    </div>
+    <div class="filter-heading" id="heroFilter"></div>
   </div>
-  <div class="filter-heading" id="heroFilter"></div>
   <div id="grid">
     <div class="status-msg" id="statusMsg">Loading</div>
   </div>
