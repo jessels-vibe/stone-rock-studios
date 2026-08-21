@@ -135,7 +135,8 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .dropdown-item:last-child { border-bottom: none; }
   .dropdown-item:hover { color: var(--text); background: #0a0a0a; }
   .dropdown-item.selected { color: var(--text); }
-  .hero { padding: 120px 36px 56px; }
+  .hero { padding: 120px 36px 56px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .hero-filter { font-weight: 600; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.04em; color: var(--text); text-align: right; display: none; flex-shrink: 0; }
   .hero-label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; color: #ffffff; margin-bottom: 18px; }
   .hero-title { font-weight: 600; font-size: clamp(48px, 7vw, 88px); line-height: 0.92; letter-spacing: -0.04em; color: var(--text); margin-bottom: 14px; }
   .hero-sub { font-size: 13px; font-weight: 600; color: #ffffff; letter-spacing: -0.01em; }
@@ -217,6 +218,7 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
     .tile.portrait { width: calc(50% - var(--gap) / 2) !important; }
     nav { padding: 0 20px; }
     .nav-links { gap: 16px; }
+    .hero-filter { display: none !important; }
     .nav-cta { display: none; }
     .hero { padding: 90px 20px 48px; }
     .contact-section { padding: 90px 20px 60px; }
@@ -253,8 +255,11 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
 
 <div id="workView">
   <div class="hero">
-    <div class="hero-label">Selected Work</div>
-    <h1 class="hero-title">Stone Rock<br>Studios</h1>
+    <div>
+      <div class="hero-label">Selected Work</div>
+      <h1 class="hero-title">Stone Rock<br>Studios</h1>
+    </div>
+    <div class="hero-filter" id="heroFilter"></div>
   </div>
   <div id="grid">
     <div class="status-msg" id="statusMsg">Loading</div>
@@ -653,6 +658,7 @@ const workDropdown = document.getElementById('workDropdown');
 document.getElementById('workBtn').addEventListener('click', e => { e.stopPropagation(); showView('work'); workDropdown.classList.toggle('open'); });
 document.addEventListener('click', () => workDropdown.classList.remove('open'));
 
+const heroFilter = document.getElementById('heroFilter');
 document.querySelectorAll('.dropdown-item').forEach(item => {
   item.addEventListener('click', e => {
     e.stopPropagation();
@@ -661,6 +667,13 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     item.classList.add('selected');
     workDropdown.classList.remove('open');
     gtag('event', 'select_content', { content_type: 'portfolio_filter', item_id: activeCat });
+    if (activeCat === 'all') {
+      heroFilter.style.display = 'none';
+      heroFilter.textContent = '';
+    } else {
+      heroFilter.textContent = item.textContent;
+      heroFilter.style.display = '';
+    }
     const filtered = activeCat === 'all'
       ? allVideos
       : allVideos.filter(v => (v.tags?.length ? v.tags : [v.category]).includes(activeCat));
