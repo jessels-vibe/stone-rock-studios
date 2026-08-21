@@ -84,6 +84,16 @@ Inter 600 · #000000 / #ffffff only · no `text-transform: uppercase` · no `bor
 
 ---
 
+### 2026-08-20 — Filter label in hero (index.html)
+
+**What changed:** When a portfolio category filter is selected (anything other than "All Work"), the category name appears right-aligned in the hero at the same font size, weight, and letter-spacing as "Stone Rock Studios" (`clamp(48px, 7vw, 88px)`, Inter 600, -0.04em). Clears when the filter resets to All Work. Hidden on mobile (`display: none !important` at ≤768px) since two full-size headings don't fit side by side.
+
+**How it works:** `.hero` is now `display: flex; justify-content: space-between`. The existing `<h1>` is wrapped in a plain `<div>` (left side). `#heroFilter` is a new sibling div on the right. The dropdown click handler sets `heroFilter.textContent = item.textContent` and shows/hides it based on `activeCat === 'all'`.
+
+**Watch out for:** If new filter categories are added to the dropdown, the label appears automatically — no extra JS needed since it reads `item.textContent` directly. Long two-word labels (e.g., "Event Coverage") will wrap at large viewport sizes; that's intentional and matches the two-line "Stone Rock / Studios" treatment.
+
+---
+
 ### 2026-08-18 — SEO overhaul (index.html, about.html, shop.html, sitemap.xml)
 
 **What changed:** Full SEO pass targeting "videographer Los Angeles", "cinematographer Los Angeles", "real estate videographer", "moto video production", "commercial video production", and "film crew t-shirts".
