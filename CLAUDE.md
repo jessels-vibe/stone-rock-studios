@@ -28,6 +28,42 @@ A Claude Code agent instruction document exists for this build. Reference it bef
 - `.github/` — GitHub Actions workflows (if present)
 - `CLAUDE.md` — this file
 
+## Working Memory (current state as of 2026-08-20)
+
+Quick snapshot for new Claude instances — read this before touching any file.
+
+### Pages & their status
+| File | Purpose | Line count | Notes |
+|------|---------|-----------|-------|
+| `index.html` | Main portfolio — Firebase + YouTube playlist grid | ~661 | Firebase reads `db.ref('videos')`, filters `visible===true`, orders by `v.order`. Masonry.js layout. JSON-LD SEO done (2026-08-18). |
+| `shop.html` | Shopify film crew t-shirt store | ~1423 | Storefront API, cart drawer, department sidebar, search, suggestion forms. Klaviyo popup active. |
+| `about.html` | Studio bio + contact form | ~216 | Formspree endpoint `mwvdoqdb`. JSON-LD SEO done. |
+| `admin.html` | Firebase admin dashboard | ~1519 | Full video management panel. Ad dashboard in iframe (`/ad-dashboard/`). GA4 analytics panel. Firebase auth gated. |
+| `seed.html` | Internal DB seeder tool | ~224 | Not public-facing. One-time use for seeding Firebase from YouTube playlists. |
+
+### Active integrations
+- **Firebase** — Realtime Database at `stonerockstudios-default-rtdb.firebaseio.com`. `videos` node drives the public portfolio. Auth: `admin@stonerockstudios.xyz`. Storage holds manual thumbnail uploads.
+- **YouTube Data API v3** — 16 hardcoded playlist IDs in `admin.html`. Key is hardcoded in the script block.
+- **Shopify Storefront API** — token hardcoded in `shop.html`. Products query uses `first: 100`. Shopify CAPI (Maximum) owns ATC, InitiateCheckout, Purchase events.
+- **Meta Pixel `1275243804483057`** — fires PageView + ViewContent (browser only). All 5 pages. Old pixel `1706510330484603` is retired — do not use.
+- **GA4 `G-F0F5ZDTLY3`** — fires on all 5 pages. OAuth-connected in the admin Traffic panel (token in-memory, creds in `localStorage`).
+- **Klaviyo** — public key `YvXr4f`, form `U9c6JM` (Email & SMS Popup). Script tag in `shop.html` only.
+- **Formspree `mwvdoqdb`** — handles contact form (about.html) + shirt suggestion forms (shop.html). Free tier: 50 submissions/month.
+
+### Subdirectories
+- **`ad-dashboard/`** — Built React/Vite app (bundled static files). Source lives at `/Users/jesseschneider/ad-dashboard/`. After source changes: `npm run build` there, copy `dist/` contents here. Platform API tokens stored in `localStorage`.
+- **`ShotCall/`** — Separate project (has its own `CLAUDE.md` and `src/`). Not part of the public SRS site.
+- **`lead-radar/`** — Contains only a `CLAUDE.md`. Separate internal tool, not part of the public SRS site.
+
+### Open / in-progress items (from changelog)
+- **Checkout subdomain** — `shop.stonerockstudios.xyz` CNAME not yet configured. Waiting on DNS record in GoDaddy + Shopify custom domain. Until then, checkout sends customers to `stonerockstudios.myshopify.com` (trust break).
+- No other known open items.
+
+### Brand rules (quick ref)
+Inter 600 · #000000 / #ffffff only · no `text-transform: uppercase` · no `border-radius` · letter-spacing -0.01em to -0.04em
+
+---
+
 ## Key Rules
 - Do not break the existing YouTube API playlist integration
 - Masonry layout must remain functional across aspect ratios
