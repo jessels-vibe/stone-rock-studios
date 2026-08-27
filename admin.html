@@ -746,10 +746,11 @@ function signOut() {
 async function loadVideos() {
   setStatus('Loading...');
   try {
-    const snap = await db.ref('videos').get();
-    db.ref('syncBlocklist').get().then(blockSnap => {
-      syncBlocklist = new Set(Object.keys(blockSnap.val() || {}));
-    }).catch(() => {});
+    const [snap, blockSnap] = await Promise.all([
+      db.ref('videos').get(),
+      db.ref('syncBlocklist').get().catch(() => null)
+    ]);
+    syncBlocklist = new Set(Object.keys(blockSnap?.val() || {}));
     const data = snap.val();
     videos = data ? Object.values(data).sort((a,b) => a.order - b.order) : [];
     // Ensure all videos have an aspectRatio field
@@ -873,8 +874,16 @@ async function syncFromYouTube() {
       const aspectRatio = portrait ? '9:16' : '16:9';
       videos.push({ videoId: v.videoId, title: detail?.snippet?.title || v.videoId, thumbnail: thumb, category: v.cat, categoryLabel: v.label, tags: [v.cat], portrait, aspectRatio, featured: false, visible: true, order: start + i, duration: detail ? parseDuration(detail.contentDetails?.duration||'PT0S') : 0, addedAt: Date.now() });
     });
-    markDirty(); detectDuplicates(); renderAll();
-    setStatus(`Added ${newVideos.length} video${newVideos.length>1?'s':''}`);
+    detectDuplicates(); renderAll();
+    setStatus(`Added ${newVideos.length} video${newVideos.length>1?'s':''} — saving...`);
+    // Auto-save immediately so synced videos are in Firebase and won't re-appear as new on the next sync
+    videos.forEach((v, i) => v.order = i);
+    const obj = {};
+    videos.forEach(v => { obj[v.videoId] = v; });
+    await db.ref('videos').set(obj);
+    dirty = false;
+    document.getElementById('saveBar').classList.remove('visible');
+    setStatus(`Added ${newVideos.length} video${newVideos.length>1?'s':''} — saved`);
     btn.textContent = '↓ Sync YouTube'; btn.disabled = false;
     setTimeout(() => setStatus(''), 4000);
   } catch(e) { setStatus('Sync error: ' + e.message); btn.textContent = '↓ Sync YouTube'; btn.disabled = false; }
