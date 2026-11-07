@@ -241,6 +241,22 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
   .manual-thumb-drop:hover { border-color:#444; }
   .manual-thumb-drop img { width:100%; height:100%; object-fit:cover; display:none; }
 
+  /* SYNC PREVIEW MODAL */
+  .sync-preview-box { background: var(--surface); border: 1px solid var(--border); width: min(700px, 94vw); max-height: 88vh; display: flex; flex-direction: column; padding: 28px; position: relative; }
+  .sync-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; overflow-y: auto; flex: 1; padding: 2px 2px 4px; margin: 0 -2px; }
+  .sync-preview-card { position: relative; background: var(--surface2); border: 1px solid var(--border); cursor: pointer; transition: border-color 0.12s; user-select: none; }
+  .sync-preview-card.checked { border-color: var(--green); }
+  .sync-preview-card.unchecked { opacity: 0.35; }
+  .sync-preview-card .spc-thumb { width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; }
+  .sync-preview-card .spc-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .sync-preview-card .spc-info { padding: 6px 7px 7px; }
+  .sync-preview-card .spc-title { font-size: 10px; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .sync-preview-card .spc-cat { font-size: 9px; color: var(--muted); margin-top: 3px; letter-spacing: 0.03em; }
+  .sync-preview-card .spc-check { position: absolute; top: 5px; right: 5px; width: 16px; height: 16px; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 9px; color: #000; font-weight: 700; }
+  .sync-preview-card.unchecked .spc-check { background: #333; color: #555; }
+  .sync-preview-actions { display: flex; gap: 8px; margin-top: 20px; align-items: center; }
+  .sync-preview-sel-count { margin-left: auto; font-size: 11px; color: var(--muted); white-space: nowrap; }
+
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
@@ -510,6 +526,25 @@ src="https://www.facebook.com/tr?id=1275243804483057&ev=PageView&noscript=1"
       <div id="campaignsPanel" style="display:none">
         <iframe src="/ad-dashboard/" title="Ad Campaign Manager"></iframe>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- SYNC PREVIEW MODAL -->
+<div class="modal-backdrop" id="syncPreviewModal">
+  <div class="sync-preview-box">
+    <button class="modal-close-btn" onclick="closeSyncPreview()">✕</button>
+    <div class="modal-title">Sync Preview — <span id="syncPreviewCount">0</span> New Videos Found</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:16px;line-height:1.5">Uncheck any video to skip it forever — it won't appear in future syncs.</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+      <button class="btn btn-ghost" style="font-size:10px;padding:5px 10px" onclick="syncPreviewSelectAll(true)">Select All</button>
+      <button class="btn btn-ghost" style="font-size:10px;padding:5px 10px" onclick="syncPreviewSelectAll(false)">Deselect All</button>
+      <span class="sync-preview-sel-count"><span id="syncPreviewSelectedCount">0</span> selected</span>
+    </div>
+    <div class="sync-preview-grid" id="syncPreviewGrid"></div>
+    <div class="sync-preview-actions">
+      <button class="btn btn-primary" onclick="confirmSyncImport()" id="syncImportBtn">Import Selected</button>
+      <button class="btn btn-ghost" onclick="closeSyncPreview()">Cancel</button>
     </div>
   </div>
 </div>
@@ -865,9 +900,83 @@ async function syncFromYouTube() {
       const d = await r.json();
       (d.items||[]).forEach(v => detailMap[v.id] = v);
     }
+    setStatus('');
+    btn.textContent = '↓ Sync YouTube'; btn.disabled = false;
+    showSyncPreview(newVideos, detailMap);
+  } catch(e) { setStatus('Sync error: ' + e.message); btn.textContent = '↓ Sync YouTube'; btn.disabled = false; }
+}
+
+// ── SYNC PREVIEW ──
+let pendingSyncVideos = [];
+let pendingSyncDetailMap = {};
+let syncPreviewChecked = new Set();
+
+function showSyncPreview(newVideos, detailMap) {
+  pendingSyncVideos = newVideos;
+  pendingSyncDetailMap = detailMap;
+  syncPreviewChecked = new Set(newVideos.map(v => v.videoId));
+  document.getElementById('syncPreviewCount').textContent = newVideos.length;
+  renderSyncPreviewGrid();
+  document.getElementById('syncPreviewModal').classList.add('open');
+}
+
+function renderSyncPreviewGrid() {
+  const grid = document.getElementById('syncPreviewGrid');
+  grid.innerHTML = pendingSyncVideos.map(v => {
+    const detail = pendingSyncDetailMap[v.videoId];
+    const thumbs = detail?.snippet?.thumbnails;
+    const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`;
+    const title = detail?.snippet?.title || v.videoId;
+    const checked = syncPreviewChecked.has(v.videoId);
+    return `<div class="sync-preview-card ${checked ? 'checked' : 'unchecked'}" onclick="toggleSyncPreviewCard('${v.videoId}')" data-vid="${v.videoId}">
+      <div class="spc-thumb"><img src="${thumb}" loading="lazy" alt=""></div>
+      <div class="spc-check">${checked ? '✓' : '✕'}</div>
+      <div class="spc-info">
+        <div class="spc-title">${title.replace(/</g,'&lt;')}</div>
+        <div class="spc-cat">${v.label}</div>
+      </div>
+    </div>`;
+  }).join('');
+  updateSyncPreviewCount();
+}
+
+function toggleSyncPreviewCard(videoId) {
+  if (syncPreviewChecked.has(videoId)) syncPreviewChecked.delete(videoId);
+  else syncPreviewChecked.add(videoId);
+  const card = document.querySelector(`.sync-preview-card[data-vid="${videoId}"]`);
+  if (card) {
+    const checked = syncPreviewChecked.has(videoId);
+    card.classList.toggle('checked', checked);
+    card.classList.toggle('unchecked', !checked);
+    card.querySelector('.spc-check').textContent = checked ? '✓' : '✕';
+  }
+  updateSyncPreviewCount();
+}
+
+function syncPreviewSelectAll(val) {
+  pendingSyncVideos.forEach(v => { if (val) syncPreviewChecked.add(v.videoId); else syncPreviewChecked.delete(v.videoId); });
+  renderSyncPreviewGrid();
+}
+
+function updateSyncPreviewCount() {
+  document.getElementById('syncPreviewSelectedCount').textContent = syncPreviewChecked.size;
+}
+
+async function confirmSyncImport() {
+  const btn = document.getElementById('syncImportBtn');
+  btn.textContent = 'Importing...'; btn.disabled = true;
+  const toImport = pendingSyncVideos.filter(v => syncPreviewChecked.has(v.videoId));
+  const toBlock  = pendingSyncVideos.filter(v => !syncPreviewChecked.has(v.videoId));
+  // blocklist skipped videos
+  if (toBlock.length) {
+    const updates = {};
+    toBlock.forEach(v => { syncBlocklist.add(v.videoId); updates['syncBlocklist/' + v.videoId] = true; });
+    await db.ref().update(updates);
+  }
+  if (toImport.length) {
     const start = videos.length;
-    newVideos.forEach((v, i) => {
-      const detail = detailMap[v.videoId];
+    toImport.forEach((v, i) => {
+      const detail = pendingSyncDetailMap[v.videoId];
       const thumbs = detail?.snippet?.thumbnails;
       const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`;
       const portrait = detail ? isPortrait(detail) : false;
@@ -875,19 +984,30 @@ async function syncFromYouTube() {
       videos.push({ videoId: v.videoId, title: detail?.snippet?.title || v.videoId, thumbnail: thumb, category: v.cat, categoryLabel: v.label, tags: [v.cat], portrait, aspectRatio, featured: false, visible: true, order: start + i, duration: detail ? parseDuration(detail.contentDetails?.duration||'PT0S') : 0, addedAt: Date.now() });
     });
     detectDuplicates(); renderAll();
-    setStatus(`Added ${newVideos.length} video${newVideos.length>1?'s':''} — saving...`);
-    // Auto-save immediately so synced videos are in Firebase and won't re-appear as new on the next sync
+    // Auto-save so imported videos are in Firebase and won't re-appear next sync
     videos.forEach((v, i) => v.order = i);
     const obj = {};
     videos.forEach(v => { obj[v.videoId] = v; });
     await db.ref('videos').set(obj);
     dirty = false;
     document.getElementById('saveBar').classList.remove('visible');
-    setStatus(`Added ${newVideos.length} video${newVideos.length>1?'s':''} — saved`);
-    btn.textContent = '↓ Sync YouTube'; btn.disabled = false;
-    setTimeout(() => setStatus(''), 4000);
-  } catch(e) { setStatus('Sync error: ' + e.message); btn.textContent = '↓ Sync YouTube'; btn.disabled = false; }
+  }
+  closeSyncPreview();
+  const skipped = toBlock.length;
+  const imported = toImport.length;
+  const parts = [];
+  if (imported) parts.push(`${imported} imported`);
+  if (skipped) parts.push(`${skipped} skipped forever`);
+  setStatus(parts.join(' · '));
+  setTimeout(() => setStatus(''), 4000);
+  btn.textContent = 'Import Selected'; btn.disabled = false;
 }
+
+function closeSyncPreview() {
+  document.getElementById('syncPreviewModal').classList.remove('open');
+}
+
+document.getElementById('syncPreviewModal').addEventListener('click', e => { if (e.target === document.getElementById('syncPreviewModal')) closeSyncPreview(); });
 
 function parseDuration(iso) {
   const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
