@@ -84,6 +84,24 @@ Inter 600 · #000000 / #ffffff only · no `text-transform: uppercase` · no `bor
 
 ---
 
+### 2026-11-07 — Sync preview modal — select videos before importing (admin.html)
+
+**What changed:** YouTube sync no longer auto-imports every new video. After fetching from the playlists, it now opens a preview modal showing all new videos as thumbnail cards (all checked by default). You can uncheck any video before importing — unchecked videos are written to `syncBlocklist` in Firebase and will never appear in future syncs.
+
+**How it works:**
+- `syncFromYouTube()` now stops after fetching video details and calls `showSyncPreview(newVideos, detailMap)` instead of pushing directly into the videos array.
+- The modal (`#syncPreviewModal`) shows a thumbnail grid. Each card is toggled by clicking it — green border + checkmark = will import, dimmed + ✕ = will skip forever.
+- Select All / Deselect All buttons for bulk control.
+- "Import Selected" calls `confirmSyncImport()`: imports checked videos (with the same auto-save logic as before), writes unchecked videoIds to `db.ref('syncBlocklist')`, then closes the modal and shows a status line like "12 imported · 3 skipped forever".
+- Status bar after close shows how many were imported vs. skipped.
+
+**Watch out for:**
+- Skipped videos are permanently blocklisted — they won't come back on future syncs. If you want to re-import a skipped video, remove its ID from `syncBlocklist/` in the Firebase console.
+- The existing delete-to-blocklist behavior is unchanged — deleting an already-imported video still blocklists it.
+- Clicking outside the modal or pressing ✕ cancels with no changes (nothing imported, nothing blocklisted).
+
+---
+
 ### 2026-08-20 — Filter label in hero (index.html)
 
 **What changed:** When a portfolio category filter is selected (anything other than "All Work"), the category name appears right-aligned in the hero at the same font size, weight, and letter-spacing as "Stone Rock Studios" (`clamp(48px, 7vw, 88px)`, Inter 600, -0.04em). Clears when the filter resets to All Work. Hidden on mobile (`display: none !important` at ≤768px) since two full-size headings don't fit side by side.
