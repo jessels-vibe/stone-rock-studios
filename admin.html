@@ -965,42 +965,50 @@ function updateSyncPreviewCount() {
 async function confirmSyncImport() {
   const btn = document.getElementById('syncImportBtn');
   btn.textContent = 'Importing...'; btn.disabled = true;
-  const toImport = pendingSyncVideos.filter(v => syncPreviewChecked.has(v.videoId));
-  const toBlock  = pendingSyncVideos.filter(v => !syncPreviewChecked.has(v.videoId));
-  // blocklist skipped videos
-  if (toBlock.length) {
-    const updates = {};
-    toBlock.forEach(v => { syncBlocklist.add(v.videoId); updates['syncBlocklist/' + v.videoId] = true; });
-    await db.ref().update(updates);
+  try {
+    const toImport = pendingSyncVideos.filter(v => syncPreviewChecked.has(v.videoId));
+    const toBlock  = pendingSyncVideos.filter(v => !syncPreviewChecked.has(v.videoId));
+    // blocklist skipped videos
+    if (toBlock.length) {
+      const updates = {};
+      toBlock.forEach(v => { syncBlocklist.add(v.videoId); updates['syncBlocklist/' + v.videoId] = true; });
+      await db.ref().update(updates);
+    }
+    if (toImport.length) {
+      const start = videos.length;
+      toImport.forEach((v, i) => {
+        const detail = pendingSyncDetailMap[v.videoId];
+        const thumbs = detail?.snippet?.thumbnails;
+        const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`;
+        const portrait = detail ? isPortrait(detail) : false;
+        const aspectRatio = portrait ? '9:16' : '16:9';
+        videos.push({ videoId: v.videoId, title: detail?.snippet?.title || v.videoId, thumbnail: thumb, category: v.cat, categoryLabel: v.label, tags: [v.cat], portrait, aspectRatio, featured: false, visible: true, order: start + i, duration: detail ? parseDuration(detail.contentDetails?.duration||'PT0S') : 0, addedAt: Date.now() });
+      });
+      detectDuplicates(); renderAll();
+      videos.forEach((v, i) => v.order = i);
+      const obj = {};
+      videos.forEach(v => { obj[v.videoId] = v; });
+      // Close modal before the async Firebase write so the page isn't blocked
+      closeSyncPreview();
+      await db.ref('videos').set(obj);
+      dirty = false;
+      document.getElementById('saveBar').classList.remove('visible');
+    } else {
+      closeSyncPreview();
+    }
+    const skipped = toBlock.length;
+    const imported = toImport.length;
+    const parts = [];
+    if (imported) parts.push(`${imported} imported`);
+    if (skipped) parts.push(`${skipped} skipped forever`);
+    setStatus(parts.join(' · '));
+    setTimeout(() => setStatus(''), 4000);
+  } catch(e) {
+    closeSyncPreview();
+    setStatus('Import error: ' + e.message);
+  } finally {
+    btn.textContent = 'Import Selected'; btn.disabled = false;
   }
-  if (toImport.length) {
-    const start = videos.length;
-    toImport.forEach((v, i) => {
-      const detail = pendingSyncDetailMap[v.videoId];
-      const thumbs = detail?.snippet?.thumbnails;
-      const thumb = thumbs?.maxres?.url || thumbs?.standard?.url || thumbs?.high?.url || thumbs?.medium?.url || `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`;
-      const portrait = detail ? isPortrait(detail) : false;
-      const aspectRatio = portrait ? '9:16' : '16:9';
-      videos.push({ videoId: v.videoId, title: detail?.snippet?.title || v.videoId, thumbnail: thumb, category: v.cat, categoryLabel: v.label, tags: [v.cat], portrait, aspectRatio, featured: false, visible: true, order: start + i, duration: detail ? parseDuration(detail.contentDetails?.duration||'PT0S') : 0, addedAt: Date.now() });
-    });
-    detectDuplicates(); renderAll();
-    // Auto-save so imported videos are in Firebase and won't re-appear next sync
-    videos.forEach((v, i) => v.order = i);
-    const obj = {};
-    videos.forEach(v => { obj[v.videoId] = v; });
-    await db.ref('videos').set(obj);
-    dirty = false;
-    document.getElementById('saveBar').classList.remove('visible');
-  }
-  closeSyncPreview();
-  const skipped = toBlock.length;
-  const imported = toImport.length;
-  const parts = [];
-  if (imported) parts.push(`${imported} imported`);
-  if (skipped) parts.push(`${skipped} skipped forever`);
-  setStatus(parts.join(' · '));
-  setTimeout(() => setStatus(''), 4000);
-  btn.textContent = 'Import Selected'; btn.disabled = false;
 }
 
 function closeSyncPreview() {

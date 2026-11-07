@@ -84,6 +84,21 @@ Inter 600 · #000000 / #ffffff only · no `text-transform: uppercase` · no `bor
 
 ---
 
+### 2026-11-07 — Fix sync import freezing the page (admin.html)
+
+**What changed:** `confirmSyncImport()` now closes the modal before the async Firebase write, and wraps everything in try/catch/finally.
+
+**Why it was freezing:** The original code called `closeSyncPreview()` only after `await db.ref('videos').set(obj)`. That write can take several seconds, and the whole time the modal was still open with `pointer-events: all`, blocking all interaction with the page behind it. If the Firebase call threw (network error, etc.) there was no catch, so `closeSyncPreview()` was never reached and the modal stayed stuck open permanently.
+
+**Fix:**
+- Modal is now closed immediately after `detectDuplicates(); renderAll()` — before the Firebase write.
+- Entire function body is wrapped in try/catch/finally. `finally` always re-enables the Import button. `catch` closes the modal and shows the error in the status bar.
+- If there's nothing to import (only skips), `closeSyncPreview()` is called in the else branch.
+
+**Watch out for:** The Firebase write still happens after the modal closes — status bar shows the result once it's done. If the write fails, the videos are already in the local `videos` array and rendered; they'll re-sync on next page load from Firebase.
+
+---
+
 ### 2026-11-07 — Sync preview modal — select videos before importing (admin.html)
 
 **What changed:** YouTube sync no longer auto-imports every new video. After fetching from the playlists, it now opens a preview modal showing all new videos as thumbnail cards (all checked by default). You can uncheck any video before importing — unchecked videos are written to `syncBlocklist` in Firebase and will never appear in future syncs.
