@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "/Users/jesseschneider/stone-rock-studios/admin.html"
+        ],
+        "createdAt": "2026-11-07T22:57:17.959Z",
+        "reason": "runtime-populated placeholders: src set by JS (hover preview, YouTube preview card, manual thumb upload)"
+      }
+    ]
+  }
+}

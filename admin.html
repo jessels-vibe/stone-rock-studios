@@ -990,6 +990,7 @@ async function confirmSyncImport() {
       videos.forEach(v => { obj[v.videoId] = v; });
       // Close modal before the async Firebase write so the page isn't blocked
       closeSyncPreview();
+      setStatus(`Saving ${toImport.length} video${toImport.length !== 1 ? 's' : ''} to database…`);
       await db.ref('videos').set(obj);
       dirty = false;
       document.getElementById('saveBar').classList.remove('visible');
